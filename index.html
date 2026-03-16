@@ -200,6 +200,7 @@ textarea{resize:vertical;min-height:60px}
     <div class="login-tabs">
       <button class="ltab active" id="ltab-login" onclick="setLoginMode('login')">Se connecter</button>
       <button class="ltab" id="ltab-register" onclick="setLoginMode('register')">S'inscrire</button>
+      <button class="ltab" id="ltab-reset" onclick="setLoginMode('reset')">🔑 Oublié</button>
     </div>
     <div class="fi" style="margin-bottom:10px">
       <label>Votre prénom</label>
@@ -216,9 +217,24 @@ textarea{resize:vertical;min-height:60px}
         <option value="b19">🟣 Machine B19</option>
       </select>
     </div>
-    <div class="fi" style="margin-bottom:14px">
+    <div class="fi" style="margin-bottom:14px" id="pwdField">
       <label>Mot de passe</label>
       <input type="password" id="lPwd" placeholder="Votre mot de passe" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <!-- RESET FIELDS -->
+    <div id="resetFields" style="display:none">
+      <div class="fi" style="margin-bottom:10px">
+        <label>Nouveau mot de passe</label>
+        <input type="password" id="newPwd1" placeholder="Nouveau mot de passe">
+      </div>
+      <div class="fi" style="margin-bottom:10px">
+        <label>Confirmer le nouveau mot de passe</label>
+        <input type="password" id="newPwd2" placeholder="Répétez le nouveau mot de passe">
+      </div>
+      <div class="fi" style="margin-bottom:14px">
+        <label>Mot de passe ADMIN (responsable)</label>
+        <input type="password" id="adminPwd" placeholder="Mot de passe administrateur" onkeydown="if(event.key==='Enter')doReset()">
+      </div>
     </div>
     <div class="lerr" id="lErr"></div>
     <button class="sbtn" style="margin-top:0" onclick="doLogin()" id="lBtn">🔑 Se connecter</button>
@@ -452,12 +468,41 @@ window.setLoginMode=mode=>{
   loginMode=mode;
   document.getElementById("ltab-login").classList.toggle("active",mode==="login");
   document.getElementById("ltab-register").classList.toggle("active",mode==="register");
-  document.getElementById("lBtn").textContent=mode==="login"?"🔑 Se connecter":"✅ S'inscrire";
+  document.getElementById("ltab-reset").classList.toggle("active",mode==="reset");
   document.getElementById("machineField").style.display=mode==="register"?"block":"none";
+  document.getElementById("pwdField").style.display=mode==="reset"?"none":"block";
+  document.getElementById("resetFields").style.display=mode==="reset"?"block":"none";
   document.getElementById("lErr").style.display="none";
+  if(mode==="login") document.getElementById("lBtn").textContent="🔑 Se connecter";
+  else if(mode==="register") document.getElementById("lBtn").textContent="✅ S'inscrire";
+  else { document.getElementById("lBtn").textContent="🔄 Réinitialiser"; }
+};
+
+window.doReset=async()=>{
+  const name=document.getElementById("lName").value.trim();
+  const newP1=document.getElementById("newPwd1").value;
+  const newP2=document.getElementById("newPwd2").value;
+  const adminP=document.getElementById("adminPwd").value;
+  const err=document.getElementById("lErr");
+  err.style.display="none";
+  if(!name){err.textContent="Entrez votre prénom";err.style.display="block";return;}
+  if(!newP1||newP1.length<3){err.textContent="Nouveau mot de passe trop court";err.style.display="block";return;}
+  if(newP1!==newP2){err.textContent="Les mots de passe ne correspondent pas";err.style.display="block";return;}
+  if(adminP!==ADMIN_PW){err.textContent="❌ Mot de passe administrateur incorrect";err.style.display="block";return;}
+  const key=name.toLowerCase().replace(/[^a-z0-9]/g,"_");
+  const uRef=ref(db,"users/"+key);
+  try{
+    const snap=await get(uRef);
+    if(!snap.exists()){err.textContent="Employé non trouvé";err.style.display="block";return;}
+    await update(uRef,{pwd:btoa(newP1)});
+    err.style.cssText="display:block;color:var(--gr)";
+    err.textContent="✅ Mot de passe réinitialisé ! Connectez-vous.";
+    setTimeout(()=>setLoginMode("login"),2000);
+  }catch(e){err.textContent="Erreur: "+e.message;err.style.display="block";}
 };
 
 window.doLogin=async()=>{
+  if(loginMode==="reset"){doReset();return;}
   const name=document.getElementById("lName").value.trim();
   const pwd=document.getElementById("lPwd").value;
   const err=document.getElementById("lErr");
