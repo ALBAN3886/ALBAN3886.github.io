@@ -172,19 +172,6 @@ textarea{resize:vertical;min-height:60px}
 .csend:hover{background:#8b5cf6}
 .cempty{text-align:center;color:var(--mu);padding:24px;font-size:.8rem;opacity:.6}
 
-/* PERIOD FILTER BUTTONS */
-.pbtn{padding:7px 13px;border-radius:20px;border:1.5px solid var(--b);background:var(--s);color:var(--mu);font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
-.pbtn:hover{border-color:var(--ac);color:var(--ac)}
-.pbtn.active{background:var(--ac);border-color:var(--ac);color:#fff}
-
-/* RAPPORT TABLE */
-.rtable{width:100%;border-collapse:collapse;background:var(--s);border-radius:var(--r);overflow:hidden;border:1px solid var(--b)}
-.rtable th{background:var(--s2);padding:10px 12px;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);font-weight:700;white-space:nowrap}
-.rtable td{padding:10px 12px;border-top:1px solid var(--b);font-size:.82rem;vertical-align:middle}
-.rtable tr:hover td{background:rgba(255,255,255,.02)}
-.table-wrap{overflow-x:auto;border-radius:var(--r)}
-.period-info{font-size:.76rem;color:var(--mu);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-
 /* MY REPORTS */
 .mrc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 13px;margin-bottom:8px}
 .mrch{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap}
@@ -317,46 +304,14 @@ textarea{resize:vertical;min-height:60px}
 
   <div style="margin-top:20px">
     <div class="sh2">
-      <div class="st">📋 Mes rapports</div>
+      <div class="st">📋 Mes rapports récents</div>
       <div style="display:flex;gap:6px;align-items:center">
         <div class="badge" id="myBadge">0</div>
         <button class="ab" onclick="logoutUser()" style="border-color:var(--re);color:var(--re)">Déconnexion</button>
       </div>
     </div>
-    <!-- PERIOD FILTER FOR MY REPORTS -->
-    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
-      <button class="pbtn active" id="mpbtn-today" onclick="setMyPeriod('today')">📅 Aujourd'hui</button>
-      <button class="pbtn" id="mpbtn-week" onclick="setMyPeriod('week')">📆 Semaine</button>
-      <button class="pbtn" id="mpbtn-month" onclick="setMyPeriod('month')">🗓 Mois</button>
-      <button class="pbtn" id="mpbtn-all" onclick="setMyPeriod('all')">📋 Tout</button>
-    </div>
-    <div style="display:flex;gap:6px;margin-bottom:10px">
-      <input type="date" id="myFdate" style="flex:1;padding:8px 10px;font-size:.8rem;background:var(--s2);border:1.5px solid var(--b);border-radius:8px;color:var(--tx);outline:none" oninput="setMyPeriod('custom')">
-      <select id="myFmachine" style="flex:1;padding:8px 10px;font-size:.8rem;background:var(--s2);border:1.5px solid var(--b);border-radius:8px;color:var(--tx);outline:none" onchange="renderMyReps()">
-        <option value="">Toutes mes machines</option>
-        <option value="soufflage">🔵 Soufflage</option>
-        <option value="remplissage">🟢 Remplissage</option>
-        <option value="etiquetage">🟡 Étiquetage</option>
-        <option value="emballage">🟠 Emballage</option>
-        <option value="b19">🟣 B19</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table class="rtable" id="myRepTable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Tâche</th>
-            <th>Production</th>
-            <th>Consommable</th>
-            <th>Notes</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="myRepTbody"></tbody>
-      </table>
-    </div>
-    <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.78rem">Aucun rapport pour cette période</div></div>
+    <div id="myReps"></div>
+    <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.78rem">Aucun rapport pour l'instant</div></div>
   </div>
 </div>
 
@@ -384,15 +339,8 @@ textarea{resize:vertical;min-height:60px}
       <button class="ab d" onclick="clearAll()">🗑 Tout</button>
     </div>
   </div>
-  <!-- FILTER BUTTONS -->
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="periodBtns">
-    <button class="pbtn active" onclick="setPeriod('today')">📅 Aujourd'hui</button>
-    <button class="pbtn" onclick="setPeriod('week')">📆 Cette semaine</button>
-    <button class="pbtn" onclick="setPeriod('month')">🗓 Ce mois</button>
-    <button class="pbtn" onclick="setPeriod('all')">📋 Tout</button>
-  </div>
   <div class="fb">
-    <input type="text" id="srch" placeholder="🔍 Nom employé…" oninput="renderCards()">
+    <input type="text" id="srch" placeholder="🔍 Nom…" oninput="renderCards()">
     <select id="fmachine" onchange="renderCards()">
       <option value="">Toutes les machines</option>
       <option value="soufflage">🔵 Soufflage</option>
@@ -401,30 +349,11 @@ textarea{resize:vertical;min-height:60px}
       <option value="emballage">🟠 Emballage</option>
       <option value="b19">🟣 B19</option>
     </select>
-    <input type="date" id="fdate" oninput="setPeriod('custom')" placeholder="Date précise">
-    <button class="rb" onclick="resetFilters()">✕ Réinitialiser</button>
+    <input type="date" id="fdate" oninput="renderCards()">
+    <button class="rb" onclick="resetFilters()">✕</button>
   </div>
-  <div class="period-info" id="periodInfo"><span></span><span id="periodCount"></span></div>
-  <div class="table-wrap">
-    <table class="rtable" id="repTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Employé</th>
-          <th>Machine</th>
-          <th>Tâche</th>
-          <th>Production</th>
-          <th>Consommable</th>
-          <th>Qté</th>
-          <th>Notes</th>
-          <th>Envoyé</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="repTbody"></tbody>
-    </table>
-  </div>
-  <div class="emp" id="empState"><div class="ei">📋</div><div style="font-size:.8rem;font-weight:700">Aucun rapport pour cette période</div></div>
+  <div id="repCards"></div>
+  <div class="emp" id="empState"><div class="ei">📋</div><div style="font-size:.8rem;font-weight:700">Aucun rapport</div></div>
 </div>
 
 <!-- ═══ CHAT ═══ -->
@@ -511,22 +440,15 @@ onValue(rRef, snap=>{
 });
 
 onValue(chatRef, snap=>{
-  const prevLen=allMsgs.length;
   allMsgs=[];
   snap.forEach(c=>allMsgs.push({_key:c.key,...c.val()}));
-  // Sort by timestamp
-  allMsgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
   renderChatMsgs();
-  // Force scroll after render
-  setTimeout(scrollChat, 100);
-  // Badge for new messages
-  if(!chatOpen && allMsgs.length>prevLen){
-    const diff=allMsgs.length-prevLen;
+  if(!chatOpen && allMsgs.length>lastMsgCount){
+    const diff=allMsgs.length-lastMsgCount;
     const b=document.getElementById("cbadge");
     b.textContent=diff>9?"9+":diff;
     b.classList.add("on");
   }
-  lastMsgCount=allMsgs.length;
 });
 
 onValue(onlineRef, snap=>{
@@ -695,66 +617,26 @@ window.submitRep=async()=>{
 };
 
 // ── MY REPORTS ──
-let myPeriod = 'today';
-
-window.setMyPeriod = (period) => {
-  myPeriod = period;
-  ['today','week','month','all'].forEach(p=>{
-    const b=document.getElementById("mpbtn-"+p);
-    if(b) b.classList.toggle("active", p===period);
-  });
-  if(period!=='custom') {
-    const fd=document.getElementById("myFdate");
-    if(fd) fd.value="";
-  }
-  renderMyReps();
-};
-
-function filterMyPeriod(list){
-  const t=td();
-  const today=new Date(t);
-  const customDate=document.getElementById("myFdate")?document.getElementById("myFdate").value:"";
-  if(customDate) return list.filter(r=>r.date===customDate);
-  if(myPeriod==='today') return list.filter(r=>r.date===t);
-  if(myPeriod==='week'){
-    const weekAgo=new Date(today); weekAgo.setDate(today.getDate()-6);
-    return list.filter(r=>r.date&&new Date(r.date)>=weekAgo&&new Date(r.date)<=today);
-  }
-  if(myPeriod==='month'){
-    const [y,m]=t.split("-");
-    return list.filter(r=>r.date&&r.date.startsWith(y+"-"+m));
-  }
-  return list;
-}
-
 function renderMyReps(){
   if(!currentUser)return;
-  const tbody=document.getElementById("myRepTbody");
-  const emp=document.getElementById("myEmp");
-  if(!tbody)return;
-
-  // Filter by user + optional machine filter
-  const fm=document.getElementById("myFmachine")?document.getElementById("myFmachine").value:"";
-  let mine=allReports.filter(r=>r.employee===currentUser.name);
-  if(fm) mine=mine.filter(r=>r.machine===fm);
-  mine=filterMyPeriod(mine);
-
+  const cont=document.getElementById("myReps"),emp=document.getElementById("myEmp");
+  const mine=allReports.filter(r=>r.employee===currentUser.name&&r.machine===currentUser.machine).slice(0,8);
   document.getElementById("myBadge").textContent=mine.length;
   emp.style.display=mine.length?"none":"flex";
-  tbody.innerHTML="";
-
+  cont.innerHTML="";
   mine.forEach(r=>{
     const mc=MACHINES[r.machine]||{};
-    const pn=parseInt(r.production),pv=!isNaN(pn)?pn.toLocaleString("fr-FR"):(r.production||"—");
-    const tr=document.createElement("tr");
-    tr.innerHTML=
-      '<td style="font-weight:700;white-space:nowrap;color:var(--ac)">'+fmtD(r.date)+'</td>'+
-      '<td style="color:var(--mu);font-size:.78rem">'+esc(r.task||"—")+'</td>'+
-      '<td style="color:var(--gr);font-weight:700">'+pv+'</td>'+
-      '<td style="color:var(--bl);font-weight:700">'+(r.cons1&&r.cons1!=="—"?r.cons1:"—")+'</td>'+
-      '<td style="color:var(--yw);font-size:.75rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(r.notes?esc(r.notes):"—")+'</td>'+
-      '<td><button class="editb" onclick="openEdit(''+r._key+'')">✏️</button></td>';
-    tbody.appendChild(tr);
+    const d=document.createElement("div");d.className="mrc";
+    d.innerHTML=`<div class="mrch">
+      <div class="badge" style="background:${mc.color||"var(--ac)"}22;color:${mc.color||"var(--ac)"}">📅 ${fmtD(r.date)}</div>
+      <div style="font-size:.74rem;color:var(--mu);flex:1">${r.task&&r.task!=="—"?r.task:""}</div>
+      <button class="editb" onclick="openEdit('${r._key}')">✏️ Modifier</button>
+    </div>
+    <div class="mrcg">
+      <div class="mrcf"><div class="mrfl">${mc.units?mc.units[0]:"Production"}</div><div class="mrfv" style="color:var(--gr)">${fmtNum(r.production)}</div></div>
+      ${r.cons1&&r.cons1!=="—"?`<div class="mrcf"><div class="mrfl">${r.cons1Label||"Consommable"}</div><div class="mrfv" style="color:var(--bl)">${r.cons1}</div></div>`:""}
+    </div>`;
+    cont.appendChild(d);
   });
 }
 
@@ -831,92 +713,39 @@ function renderMachineStats(){
 window.renderCards=()=>{
   const search=(document.getElementById("srch").value||"").toLowerCase();
   const fm=document.getElementById("fmachine").value;
+  const fd=document.getElementById("fdate").value;
   let list=allReports.slice();
   if(search)list=list.filter(r=>(r.employee||"").toLowerCase().includes(search));
   if(fm)list=list.filter(r=>r.machine===fm);
-  list=filterByPeriod(list);
-
-  const tbody=document.getElementById("repTbody");
-  const emp=document.getElementById("empState");
-  const pInfo=document.getElementById("periodInfo");
-  const pCount=document.getElementById("periodCount");
-
-  if(!tbody){return;}
-  tbody.innerHTML="";
-  emp.style.display=list.length?"none":"flex";
-
-  // Period info
-  if(pInfo) pInfo.querySelector("span").textContent=getPeriodLabel();
-  if(pCount) pCount.textContent=list.length+" rapport"+(list.length>1?"s":"");
-
+  if(fd)list=list.filter(r=>r.date===fd);
+  const cont=document.getElementById("repCards"),emp=document.getElementById("empState");
+  cont.innerHTML="";emp.style.display=list.length?"none":"flex";
   list.forEach(r=>{
     const mc=MACHINES[r.machine]||{};
-    const pn=parseInt(r.production), pv=!isNaN(pn)?pn.toLocaleString("fr-FR"):(r.production||"—");
-    const tr=document.createElement("tr");
-    tr.innerHTML=
-      '<td style="font-weight:700;white-space:nowrap">'+fmtD(r.date)+'</td>'+
-      '<td><strong>'+esc(r.employee||"—")+'</strong></td>'+
-      '<td><span class="mbadge m-'+(r.machine||"")+'" style="font-size:.65rem">'+esc(mc.label||r.machine||"—")+'</span></td>'+
-      '<td style="color:var(--mu);font-size:.78rem;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.task||"—")+'</td>'+
-      '<td style="color:var(--gr);font-weight:700">'+pv+'</td>'+
-      '<td style="color:var(--mu);font-size:.75rem">'+esc(r.cons1Label||"—")+'</td>'+
-      '<td style="color:var(--bl);font-weight:700">'+(r.cons1&&r.cons1!=="—"?r.cons1:"—")+'</td>'+
-      '<td style="color:var(--yw);font-size:.75rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(r.notes?esc(r.notes):"—")+'</td>'+
-      '<td style="color:var(--mu);font-size:.68rem;white-space:nowrap">'+(r.submittedAt||"—")+'</td>'+
-      '<td><button class="ab d" style="padding:3px 7px;font-size:.65rem" onclick="delRep(''+r._key+'')">🗑</button></td>';
-    tbody.appendChild(tr);
+    const d=document.createElement("div");d.className="rc";
+    d.innerHTML=`<div class="rch">
+      <div class="rcn">👤 ${r.employee||"—"}</div>
+      <span class="mbadge m-${r.machine||""}">${mc.label||r.machine||"—"}</span>
+      <div class="rcd">${fmtD(r.date)}</div>
+      <button class="ab d" style="padding:3px 7px;font-size:.66rem;margin-left:auto" onclick="delRep('${r._key}')">🗑</button>
+    </div>
+    ${r.task&&r.task!=="—"?`<div style="font-size:.76rem;color:var(--mu);margin-bottom:6px">📋 ${r.task}${r.editedAt?' <span style="color:var(--pu);font-size:.65rem">(modifié)</span>':""}</div>`:""}
+    <div class="rcg">
+      <div class="rcf"><div class="rfl">${mc.units?mc.units[0]:"Production"}</div><div class="rfv" style="color:var(--gr)">${fmtNum(r.production)}</div></div>
+      ${r.cons1&&r.cons1!=="—"?`<div class="rcf"><div class="rfl">${r.cons1Label||mc.units?.[1]||"Consommable"}</div><div class="rfv" style="color:var(--bl)">${r.cons1}</div></div>`:""}
+    </div>
+    ${r.notes?`<div class="rno">💬 ${r.notes}</div>`:""}
+    <div class="rtm">${r.submittedAt||"—"}</div>`;
+    cont.appendChild(d);
   });
-};
-
-// ── PERIOD FILTER ──
-let currentPeriod = 'today';
-
-window.setPeriod = (period) => {
-  currentPeriod = period;
-  // Update button styles
-  document.querySelectorAll(".pbtn").forEach(b => b.classList.remove("active"));
-  const map = {today:0, week:1, month:2, all:3};
-  const btns = document.querySelectorAll(".pbtn");
-  if(period !== 'custom' && btns[map[period]]) btns[map[period]].classList.add("active");
-  if(period !== 'custom') document.getElementById("fdate").value = "";
-  renderCards();
 };
 
 window.resetFilters=()=>{
   document.getElementById("srch").value="";
   document.getElementById("fmachine").value="";
   document.getElementById("fdate").value="";
-  currentPeriod = 'all';
-  document.querySelectorAll(".pbtn").forEach(b=>b.classList.remove("active"));
-  document.querySelectorAll(".pbtn")[3].classList.add("active");
   renderCards();
 };
-
-function filterByPeriod(list) {
-  const t = td();
-  const today = new Date(t);
-  const customDate = document.getElementById("fdate").value;
-  if(customDate) return list.filter(r => r.date === customDate);
-  if(currentPeriod === 'today') return list.filter(r => r.date === t);
-  if(currentPeriod === 'week') {
-    const weekAgo = new Date(today); weekAgo.setDate(today.getDate()-6);
-    return list.filter(r => r.date && new Date(r.date) >= weekAgo && new Date(r.date) <= today);
-  }
-  if(currentPeriod === 'month') {
-    const [y,m] = t.split("-");
-    return list.filter(r => r.date && r.date.startsWith(y+"-"+m));
-  }
-  return list; // 'all'
-}
-
-function getPeriodLabel() {
-  const customDate = document.getElementById("fdate")?document.getElementById("fdate").value:"";
-  if(customDate) return "📅 " + customDate.split("-").reverse().join("/");
-  if(currentPeriod==='today') return "📅 Aujourd'hui";
-  if(currentPeriod==='week') return "📆 Cette semaine";
-  if(currentPeriod==='month') return "🗓 Ce mois";
-  return "📋 Tous les rapports";
-}
 
 window.delRep=async key=>{if(!confirm("Supprimer ?"))return;await remove(ref(db,"rapports_v2/"+key));};
 window.clearAll=async()=>{if(!confirm("Effacer TOUS les rapports ?"))return;await remove(rRef);};
