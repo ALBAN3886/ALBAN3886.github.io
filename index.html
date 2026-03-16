@@ -440,15 +440,22 @@ onValue(rRef, snap=>{
 });
 
 onValue(chatRef, snap=>{
+  const prevLen=allMsgs.length;
   allMsgs=[];
   snap.forEach(c=>allMsgs.push({_key:c.key,...c.val()}));
+  // Sort by timestamp
+  allMsgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
   renderChatMsgs();
-  if(!chatOpen && allMsgs.length>lastMsgCount){
-    const diff=allMsgs.length-lastMsgCount;
+  // Force scroll after render
+  setTimeout(scrollChat, 100);
+  // Badge for new messages
+  if(!chatOpen && allMsgs.length>prevLen){
+    const diff=allMsgs.length-prevLen;
     const b=document.getElementById("cbadge");
     b.textContent=diff>9?"9+":diff;
     b.classList.add("on");
   }
+  lastMsgCount=allMsgs.length;
 });
 
 onValue(onlineRef, snap=>{
