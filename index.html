@@ -629,6 +629,16 @@ async function doSubmit(){
   if(!currentUser)return;
   const date=(document.getElementById("repDate")||{}).value;
   if(!date){alert("Entrez la date");return;}
+  // Check: only 1 report per person per day
+  const alreadyToday=allReports.find(r=>
+    (r.employee||"").toLowerCase()===currentUser.name.toLowerCase() && r.date===date
+  );
+  if(alreadyToday){
+    if(!confirm("Vous avez déjà un rapport pour le "+fmtD(date)+".
+Voulez-vous en soumettre un deuxième quand même ?")){
+      return;
+    }
+  }
   const btn=document.getElementById("submitBtn");
   btn.disabled=true; btn.textContent="⏳…";
   const mc=MACHINES[currentUser.machine]||{};
@@ -685,12 +695,22 @@ function renderMyReps(){
       "<td style='color:var(--gr);font-weight:700'>"+pv+"</td>"+
       "<td style='color:var(--bl);font-weight:700'>"+(r.cons1&&r.cons1!=="—"?r.cons1:"—")+"</td>"+
       "<td style='color:var(--yw);font-size:.74rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+(r.notes?esc(r.notes):"—")+"</td>"+
-      "<td><button class='ab' style='padding:3px 7px;font-size:.68rem;color:var(--pu);border-color:var(--pu)' data-editkey='"+r._k+"'>✏️</button></td>";
+      "<td style='display:flex;gap:4px'>"+
+      "<button class='ab' style='padding:3px 7px;font-size:.68rem;color:var(--pu);border-color:var(--pu)' data-editkey='"+r._k+"'>✏️</button>"+
+      "<button class='ab d' style='padding:3px 7px;font-size:.68rem' data-mydelkey='"+r._k+"'>🗑</button>"+
+      "</td>";
     tbody.appendChild(tr);
   });
   // Bind edit buttons
   tbody.querySelectorAll("[data-editkey]").forEach(btn=>{
     btn.addEventListener("click",()=>openEdit(btn.getAttribute("data-editkey")));
+  });
+  // Bind delete buttons
+  tbody.querySelectorAll("[data-mydelkey]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      if(confirm("Supprimer ce rapport définitivement ?"))
+        remove(ref(db,"rapports_v2/"+btn.getAttribute("data-mydelkey")));
+    });
   });
 }
 
