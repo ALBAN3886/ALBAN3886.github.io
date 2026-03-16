@@ -391,7 +391,7 @@ textarea{resize:vertical;min-height:60px}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update, set, get, onDisconnect, serverTimestamp }
+import { getDatabase, ref, push, onValue, remove, update, set, get, onDisconnect }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FC = {
@@ -533,10 +533,14 @@ window.doLogin=async()=>{
 function startSession(){
   localStorage.setItem("aet_sess",JSON.stringify(currentUser));
   showApp();
-  // Set online presence
-  presenceRef=ref(db,"online/"+currentUser.key);
-  set(presenceRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()});
-  onDisconnect(presenceRef).remove();
+  // Set online presence with retry
+  try{
+    presenceRef=ref(db,"online/"+currentUser.key);
+    set(presenceRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()})
+      .catch(e=>console.warn("Presence set failed:",e));
+    onDisconnect(presenceRef).remove()
+      .catch(e=>console.warn("onDisconnect failed:",e));
+  }catch(e){console.warn("Presence error:",e);}
 }
 
 function showApp(){
@@ -758,26 +762,28 @@ window.expCSV=()=>{
 window.sendMsg=async()=>{
   if(!currentUser){alert("Vous devez être connecté");return;}
   const inp=document.getElementById("cinput");
-  const text=inp.value.trim();
+  const text=(inp.value||"").trim();
   if(!text)return;
   const btn=document.getElementById("csend");
   btn.disabled=true;
-  const mc=MACHINES[currentUser.machine];
+  btn.textContent="⏳";
+  const mc=MACHINES[currentUser.machine]||{};
+  const msg={
+    name:currentUser.name,
+    machine:currentUser.machine||"",
+    machineLabel:mc.label||"",
+    text:text,
+    ts:Date.now(),
+    time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})
+  };
   try{
-    await push(chatRef,{
-      name:currentUser.name,
-      machine:currentUser.machine,
-      machineLabel:mc?mc.label:"",
-      text,
-      ts:Date.now(),
-      time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})
-    });
-    inp.value=""; // clear ONLY after success
+    await push(chatRef, msg);
+    inp.value="";
   }catch(e){
-    alert("Erreur envoi message: "+e.message);
-    console.error(e);
+    alert("Erreur: "+e.message);
   }
   btn.disabled=false;
+  btn.textContent="➤";
   inp.focus();
 };
 
@@ -807,6 +813,14 @@ function renderChatMsgs(){
   if(wasAtBottom) scrollChat();
 }
 function scrollChat(){const c=document.getElementById("cmsgs");if(c)c.scrollTop=c.scrollHeight;}
+
+// Keep presence alive every 30 seconds
+setInterval(()=>{
+  if(currentUser&&presenceRef){
+    set(presenceRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()})
+      .catch(()=>{});
+  }
+},30000);
 
 // ── VIEW SWITCH ──
 window.sv=name=>{
