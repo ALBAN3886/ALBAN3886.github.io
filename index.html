@@ -265,10 +265,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
     <div class="pbtns">
-      <button class="pbtn active" id="mp-today">📅 Aujourd'hui</button>
+      <button class="pbtn" id="mp-today">📅 Aujourd'hui</button>
       <button class="pbtn" id="mp-week">📆 Semaine</button>
       <button class="pbtn" id="mp-month">🗓 Mois</button>
-      <button class="pbtn" id="mp-all">📋 Tout</button>
+      <button class="pbtn active" id="mp-all">📋 Tout</button>
     </div>
     <div class="fb">
       <input type="date" id="myFdate" placeholder="Date précise">
@@ -282,7 +282,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </select>
     </div>
     <div class="twrap">
-      <table><thead><tr><th>Date</th><th>Tâche</th><th>Production</th><th>Conso.</th><th>Notes</th><th></th></tr></thead>
+      <table><thead><tr><th>Date</th><th>Employé</th><th>Machine</th><th>Tâche</th><th>Production</th><th>Conso.</th><th>Notes</th><th></th></tr></thead>
       <tbody id="myTbody"></tbody></table>
     </div>
     <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.77rem">Aucun rapport</div></div>
@@ -309,10 +309,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
   <div class="pbtns">
-    <button class="pbtn active" id="dp-today">📅 Aujourd'hui</button>
+    <button class="pbtn" id="dp-today">📅 Aujourd'hui</button>
     <button class="pbtn" id="dp-week">📆 Semaine</button>
     <button class="pbtn" id="dp-month">🗓 Mois</button>
-    <button class="pbtn" id="dp-all">📋 Tout</button>
+    <button class="pbtn active" id="dp-all">📋 Tout</button>
   </div>
   <div class="fb">
     <input type="text" id="srch" placeholder="🔍 Nom employé…">
@@ -392,7 +392,7 @@ const onlRef = ref(db, "online");
 
 let allReports=[], allMsgs=[], allOnline={};
 let currentUser=null, editKey=null, presRef=null;
-let myPeriod="today", dPeriod="today", chatOpen=false, lastMsgLen=0;
+let myPeriod="all", dPeriod="all", chatOpen=false, lastMsgLen=0;
 
 // Listeners
 onValue(rRef, snap=>{
@@ -584,7 +584,8 @@ function renderMyReps(){
   if(!tbody)return;
   const fm=document.getElementById("myFmachine")?document.getElementById("myFmachine").value:"";
   const fd=document.getElementById("myFdate")?document.getElementById("myFdate").value:"";
-  let list=allReports.filter(r=>r.employee===currentUser.name);
+  // Show ALL reports - no employee name filter
+  let list=allReports.slice();
   if(fm) list=list.filter(r=>r.machine===fm);
   if(fd) list=list.filter(r=>r.date===fd);
   else list=filterPeriod(list,myPeriod);
@@ -593,13 +594,16 @@ function renderMyReps(){
   tbody.innerHTML="";
   list.forEach(r=>{
     const pn=parseInt(r.production),pv=isNaN(pn)?r.production||"—":pn.toLocaleString("fr-FR");
+    const mc2=MACHINES[r.machine]||{};
     const tr=document.createElement("tr");
     tr.innerHTML=
       "<td style='font-weight:700;color:var(--ac);white-space:nowrap'>"+fmtD(r.date)+"</td>"+
+      "<td style='font-weight:600'>"+esc(r.employee||"—")+"</td>"+
+      "<td><span class='mb m-"+(r.machine||"")+"' style='font-size:.6rem'>"+esc(mc2.label||r.machine||"—")+"</span></td>"+
       "<td style='color:var(--mu);font-size:.76rem'>"+esc(r.task||"—")+"</td>"+
       "<td style='color:var(--gr);font-weight:700'>"+pv+"</td>"+
       "<td style='color:var(--bl);font-weight:700'>"+(r.cons1&&r.cons1!=="—"?r.cons1:"—")+"</td>"+
-      "<td style='color:var(--yw);font-size:.74rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+(r.notes?esc(r.notes):"—")+"</td>"+
+      "<td style='color:var(--yw);font-size:.74rem;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+(r.notes?esc(r.notes):"—")+"</td>"+
       "<td><button class='ab' style='padding:3px 7px;font-size:.68rem;color:var(--pu);border-color:var(--pu)' data-editkey='"+r._k+"'>✏️</button></td>";
     tbody.appendChild(tr);
   });
