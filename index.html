@@ -382,8 +382,8 @@ textarea{resize:vertical;min-height:60px}
     <div class="cempty">💬 Aucun message pour l'instant…</div>
   </div>
   <div class="cinbar">
-    <input type="text" id="cinput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendMsg()">
-    <button class="csend" onclick="sendMsg()">➤</button>
+    <input type="text" id="cinput" placeholder="Écrivez un message…">
+    <button class="csend" id="csend">➤</button>
   </div>
 </div>
 
@@ -869,6 +869,38 @@ if(saved){
     startSession();
   }catch(e){localStorage.removeItem("aet_sess");}
 }
+
+// ── EVENT LISTENERS (more reliable than onclick) ──
+document.addEventListener("DOMContentLoaded",()=>{
+  const csend=document.getElementById("csend");
+  if(csend) csend.addEventListener("click",()=>window.sendMsg());
+  
+  const cinput=document.getElementById("cinput");
+  if(cinput) cinput.addEventListener("keydown",e=>{if(e.key==="Enter")window.sendMsg();});
+  
+  const lBtn=document.getElementById("lBtn");
+  if(lBtn) lBtn.addEventListener("click",()=>window.doLogin());
+  
+  const lName=document.getElementById("lName");
+  if(lName) lName.addEventListener("keydown",e=>{if(e.key==="Enter")window.doLogin();});
+  
+  const lPwd=document.getElementById("lPwd");
+  if(lPwd) lPwd.addEventListener("keydown",e=>{if(e.key==="Enter")window.doLogin();});
+});
+
+// Also bind immediately in case DOMContentLoaded already fired
+setTimeout(()=>{
+  const csend=document.getElementById("csend");
+  if(csend&&!csend._bound){
+    csend.addEventListener("click",()=>window.sendMsg());
+    csend._bound=true;
+  }
+  const cinput=document.getElementById("cinput");
+  if(cinput&&!cinput._bound){
+    cinput.addEventListener("keydown",e=>{if(e.key==="Enter")window.sendMsg();});
+    cinput._bound=true;
+  }
+},500);
 </script>
 </body>
 </html>
