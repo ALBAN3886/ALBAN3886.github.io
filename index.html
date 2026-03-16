@@ -271,9 +271,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="pbtn active" id="mp-all">📋 Tout</button>
     </div>
     <div class="fb">
+      <input type="text" id="myFname" placeholder="🔍 Nom employé…">
       <input type="date" id="myFdate" placeholder="Date précise">
       <select id="myFmachine">
-        <option value="">Toutes mes machines</option>
+        <option value="">Toutes les machines</option>
         <option value="soufflage">🔵 Soufflage</option>
         <option value="remplissage">🟢 Remplissage</option>
         <option value="etiquetage">🟡 Étiquetage</option>
@@ -506,6 +507,8 @@ function startSession(){
   setInterval(()=>{
     if(presRef) set(presRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()}).catch(()=>{});
   },30000);
+  // Force render after login
+  setTimeout(()=>{renderMyReps();},500);
 }
 
 function showApp(){
@@ -584,8 +587,10 @@ function renderMyReps(){
   if(!tbody)return;
   const fm=document.getElementById("myFmachine")?document.getElementById("myFmachine").value:"";
   const fd=document.getElementById("myFdate")?document.getElementById("myFdate").value:"";
-  // Show ALL reports - no employee name filter
+  const fn=(document.getElementById("myFname")||{}).value||"";
+  // Show ALL reports
   let list=allReports.slice();
+  if(fn) list=list.filter(r=>(r.employee||"").toLowerCase().includes(fn.toLowerCase()));
   if(fm) list=list.filter(r=>r.machine===fm);
   if(fd) list=list.filter(r=>r.date===fd);
   else list=filterPeriod(list,myPeriod);
@@ -906,6 +911,8 @@ document.addEventListener("DOMContentLoaded", function(){
   // My reports filters
   document.getElementById("myFdate").addEventListener("change",renderMyReps);
   document.getElementById("myFmachine").addEventListener("change",renderMyReps);
+  const myFname=document.getElementById("myFname");
+  if(myFname) myFname.addEventListener("input",renderMyReps);
 });
 
 // ── AUTO LOGIN ──
@@ -915,6 +922,11 @@ if(saved){
     currentUser=JSON.parse(saved);
     showApp();
     startSession();
+    // Re-render after data loads
+    setTimeout(()=>{
+      renderMyReps();
+      if(document.getElementById("view-dashboard").classList.contains("active")) renderDash();
+    },1000);
   }catch(e){localStorage.removeItem("aet_s");}
 }
 </script>
