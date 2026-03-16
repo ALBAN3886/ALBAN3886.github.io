@@ -756,60 +756,56 @@ window.expCSV=()=>{
 
 // ── CHAT ──
 window.sendMsg=async()=>{
-  if(!currentUser)return;
+  if(!currentUser){alert("Vous devez être connecté");return;}
   const inp=document.getElementById("cinput");
   const text=inp.value.trim();
   if(!text)return;
-  inp.value="";
+  const btn=document.getElementById("csend");
+  btn.disabled=true;
   const mc=MACHINES[currentUser.machine];
   try{
     await push(chatRef,{
       name:currentUser.name,
       machine:currentUser.machine,
       machineLabel:mc?mc.label:"",
-      text,ts:Date.now(),
+      text,
+      ts:Date.now(),
       time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})
     });
-  }catch(e){alert("Erreur: "+e.message);}
+    inp.value=""; // clear ONLY after success
+  }catch(e){
+    alert("Erreur envoi message: "+e.message);
+    console.error(e);
+  }
+  btn.disabled=false;
   inp.focus();
 };
 
 function renderChatMsgs(){
   const cont=document.getElementById("cmsgs");
   if(!cont)return;
-  if(!allMsgs.length){cont.innerHTML='<div class="cempty">💬 Aucun message pour l\'instant…</div>';return;}
-  const atBottom=cont.scrollHeight-cont.scrollTop-cont.clientHeight<80;
+  if(!allMsgs.length){
+    cont.innerHTML='<div class="cempty">💬 Aucun message pour l\'instant…</div>';
+    return;
+  }
+  const wasAtBottom=cont.scrollHeight-cont.scrollTop-cont.clientHeight<100;
   cont.innerHTML="";
   allMsgs.forEach(m=>{
-    const isSys=m.sys;
-    const isMe=!isSys&&currentUser&&m.name===currentUser.name;
+    const isSys=!!m.sys;
+    const isMe=!isSys&&!!currentUser&&m.name===currentUser.name;
     const mc=MACHINES[m.machine]||{};
     const div=document.createElement("div");
     div.className="cmsg "+(isSys?"sys":isMe?"me":"other");
     if(isSys){
-      div.innerHTML=`<div class="cmbub">${esc(m.text)}</div>`;
+      div.innerHTML='<div class="cmbub">'+esc(m.text)+'</div>';
     }else{
-      const senderInfo=!isMe?`<div class="cmsender">${esc(m.name)} <span style="color:${mc.color||"var(--mu)"};font-size:.58rem">${mc.label||""}</span></div>`:"";
-      div.innerHTML=senderInfo+
-        `<div class="cmbub">${esc(m.text)}</div>`+
-        `<div class="cmtime">${m.time||""}</div>`;
+      const sender=!isMe?('<div class="cmsender">'+esc(m.name)+(mc.label?' <span style="font-size:.58rem;opacity:.7">'+esc(mc.label)+'</span>':'')+'</div>'):"";
+      div.innerHTML=sender+'<div class="cmbub">'+esc(m.text)+'</div>'+'<div class="cmtime">'+(m.time||"")+'</div>';
     }
     cont.appendChild(div);
   });
-  if(atBottom)scrollChat();
+  if(wasAtBottom) scrollChat();
 }
-
-function renderOnlineUsers(){
-  const cont=document.getElementById("onlineUsers");
-  if(!cont)return;
-  const users=Object.values(allOnline);
-  if(!users.length){cont.innerHTML='<div class="ol-empty">Aucun utilisateur en ligne</div>';return;}
-  cont.innerHTML=users.map(u=>{
-    const mc=MACHINES[u.machine]||{};
-    return`<div class="ol-user"><div class="ol-dot"></div>${esc(u.name)} <span style="font-size:.65rem;color:var(--mu)">${mc.label||""}</span></div>`;
-  }).join("");
-}
-
 function scrollChat(){const c=document.getElementById("cmsgs");if(c)c.scrollTop=c.scrollHeight;}
 
 // ── VIEW SWITCH ──
