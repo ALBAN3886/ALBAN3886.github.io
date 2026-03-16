@@ -6,184 +6,234 @@
 <title>Alban Eloh Technology</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0a0a0f; --s:#12121a; --s2:#1a1a26; --b:#2a2a3d;
-  --ac:#f97316; --ac2:#fb923c; --gr:#22d47a; --bl:#60a5fa;
-  --re:#f87171; --yw:#fbbf24; --pu:#a78bfa;
-  --tx:#f0f0ff; --mu:#6b6b8a; --r:14px;
+:root{
+  --bg:#0d0d14;--s:#13131e;--s2:#1a1a28;--b:#2a2a40;
+  --ac:#f97316;--gr:#22d47a;--bl:#60a5fa;--re:#f87171;
+  --yw:#fbbf24;--pu:#a78bfa;--tx:#f0f0ff;--mu:#6b7280;--r:13px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
 
-nav{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:100}
-.logo{font-size:.82rem;font-weight:800;color:var(--ac)}
-.nr{display:flex;align-items:center;gap:7px}
-.ld{width:7px;height:7px;border-radius:50%;background:var(--mu)}
+/* ── NAV ── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4)}
+.logo{font-size:.8rem;font-weight:800;color:var(--ac);line-height:1.2}
+.nr{display:flex;align-items:center;gap:6px}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--mu);flex-shrink:0;transition:all .3s}
 .ld.on{background:var(--gr);box-shadow:0 0 6px var(--gr)}
-.ll{font-size:.68rem;color:var(--mu)}
-.tabs{display:flex;gap:4px}
-.tab{padding:7px 10px;border-radius:8px;border:none;background:transparent;color:var(--mu);font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;position:relative}
+.ll{font-size:.66rem;color:var(--mu)}
+.tabs{display:flex;gap:3px}
+.tab{padding:6px 9px;border-radius:7px;border:none;background:transparent;color:var(--mu);font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;position:relative;white-space:nowrap}
 .tab:hover{background:var(--s2);color:var(--tx)}
 .tab.active{background:var(--ac);color:#fff}
-.cbadge{position:absolute;top:-4px;right:-4px;background:var(--re);color:#fff;border-radius:50%;width:15px;height:15px;font-size:.58rem;display:none;align-items:center;justify-content:center;font-weight:800}
+.cbadge{position:absolute;top:-3px;right:-3px;background:var(--re);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:none;align-items:center;justify-content:center;font-weight:800}
 .cbadge.on{display:flex}
 
-.view{display:none;padding:18px 14px;max-width:680px;margin:0 auto}
+/* ── VIEWS ── */
+.view{display:none;padding:16px 14px;max-width:720px;margin:0 auto}
 .view.active{display:block;animation:fu .3s ease}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.ptitle{font-size:1.45rem;font-weight:800;margin-bottom:3px}
-.psub{color:var(--mu);font-size:.83rem;margin-bottom:18px}
+/* ── TYPOGRAPHY ── */
+.ptitle{font-size:1.4rem;font-weight:800;margin-bottom:3px}
+.psub{color:var(--mu);font-size:.82rem;margin-bottom:16px}
 
-.card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:18px}
-.sl{font-size:.66rem;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);font-weight:700;margin-bottom:11px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+/* ── CARDS ── */
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:16px}
+.sl{font-size:.63rem;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);font-weight:700;margin-bottom:10px}
+
+/* ── FORMS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .full{grid-column:1/-1}
-.fi{display:flex;flex-direction:column;gap:5px}
-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);font-weight:600}
-input,textarea{background:var(--s2);border:1.5px solid var(--b);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s}
-input:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(249,115,22,.12)}
-input[readonly]{opacity:.5;cursor:default}
-textarea{resize:vertical;min-height:64px}
-.hr{grid-column:1/-1;height:1px;background:var(--b);margin:2px 0}
-
-.sbtn{margin-top:16px;width:100%;padding:12px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
-.sbtn:hover{background:var(--ac2);transform:translateY(-1px)}
+.fi{display:flex;flex-direction:column;gap:4px}
+label{font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);font-weight:600}
+input,textarea,select{background:var(--s2);border:1.5px solid var(--b);border-radius:8px;padding:10px 12px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+input[readonly]{opacity:.45;cursor:default}
+select option{background:var(--s2)}
+textarea{resize:vertical;min-height:60px}
+.hr{grid-column:1/-1;height:1px;background:var(--b);margin:3px 0}
+.sbtn{margin-top:14px;width:100%;padding:12px;background:var(--ac);border:none;border-radius:9px;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+.sbtn:hover{background:#fb923c;transform:translateY(-1px)}
 .sbtn:disabled{opacity:.5;transform:none;cursor:wait}
-.ok{display:none;margin-top:11px;padding:11px;background:rgba(34,212,122,.1);border:1px solid rgba(34,212,122,.3);border-radius:9px;color:var(--gr);font-weight:600;text-align:center;font-size:.85rem}
+.ok{display:none;margin-top:10px;padding:10px;background:rgba(34,212,122,.1);border:1px solid rgba(34,212,122,.3);border-radius:8px;color:var(--gr);font-weight:600;text-align:center;font-size:.83rem}
 .ok.on{display:block;animation:fu .3s ease}
 @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .sh{animation:sh .3s ease;border-color:var(--re)!important}
 
-.s3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
-.sc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:13px 14px}
-.sl2{font-size:.63rem;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);font-weight:700;margin-bottom:6px}
-.sv{font-size:1.55rem;font-weight:900}
-.ov{color:var(--ac)}.gv{color:var(--gr)}.bv{color:var(--bl)}
+/* ── LOGIN SCREEN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:28px;width:100%;max-width:380px}
+.login-logo{font-size:1.3rem;font-weight:900;color:var(--ac);text-align:center;margin-bottom:4px}
+.login-sub{text-align:center;color:var(--mu);font-size:.82rem;margin-bottom:22px}
+.login-tabs{display:flex;background:var(--s2);border-radius:9px;padding:4px;gap:4px;margin-bottom:18px}
+.ltab{flex:1;padding:8px;border:none;border-radius:7px;background:transparent;color:var(--mu);font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.ltab.active{background:var(--ac);color:#fff}
+.lerr{color:var(--re);font-size:.76rem;margin-top:6px;display:none;text-align:center}
 
-.mw{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
-.mc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 13px;flex:1;min-width:125px}
-.mt{font-size:.8rem;font-weight:800;color:var(--ac);margin-bottom:8px}
-.mr{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 0;border-bottom:1px solid var(--b)}
-.mr:last-child{border:none}
+/* ── MACHINE BADGE ── */
+.mbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+.m-soufflage{background:rgba(96,165,250,.15);color:var(--bl);border:1px solid rgba(96,165,250,.3)}
+.m-remplissage{background:rgba(34,212,122,.15);color:var(--gr);border:1px solid rgba(34,212,122,.3)}
+.m-etiquetage{background:rgba(251,191,36,.15);color:var(--yw);border:1px solid rgba(251,191,36,.3)}
+.m-emballage{background:rgba(249,115,22,.15);color:var(--ac);border:1px solid rgba(249,115,22,.3)}
+.m-b19{background:rgba(167,139,250,.15);color:var(--pu);border:1px solid rgba(167,139,250,.3)}
 
-.rc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;margin-bottom:9px}
-.rch{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.rcn{font-size:.9rem;font-weight:800;flex:1}
-.rcd{font-size:.7rem;color:var(--mu)}
-.rct{font-size:.78rem;color:var(--mu);margin-bottom:9px}
-.rcg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
-.rcf{background:var(--s2);border-radius:7px;padding:8px 10px}
-.rfl{font-size:.61rem;text-transform:uppercase;color:var(--mu);margin-bottom:2px}
-.rfv{font-size:.95rem;font-weight:800}
-.rfv.g{color:var(--gr)}.rfv.b{color:var(--bl)}
-.rno{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:6px 9px;font-size:.76rem;color:var(--yw);margin-bottom:6px}
-.rtm{font-size:.68rem;color:var(--mu);text-align:right}
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}
+.sc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 13px}
+.sl2{font-size:.6rem;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);font-weight:700;margin-bottom:5px}
+.sv{font-size:1.45rem;font-weight:900}
 
-.fb{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap}
-.fb input{flex:1;min-width:120px;padding:8px 11px;font-size:.8rem}
-.rb{padding:8px 11px;background:var(--s2);border:1px solid var(--b);border-radius:9px;color:var(--mu);font-size:.78rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600}
+/* ── MACHINE STATS ── */
+.mstats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:16px}
+.msc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 13px}
+.msc-title{font-size:.78rem;font-weight:800;margin-bottom:8px}
+.msc-row{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 0;border-bottom:1px solid var(--b)}
+.msc-row:last-child{border:none}
+.msc-row strong{color:var(--tx)}
 
-.sh2{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;flex-wrap:wrap;gap:6px}
-.st{font-size:.9rem;font-weight:800}
-.sa{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.ab{padding:6px 11px;border-radius:7px;border:1px solid var(--b);background:var(--s);color:var(--tx);font-size:.73rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+/* ── REPORT CARDS ── */
+.rc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;margin-bottom:8px}
+.rch{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap}
+.rcn{font-size:.88rem;font-weight:800;flex:1}
+.rcd{font-size:.68rem;color:var(--mu)}
+.rcg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.rcf{background:var(--s2);border-radius:7px;padding:7px 9px}
+.rfl{font-size:.58rem;text-transform:uppercase;color:var(--mu);margin-bottom:2px}
+.rfv{font-size:.9rem;font-weight:800}
+.rno{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:6px 8px;font-size:.74rem;color:var(--yw);margin-top:7px}
+.rtm{font-size:.66rem;color:var(--mu);text-align:right;margin-top:5px}
+
+/* ── FILTER ── */
+.fb{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.fb input,.fb select{flex:1;min-width:110px;padding:8px 10px;font-size:.78rem}
+.rb{padding:8px 10px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--mu);font-size:.76rem;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;white-space:nowrap}
+
+.sh2{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.st{font-size:.88rem;font-weight:800}
+.sa{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.ab{padding:5px 10px;border-radius:7px;border:1px solid var(--b);background:var(--s);color:var(--tx);font-size:.71rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
 .ab:hover{border-color:var(--ac);color:var(--ac)}
 .ab.d:hover{border-color:var(--re);color:var(--re)}
-.badge{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:2px 8px;font-size:.7rem;color:var(--mu);font-weight:600}
-.emp{padding:36px;text-align:center;color:var(--mu);display:none;flex-direction:column;align-items:center;gap:7px}
-.ei{font-size:2rem;opacity:.3}
+.badge{background:var(--s2);border:1px solid var(--b);border-radius:20px;padding:2px 8px;font-size:.68rem;color:var(--mu);font-weight:600}
+.emp{padding:32px;text-align:center;color:var(--mu);display:none;flex-direction:column;align-items:center;gap:6px}
+.ei{font-size:1.8rem;opacity:.3}
 
+/* ── MODAL ── */
 .ov2{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center}
 .ov2.on{display:flex;animation:fu .25s ease}
-.mo{background:var(--s);border:1px solid var(--b);border-radius:18px;padding:28px;width:290px;text-align:center}
-.mo h3{font-size:1.15rem;font-weight:800;margin-bottom:7px}
-.mo p{color:var(--mu);font-size:.82rem;margin-bottom:16px}
-.mo input{width:100%;margin-bottom:11px;text-align:center;font-size:1rem;letter-spacing:4px}
-.mbtn{width:100%;padding:11px;background:var(--ac);border:none;border-radius:9px;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;cursor:pointer;font-weight:700}
-.merr{color:var(--re);font-size:.76rem;margin-top:7px;display:none}
-.mcan{margin-top:8px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:.78rem;font-family:'Outfit',sans-serif}
+.mo{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:26px;width:290px;text-align:center}
+.mo h3{font-size:1.1rem;font-weight:800;margin-bottom:6px}
+.mo p{color:var(--mu);font-size:.8rem;margin-bottom:14px}
+.mo input{margin-bottom:10px;text-align:center;font-size:1rem;letter-spacing:4px}
+.mbtn{width:100%;padding:10px;background:var(--ac);border:none;border-radius:8px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;cursor:pointer;font-weight:700}
+.merr{color:var(--re);font-size:.74rem;margin-top:6px;display:none}
+.mcan{margin-top:7px;background:none;border:none;color:var(--mu);cursor:pointer;font-size:.76rem;font-family:'Outfit',sans-serif}
 
-.ib{display:none;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:12px;padding:13px 15px;margin-bottom:16px;text-align:center}
-.ib strong{color:var(--yw);display:block;margin-bottom:4px;font-size:.88rem}
-.ib p{color:var(--mu);font-size:.78rem;margin-bottom:9px}
-.ibtn2{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:.85rem;font-family:'Outfit',sans-serif}
-.ibtn2:disabled{opacity:.5;cursor:wait}
-.ipg{margin-top:7px;font-size:.73rem;color:var(--yw)}
-
-/* MES RAPPORTS */
-.mrc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px}
-.mrch{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.mrcd{font-size:.78rem;font-weight:700;color:var(--ac);flex:1}
-.mrcg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.mrcf{background:var(--s2);border-radius:7px;padding:7px 9px}
-.mrfl{font-size:.6rem;text-transform:uppercase;color:var(--mu);margin-bottom:2px}
-.mrfv{font-size:.9rem;font-weight:700}
-.editb{padding:5px 11px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:7px;color:var(--pu);font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
-
-/* EDIT SHEET */
+/* ── EDIT SHEET ── */
 .eov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:300;align-items:flex-end;justify-content:center}
 .eov.on{display:flex}
-.esh{background:var(--s);border:1px solid var(--b);border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-width:680px;max-height:88vh;overflow-y:auto;animation:su .3s ease}
+.esh{background:var(--s);border:1px solid var(--b);border-radius:18px 18px 0 0;padding:18px 14px;width:100%;max-width:720px;max-height:88vh;overflow-y:auto;animation:su .3s ease}
 @keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.etitle{font-size:1rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.xcl{background:var(--s2);border:none;color:var(--mu);border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.etitle{font-size:.95rem;font-weight:800;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between}
+.xcl{background:var(--s2);border:none;color:var(--mu);border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
 
-/* ════════════ CHAT ════════════ */
-/* AUTH SCREEN */
-.cauth{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:22px;max-width:380px;margin:0 auto}
-.catitle{font-size:1.05rem;font-weight:800;margin-bottom:14px;text-align:center}
-.cafield{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
-.caerr{color:var(--re);font-size:.76rem;margin-bottom:8px;display:none}
-.catoggle{text-align:center;margin-top:11px;font-size:.79rem;color:var(--mu)}
-.catoggle button{background:none;border:none;color:var(--pu);cursor:pointer;font-weight:700;font-family:'Outfit',sans-serif;font-size:.79rem}
+/* ── CHAT ── */
+.chead{display:flex;align-items:center;justify-content:space-between;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:10px 13px;margin-bottom:10px}
+.cava{width:30px;height:30px;border-radius:50%;background:var(--pu);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+.cname{font-weight:700;font-size:.85rem}
+.cstatus{font-size:.65rem;color:var(--gr)}
+.clout{padding:5px 10px;background:var(--s2);border:1px solid var(--b);border-radius:7px;color:var(--mu);font-size:.7rem;cursor:pointer;font-family:'Outfit',sans-serif}
 
-/* CHAT BOX */
-.cbox{}
-.chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:11px 14px}
-.cava{width:32px;height:32px;border-radius:50%;background:var(--pu);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.88rem;flex-shrink:0}
-.cname{font-weight:700;font-size:.88rem}
-.cstatus{font-size:.68rem;color:var(--gr)}
-.clout{padding:6px 12px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--mu);font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif}
+/* ONLINE LIST */
+.online-list{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:10px 13px;margin-bottom:10px}
+.ol-title{font-size:.7rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.ol-users{display:flex;flex-wrap:wrap;gap:6px}
+.ol-user{display:flex;align-items:center;gap:5px;background:var(--s2);border-radius:20px;padding:4px 10px;font-size:.76rem;font-weight:600}
+.ol-dot{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 5px var(--gr);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.ol-empty{color:var(--mu);font-size:.78rem}
 
-.cmsgs{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:14px;height:380px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;margin-bottom:11px}
+.cmsgs{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:13px;height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
 .cmsg{display:flex;flex-direction:column;max-width:78%}
 .cmsg.me{align-self:flex-end;align-items:flex-end}
 .cmsg.other{align-self:flex-start;align-items:flex-start}
 .cmsg.sys{align-self:center;align-items:center;max-width:90%}
-.cmsender{font-size:.65rem;color:var(--mu);margin-bottom:2px;font-weight:600}
-.cmbub{padding:9px 13px;border-radius:13px;font-size:.86rem;line-height:1.5;word-break:break-word}
-.cmsg.me .cmbub{background:var(--pu);color:#fff;border-radius:13px 13px 3px 13px}
-.cmsg.other .cmbub{background:var(--s2);border:1px solid var(--b);border-radius:13px 13px 13px 3px}
-.cmsg.sys .cmbub{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--pu);font-size:.76rem;border-radius:10px;text-align:center}
-.cmtime{font-size:.6rem;color:var(--mu);margin-top:2px}
+.cmsender{font-size:.62rem;color:var(--mu);margin-bottom:2px;font-weight:600}
+.cmbub{padding:8px 12px;border-radius:12px;font-size:.84rem;line-height:1.5;word-break:break-word}
+.cmsg.me .cmbub{background:var(--pu);color:#fff;border-radius:12px 12px 3px 12px}
+.cmsg.other .cmbub{background:var(--s2);border:1px solid var(--b);border-radius:12px 12px 12px 3px}
+.cmsg.sys .cmbub{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--pu);font-size:.73rem;border-radius:9px;text-align:center}
+.cmtime{font-size:.59rem;color:var(--mu);margin-top:2px}
+.cinbar{display:flex;gap:7px}
+.cinbar input{flex:1;background:var(--s);border:1.5px solid var(--b);border-radius:11px;padding:10px 13px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.86rem;outline:none}
+.cinbar input:focus{border-color:var(--pu);box-shadow:0 0 0 3px rgba(167,139,250,.1)}
+.csend{padding:10px 15px;background:var(--pu);border:none;border-radius:11px;color:#fff;font-size:.95rem;cursor:pointer;transition:all .2s}
+.csend:hover{background:#8b5cf6}
+.cempty{text-align:center;color:var(--mu);padding:24px;font-size:.8rem;opacity:.6}
 
-.cinbar{display:flex;gap:8px}
-.cinbar input{flex:1;background:var(--s);border:1.5px solid var(--b);border-radius:12px;padding:11px 14px;color:var(--tx);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none}
-.cinbar input:focus{border-color:var(--pu);box-shadow:0 0 0 3px rgba(167,139,250,.12)}
-.csend{padding:11px 16px;background:var(--pu);border:none;border-radius:12px;color:#fff;font-size:1rem;cursor:pointer;transition:all .2s}
-.csend:hover{background:#8b5cf6;transform:scale(1.05)}
-
-.cempty{text-align:center;color:var(--mu);padding:28px;font-size:.82rem;opacity:.6}
+/* MY REPORTS */
+.mrc{background:var(--s);border:1px solid var(--b);border-radius:var(--r);padding:12px 13px;margin-bottom:8px}
+.mrch{display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap}
+.mrcg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.mrcf{background:var(--s2);border-radius:6px;padding:7px 9px}
+.mrfl{font-size:.58rem;text-transform:uppercase;color:var(--mu);margin-bottom:1px}
+.mrfv{font-size:.88rem;font-weight:700}
+.editb{padding:4px 10px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);border-radius:6px;color:var(--pu);font-size:.7rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
 
 @media(max-width:600px){
-  .s3{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .mstats{grid-template-columns:1fr}
   .g2{grid-template-columns:1fr}
   .full{grid-column:1}
-  .logo{font-size:.74rem}
-  .tab{padding:6px 8px;font-size:.7rem}
-  .cmsgs{height:300px}
+  .tab{padding:5px 7px;font-size:.68rem}
 }
 </style>
 </head>
 <body>
 
-<!-- PASSWORD MODAL -->
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏭 ALBAN ELOH TECHNOLOGY</div>
+    <div class="login-sub">Système de gestion de production</div>
+    <div class="login-tabs">
+      <button class="ltab active" id="ltab-login" onclick="setLoginMode('login')">Se connecter</button>
+      <button class="ltab" id="ltab-register" onclick="setLoginMode('register')">S'inscrire</button>
+    </div>
+    <div class="fi" style="margin-bottom:10px">
+      <label>Votre prénom</label>
+      <input type="text" id="lName" placeholder="ex : Alban, Prosper…" maxlength="25" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="fi" id="machineField" style="margin-bottom:10px;display:none">
+      <label>Votre machine</label>
+      <select id="lMachine">
+        <option value="">-- Choisissez votre machine --</option>
+        <option value="soufflage">🔵 Machine de Soufflage</option>
+        <option value="remplissage">🟢 Machine de Remplissage</option>
+        <option value="etiquetage">🟡 Machine d'Étiquetage</option>
+        <option value="emballage">🟠 Machine d'Emballage</option>
+        <option value="b19">🟣 Machine B19</option>
+      </select>
+    </div>
+    <div class="fi" style="margin-bottom:14px">
+      <label>Mot de passe</label>
+      <input type="password" id="lPwd" placeholder="Votre mot de passe" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="lerr" id="lErr"></div>
+    <button class="sbtn" style="margin-top:0" onclick="doLogin()" id="lBtn">🔑 Se connecter</button>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div id="mainApp" style="display:none">
+
+<!-- PASSWORD MODAL (manager) -->
 <div class="ov2" id="pwModal">
   <div class="mo">
-    <div style="font-size:1.6rem;margin-bottom:9px">🔐</div>
+    <div style="font-size:1.5rem;margin-bottom:8px">🔐</div>
     <h3>Accès Responsable</h3>
-    <p>Mot de passe tableau de bord</p>
+    <p>Mot de passe administrateur</p>
     <input type="password" id="pwInput" placeholder="••••••" onkeydown="if(event.key==='Enter')checkPw()">
     <button class="mbtn" onclick="checkPw()">Accéder</button>
     <div class="merr" id="pwErr">❌ Incorrect</div>
@@ -197,81 +247,74 @@ textarea{resize:vertical;min-height:64px}
     <div class="etitle">✏️ Modifier le rapport <button class="xcl" onclick="closeEdit()">✕</button></div>
     <div class="g2">
       <div class="fi"><label>Date</label><input type="date" id="ed"></div>
-      <div class="fi full"><label>Tâche</label><input type="text" id="et"></div>
-      <div class="fi"><label>Production</label><input type="text" id="ep"></div>
-      <div class="fi"><label>Nb Bouchons</label><input type="text" id="enb" oninput="calcEd()"></div>
-      <div class="fi"><label>Utilisés</label><input type="text" id="eu" oninput="calcEd()"></div>
-      <div class="fi"><label>Restants</label><input type="text" id="er"></div>
+      <div class="fi full"><label>Tâche / Observation</label><input type="text" id="et"></div>
+      <div class="fi" id="editProdField"><label>Production (unités)</label><input type="text" id="ep"></div>
+      <div class="fi" id="editCons1Field"><label id="editCons1Label">Consommable 1</label><input type="text" id="ec1"></div>
+      <div class="fi" id="editCons2Field" style="display:none"><label id="editCons2Label">Consommable 2</label><input type="text" id="ec2"></div>
       <div class="fi full"><label>Remarques</label><textarea id="en"></textarea></div>
     </div>
-    <button class="sbtn" style="margin-top:14px" onclick="saveEdit()">💾 Enregistrer</button>
-    <div class="ok" id="editOk">✅ Modifié !</div>
+    <button class="sbtn" style="margin-top:12px" onclick="saveEdit()">💾 Enregistrer</button>
+    <div class="ok" id="editOk">✅ Modifié avec succès !</div>
   </div>
 </div>
 
 <!-- NAV -->
 <nav>
-  <div class="logo">🏭 ALBAN ELOH TECHNOLOGY</div>
+  <div class="logo">🏭 ALBAN ELOH<br>TECHNOLOGY</div>
   <div class="nr">
     <div class="ld" id="ld"></div>
     <span class="ll" id="ll">…</span>
     <div class="tabs">
-      <button class="tab active" id="tab-employee" onclick="sv('employee')">📝 Rapport</button>
-      <button class="tab" id="tab-manager" onclick="tryMgr()">📊 Bord</button>
+      <button class="tab active" id="tab-rapport" onclick="sv('rapport')">📝 Rapport</button>
+      <button class="tab" id="tab-dashboard" onclick="sv('dashboard')">📊 Bord</button>
       <button class="tab" id="tab-chat" onclick="sv('chat')">💬 Chat<span class="cbadge" id="cbadge">0</span></button>
     </div>
   </div>
 </nav>
 
 <!-- ═══ RAPPORT ═══ -->
-<div class="view active" id="view-employee">
-  <div class="ptitle">Rapport de Production</div>
-  <div class="psub">Remplissez et envoyez votre rapport journalier</div>
-  <div class="card">
-    <div class="sl">Informations</div>
-    <div class="g2">
-      <div class="fi"><label>Votre nom *</label><input type="text" id="empName" placeholder="Votre nom complet"></div>
-      <div class="fi"><label>Date *</label><input type="date" id="repDate"></div>
-      <div class="fi full"><label>Tâche</label><input type="text" id="taskTitle" placeholder="ex : Production bouteilles…"></div>
-      <div class="hr"></div>
-      <div class="fi full"><div class="sl" style="margin-bottom:0">Production</div></div>
-      <div class="fi"><label>Unités produites</label><input type="number" id="production" placeholder="ex : 36 243" min="0"></div>
-      <div class="fi"><label>Nb bouchons</label><input type="number" id="nbBouchon" placeholder="ex : 12" min="0" oninput="calcR()"></div>
-      <div class="fi"><label>Bouchons utilisés</label><input type="number" id="utilise" placeholder="ex : 8" min="0" oninput="calcR()"></div>
-      <div class="fi"><label>Restants (auto)</label><input type="number" id="restant" placeholder="Auto" readonly></div>
-      <div class="fi full"><label>Remarques</label><textarea id="notes" placeholder="Incidents, observations…"></textarea></div>
+<div class="view active" id="view-rapport">
+  <div class="ptitle">📋 Rapport de Production</div>
+  <div class="psub" id="userWelcome">Bonjour !</div>
+
+  <div class="card" id="reportForm">
+    <div class="sl" id="machineLabel">Machine</div>
+    <div class="g2" id="formFields">
+      <!-- Fields injected by JS based on machine -->
     </div>
     <button class="sbtn" id="submitBtn" onclick="submitRep()">✅ Soumettre le Rapport</button>
-    <div class="ok" id="okMsg">🎉 Rapport envoyé !</div>
+    <div class="ok" id="okMsg">🎉 Rapport envoyé avec succès !</div>
   </div>
 
-  <div style="margin-top:22px">
+  <div style="margin-top:20px">
     <div class="sh2">
       <div class="st">📋 Mes rapports récents</div>
-      <div class="badge" id="myBadge">0</div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div class="badge" id="myBadge">0</div>
+        <button class="ab" onclick="logoutUser()" style="border-color:var(--re);color:var(--re)">Déconnexion</button>
+      </div>
     </div>
     <div id="myReps"></div>
-    <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.8rem">Entrez votre nom pour voir vos rapports</div></div>
+    <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.78rem">Aucun rapport pour l'instant</div></div>
   </div>
 </div>
 
-<!-- ═══ TABLEAU DE BORD ═══ -->
-<div class="view" id="view-manager">
-  <div class="ptitle">Tableau de Bord</div>
-  <div class="psub">Tous les rapports en temps réel</div>
-  <div class="ib" id="importBanner">
-    <strong>📥 Données historiques Excel</strong>
-    <p>30 rapports Fév–Mars 2026 à importer</p>
-    <button class="ibtn2" id="importBtn" onclick="doImport()">🚀 Importer</button>
-    <div class="ipg" id="ipg"></div>
+<!-- ═══ DASHBOARD ═══ -->
+<div class="view" id="view-dashboard">
+  <div class="ptitle">📊 Tableau de Bord</div>
+  <div class="psub">Production en temps réel — toutes les machines</div>
+
+  <div class="stats-grid">
+    <div class="sc"><div class="sl2">Aujourd'hui</div><div class="sv" style="color:var(--ac)" id="stToday">—</div></div>
+    <div class="sc"><div class="sl2">Total rapports</div><div class="sv" style="color:var(--gr)" id="stTotal">—</div></div>
+    <div class="sc"><div class="sl2">Employés actifs</div><div class="sv" style="color:var(--bl)" id="stEmployes">—</div></div>
   </div>
-  <div class="s3">
-    <div class="sc"><div class="sl2">Aujourd'hui</div><div class="sv ov" id="stToday">—</div></div>
-    <div class="sc"><div class="sl2">Production</div><div class="sv gv" id="stProd">—</div></div>
-    <div class="sc"><div class="sl2">Bouchons</div><div class="sv bv" id="stUtil">—</div></div>
-  </div>
-  <div class="sh2"><div class="st">📅 Par mois</div></div>
-  <div class="mw" id="mw"></div>
+
+  <!-- STATS PAR MACHINE -->
+  <div class="sh2" style="margin-bottom:10px"><div class="st">🏭 Stats par machine</div></div>
+  <div class="mstats" id="machineStats"></div>
+
+  <!-- TOUS LES RAPPORTS -->
   <div class="sh2">
     <div class="st">📋 Tous les rapports</div>
     <div class="sa">
@@ -281,62 +324,58 @@ textarea{resize:vertical;min-height:64px}
     </div>
   </div>
   <div class="fb">
-    <input type="text" id="srch" placeholder="🔍 Nom ou tâche…" oninput="renderCards()">
+    <input type="text" id="srch" placeholder="🔍 Nom…" oninput="renderCards()">
+    <select id="fmachine" onchange="renderCards()">
+      <option value="">Toutes les machines</option>
+      <option value="soufflage">🔵 Soufflage</option>
+      <option value="remplissage">🟢 Remplissage</option>
+      <option value="etiquetage">🟡 Étiquetage</option>
+      <option value="emballage">🟠 Emballage</option>
+      <option value="b19">🟣 B19</option>
+    </select>
     <input type="date" id="fdate" oninput="renderCards()">
-    <button class="rb" onclick="document.getElementById('srch').value='';document.getElementById('fdate').value='';renderCards()">✕</button>
+    <button class="rb" onclick="resetFilters()">✕</button>
   </div>
   <div id="repCards"></div>
-  <div class="emp" id="empState"><div class="ei">📋</div><div style="font-size:.82rem;font-weight:700">Aucun rapport</div></div>
+  <div class="emp" id="empState"><div class="ei">📋</div><div style="font-size:.8rem;font-weight:700">Aucun rapport</div></div>
 </div>
 
 <!-- ═══ CHAT ═══ -->
 <div class="view" id="view-chat">
   <div class="ptitle">💬 Discussion Groupe</div>
-  <div class="psub">Chat en temps réel avec toute l'équipe</div>
+  <div class="psub">Chat en temps réel — toute l'équipe</div>
 
-  <!-- AUTH -->
-  <div id="chatAuth">
-    <div class="cauth">
-      <div class="catitle" id="caTitle">👤 Créer votre compte</div>
-      <div class="cafield">
-        <label>Votre prénom</label>
-        <input type="text" id="caName" placeholder="ex : Alban, Prosper…" maxlength="20" onkeydown="if(event.key==='Enter')doAuth()">
+  <div class="chead">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="cava" id="cava">?</div>
+      <div>
+        <div class="cname" id="cwelcome">…</div>
+        <div class="cstatus">● Connecté</div>
       </div>
-      <div class="cafield">
-        <label>Mot de passe</label>
-        <input type="password" id="caPwd" placeholder="Choisissez un mot de passe" onkeydown="if(event.key==='Enter')doAuth()">
-      </div>
-      <div class="caerr" id="caErr"></div>
-      <button class="sbtn" style="margin-top:0" onclick="doAuth()" id="caBtn">✅ S'inscrire</button>
-      <div class="catoggle">Déjà inscrit ? <button onclick="toggleAuth()" id="caToggle">Se connecter</button></div>
     </div>
+    <button class="clout" onclick="logoutUser()">Déconnexion</button>
   </div>
 
-  <!-- CHAT BOX -->
-  <div id="chatBox" style="display:none">
-    <div class="chead">
-      <div style="display:flex;align-items:center;gap:9px">
-        <div class="cava" id="cava">?</div>
-        <div>
-          <div class="cname" id="cwelcome">Bonjour !</div>
-          <div class="cstatus">● En ligne</div>
-        </div>
-      </div>
-      <button class="clout" onclick="logoutChat()">Déconnexion</button>
-    </div>
-    <div class="cmsgs" id="cmsgs">
-      <div class="cempty">💬 Aucun message pour l'instant…</div>
-    </div>
-    <div class="cinbar">
-      <input type="text" id="cinput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendMsg()">
-      <button class="csend" onclick="sendMsg()">➤</button>
-    </div>
+  <!-- QUI EST EN LIGNE -->
+  <div class="online-list">
+    <div class="ol-title">🟢 En ligne maintenant</div>
+    <div class="ol-users" id="onlineUsers"><div class="ol-empty">Aucun utilisateur en ligne</div></div>
+  </div>
+
+  <div class="cmsgs" id="cmsgs">
+    <div class="cempty">💬 Aucun message pour l'instant…</div>
+  </div>
+  <div class="cinbar">
+    <input type="text" id="cinput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendMsg()">
+    <button class="csend" onclick="sendMsg()">➤</button>
   </div>
 </div>
 
+</div><!-- end mainApp -->
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update, set, get }
+import { getDatabase, ref, push, onValue, remove, update, set, get, onDisconnect, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FC = {
@@ -348,67 +387,43 @@ const FC = {
   messagingSenderId:"585202934732",
   appId:"1:585202934732:web:d3c322f7b02e5890c13369"
 };
-const PW = "1234";
 
-const EXCEL = [
-  {e:"Alban",d:"2026-02-02",t:"Production",p:"36243",nb:"12",u:"12",r:"0",s:"02/02/2026 (Excel)",ts:1000000000000},
-  {e:"Alban",d:"2026-02-03",t:"Production",p:"46858",nb:"8",u:"8",r:"0",s:"03/02/2026 (Excel)",ts:1000000001000},
-  {e:"Alban",d:"2026-02-04",t:"Repassage bouteille",p:"—",nb:"—",u:"—",r:"—",s:"04/02/2026 (Excel)",ts:1000000002000},
-  {e:"Alban",d:"2026-02-05",t:"Repassage bouteille",p:"—",nb:"—",u:"—",r:"—",s:"05/02/2026 (Excel)",ts:1000000003000},
-  {e:"Alban",d:"2026-02-06",t:"Repassage bouteille",p:"—",nb:"—",u:"—",r:"—",s:"06/02/2026 (Excel)",ts:1000000004000},
-  {e:"Alban",d:"2026-02-09",t:"Production",p:"8632",nb:"20",u:"4",r:"16",s:"09/02/2026 (Excel)",ts:1000000005000},
-  {e:"Alban",d:"2026-02-10",t:"Production",p:"13661",nb:"16",u:"3",r:"13",s:"10/02/2026 (Excel)",ts:1000000006000},
-  {e:"Alban",d:"2026-02-11",t:"Production",p:"7710",nb:"13",u:"3",r:"10",s:"11/02/2026 (Excel)",ts:1000000007000},
-  {e:"Alban",d:"2026-02-12",t:"Production",p:"4744",nb:"10",u:"0",r:"—",s:"12/02/2026 (Excel)",ts:1000000008000},
-  {e:"Alban",d:"2026-02-13",t:"Pause vendredi",p:"—",nb:"—",u:"—",r:"—",s:"13/02/2026 (Excel)",ts:1000000009000},
-  {e:"Alban",d:"2026-02-14",t:"Production",p:"8407",nb:"10",u:"1",r:"9",s:"14/02/2026 (Excel)",ts:1000000010000},
-  {e:"Alban",d:"2026-02-16",t:"Production",p:"30000",nb:"14",u:"7",r:"7",s:"16/02/2026 (Excel)",ts:1000000011000},
-  {e:"Alban",d:"2026-02-17",t:"Production",p:"8400",nb:"17",u:"3",r:"14",s:"17/02/2026 (Excel)",ts:1000000012000},
-  {e:"Alban",d:"2026-02-18",t:"Production",p:"6388",nb:"14",u:"—",r:"—",s:"18/02/2026 (Excel)",ts:1000000013000},
-  {e:"Alban",d:"2026-02-19",t:"Production",p:"11500",nb:"—",u:"—",r:"—",s:"19/02/2026 (Excel)",ts:1000000014000},
-  {e:"Alban",d:"2026-02-20",t:"Production",p:"23463",nb:"—",u:"—",r:"4",s:"20/02/2026 (Excel)",ts:1000000015000},
-  {e:"Alban",d:"2026-02-23",t:"Production",p:"23156",nb:"4+10",u:"6",r:"8",s:"23/02/2026 (Excel)",ts:1000000016000},
-  {e:"Alban",d:"2026-02-24",t:"Production",p:"30315",nb:"8+10",u:"7",r:"11",s:"24/02/2026 (Excel)",ts:1000000017000},
-  {e:"Alban",d:"2026-02-25",t:"Production",p:"46085",nb:"11+10",u:"12",r:"9",s:"25/02/2026 (Excel)",ts:1000000018000},
-  {e:"Alban",d:"2026-02-26",t:"Production",p:"72044",nb:"9+10",u:"18",r:"1",s:"26/02/2026 (Excel)",ts:1000000019000},
-  {e:"Alban",d:"2026-02-27",t:"Production",p:"72226",nb:"21",u:"17",r:"3",s:"27/02/2026 (Excel)",ts:1000000020000},
-  {e:"Alban",d:"2026-03-02",t:"Pas de production - maintenance",p:"—",nb:"—",u:"—",r:"—",s:"02/03/2026 (Excel)",ts:1000000021000},
-  {e:"Alban",d:"2026-03-03",t:"Repassage bouteilles 7143",p:"—",nb:"3.5",u:"2",r:"1.5",s:"03/03/2026 (Excel)",ts:1000000022000},
-  {e:"Alban",d:"2026-03-04",t:"Production",p:"2025",nb:"2",u:"0.5",r:"1",s:"04/03/2026 (Excel)",ts:1000000023000},
-  {e:"Alban",d:"2026-03-05",t:"Production",p:"3052",nb:"1",u:"1",r:"0",s:"05/03/2026 (Excel)",ts:1000000024000},
-  {e:"Alban",d:"2026-03-06",t:"Production",p:"—",nb:"15",u:"6",r:"—",s:"06/03/2026 (Excel)",ts:1000000025000},
-  {e:"Alban",d:"2026-03-09",t:"Production",p:"42612",nb:"16.5",u:"10.7",r:"5+1.3",s:"09/03/2026 (Excel)",ts:1000000026000},
-  {e:"Alban",d:"2026-03-10",t:"Production",p:"37217",nb:"15",u:"9",r:"6",s:"10/03/2026 (Excel)",ts:1000000027000},
-  {e:"Alban",d:"2026-03-11",t:"Production",p:"36775",nb:"16",u:"9",r:"7",s:"11/03/2026 (Excel)",ts:1000000028000},
-  {e:"Alban",d:"2026-03-12",t:"Production",p:"40577",nb:"17",u:"10",r:"7",s:"12/03/2026 (Excel)",ts:1000000029000},
-];
+const ADMIN_PW = "1234";
 
-// ── FIREBASE INIT ──
+// Machine config
+const MACHINES = {
+  soufflage:    { label:"🔵 Machine de Soufflage",   color:"var(--bl)", fields:["production"], units:["Bouteilles produites"] },
+  remplissage:  { label:"🟢 Machine de Remplissage",  color:"var(--gr)", fields:["production","cons1"], units:["Bouteilles remplies","Bouchons utilisés"] },
+  etiquetage:   { label:"🟡 Machine d'Étiquetage",    color:"var(--yw)", fields:["production","cons1"], units:["Bouteilles étiquetées","Étiquettes utilisées"] },
+  emballage:    { label:"🟠 Machine d'Emballage",     color:"var(--ac)", fields:["production","cons1"], units:["Caisses emballées","Sachets utilisés"] },
+  b19:          { label:"🟣 Machine B19",             color:"var(--pu)", fields:["production"], units:["Bouteilles 19L produites"] },
+};
+
 const app = initializeApp(FC);
 const db  = getDatabase(app);
-const rRef    = ref(db, "rapports");
-const chatRef = ref(db, "chat");
-const usersRef= ref(db, "chat_users");
+const rRef      = ref(db,"rapports_v2");
+const chatRef   = ref(db,"chat");
+const usersRef  = ref(db,"users");
+const onlineRef = ref(db,"online");
 
-let allReports=[], allMsgs=[], allUsers={};
-let managerOk=false, editKey=null;
-let chatUser=null; // {name, pwd}
+let allReports=[], allMsgs=[], allOnline={};
+let currentUser=null; // {name, machine, key}
+let adminOk=false, editKey=null;
 let lastMsgCount=0, chatOpen=false;
+let loginMode="login";
+let presenceRef=null;
 
-// ── LISTEN RAPPORTS ──
-onValue(rRef, snap => {
+// ── LISTEN DATA ──
+onValue(rRef, snap=>{
   allReports=[];
   snap.forEach(c=>allReports.push({_key:c.key,...c.val()}));
   allReports.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
   setDot(true);
-  if(managerOk) refresh();
+  if(document.getElementById("view-dashboard").classList.contains("active")) refresh();
   renderMyReps();
-  const hasEx=allReports.some(r=>r.ts&&r.ts>999999999999&&r.ts<2000000000000);
-  document.getElementById("importBanner").style.display=hasEx?"none":"block";
 });
 
-// ── LISTEN CHAT ──
-onValue(chatRef, snap => {
+onValue(chatRef, snap=>{
   allMsgs=[];
   snap.forEach(c=>allMsgs.push({_key:c.key,...c.val()}));
   renderChatMsgs();
@@ -420,10 +435,11 @@ onValue(chatRef, snap => {
   }
 });
 
-// ── LISTEN USERS ──
-onValue(usersRef, snap => {
-  allUsers={};
-  snap.forEach(c=>{ allUsers[c.key]=c.val(); });
+onValue(onlineRef, snap=>{
+  allOnline={};
+  snap.forEach(c=>{allOnline[c.key]=c.val();});
+  renderOnlineUsers();
+  document.getElementById("stEmployes").textContent=Object.keys(allOnline).length;
 });
 
 function setDot(on){
@@ -431,91 +447,179 @@ function setDot(on){
   document.getElementById("ll").textContent=on?"En ligne":"Hors ligne";
 }
 
-// ── RAPPORT ──
-window.calcR=()=>{
-  const nb=parseFloat(document.getElementById("nbBouchon").value)||0;
-  const ut=parseFloat(document.getElementById("utilise").value)||0;
-  document.getElementById("restant").value=(nb||ut)?Math.max(0,nb-ut):"";
+// ── LOGIN / REGISTER ──
+window.setLoginMode=mode=>{
+  loginMode=mode;
+  document.getElementById("ltab-login").classList.toggle("active",mode==="login");
+  document.getElementById("ltab-register").classList.toggle("active",mode==="register");
+  document.getElementById("lBtn").textContent=mode==="login"?"🔑 Se connecter":"✅ S'inscrire";
+  document.getElementById("machineField").style.display=mode==="register"?"block":"none";
+  document.getElementById("lErr").style.display="none";
 };
 
+window.doLogin=async()=>{
+  const name=document.getElementById("lName").value.trim();
+  const pwd=document.getElementById("lPwd").value;
+  const err=document.getElementById("lErr");
+  err.style.display="none";
+  if(!name){err.textContent="Entrez votre prénom";err.style.display="block";return;}
+  if(pwd.length<3){err.textContent="Mot de passe trop court (min 3 caractères)";err.style.display="block";return;}
+  const key=name.toLowerCase().replace(/[^a-z0-9]/g,"_");
+  const uRef=ref(db,"users/"+key);
+  try{
+    const snap=await get(uRef);
+    if(loginMode==="register"){
+      const machine=document.getElementById("lMachine").value;
+      if(!machine){err.textContent="Choisissez votre machine";err.style.display="block";return;}
+      if(snap.exists()){err.textContent="Ce prénom existe déjà. Connectez-vous.";err.style.display="block";return;}
+      await set(uRef,{name,machine,pwd:btoa(pwd),createdAt:Date.now()});
+      currentUser={name,machine,key};
+      startSession();
+    }else{
+      if(!snap.exists()){err.textContent="Prénom non trouvé. Inscrivez-vous d'abord.";err.style.display="block";return;}
+      const data=snap.val();
+      if(data.pwd!==btoa(pwd)){err.textContent="Mot de passe incorrect.";err.style.display="block";return;}
+      currentUser={name:data.name,machine:data.machine,key};
+      startSession();
+    }
+  }catch(e){err.textContent="Erreur: "+e.message;err.style.display="block";}
+};
+
+function startSession(){
+  localStorage.setItem("aet_sess",JSON.stringify(currentUser));
+  showApp();
+  // Set online presence
+  presenceRef=ref(db,"online/"+currentUser.key);
+  set(presenceRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()});
+  onDisconnect(presenceRef).remove();
+}
+
+function showApp(){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("mainApp").style.display="block";
+  // Setup UI for user
+  const mc=MACHINES[currentUser.machine];
+  document.getElementById("userWelcome").textContent=`Bonjour ${currentUser.name} ! — ${mc?mc.label:""}`;
+  document.getElementById("machineLabel").textContent=mc?mc.label:"";
+  document.getElementById("cava").textContent=currentUser.name.charAt(0).toUpperCase();
+  document.getElementById("cwelcome").textContent=currentUser.name;
+  buildForm();
+  renderMyReps();
+}
+
+window.logoutUser=async()=>{
+  if(presenceRef) await remove(presenceRef);
+  localStorage.removeItem("aet_sess");
+  currentUser=null;
+  document.getElementById("mainApp").style.display="none";
+  document.getElementById("loginScreen").style.display="flex";
+  document.getElementById("lName").value="";
+  document.getElementById("lPwd").value="";
+};
+
+// ── BUILD FORM ──
+function buildForm(){
+  if(!currentUser)return;
+  const mc=MACHINES[currentUser.machine];
+  if(!mc)return;
+  const container=document.getElementById("formFields");
+  let html=`
+    <div class="fi"><label>Date *</label><input type="date" id="repDate" value="${td()}"></div>
+    <div class="fi full"><label>Tâche / Observation</label><input type="text" id="taskTitle" placeholder="Description du travail…"></div>
+    <div class="hr"></div>
+    <div class="fi full"><div class="sl" style="margin-bottom:0">Données de production</div></div>
+    <div class="fi"><label>${mc.units[0]}</label><input type="number" id="fprod" placeholder="0" min="0"></div>`;
+  if(mc.fields.includes("cons1")){
+    html+=`<div class="fi"><label>${mc.units[1]}</label><input type="number" id="fcons1" placeholder="0" min="0"></div>`;
+  }
+  html+=`<div class="fi full"><label>Remarques</label><textarea id="fnotes" placeholder="Incidents, observations…"></textarea></div>`;
+  container.innerHTML=html;
+}
+
+// ── SUBMIT ──
 window.submitRep=async()=>{
-  const name=document.getElementById("empName").value.trim();
+  if(!currentUser)return;
   const date=document.getElementById("repDate").value;
-  if(!name){shk("empName");return;}
   if(!date){shk("repDate");return;}
+  const mc=MACHINES[currentUser.machine];
   const btn=document.getElementById("submitBtn");
   btn.disabled=true;btn.textContent="⏳ Envoi…";
   const now=new Date();
+  const rep={
+    timestamp:now.getTime(),
+    submittedAt:now.toLocaleString("fr-FR"),
+    employee:currentUser.name,
+    machine:currentUser.machine,
+    machineLabel:mc?mc.label:"",
+    date,
+    task:(document.getElementById("taskTitle")||{}).value||"—",
+    production:(document.getElementById("fprod")||{}).value||"0",
+    cons1:mc&&mc.fields.includes("cons1")?((document.getElementById("fcons1")||{}).value||"0"):"—",
+    cons1Label:mc&&mc.units[1]?mc.units[1]:"—",
+    notes:(document.getElementById("fnotes")||{}).value||"",
+  };
   try{
-    await push(rRef,{
-      timestamp:now.getTime(),submittedAt:now.toLocaleString("fr-FR"),
-      employee:name,date,
-      task:document.getElementById("taskTitle").value.trim()||"Production",
-      production:document.getElementById("production").value||"—",
-      nbBouchon:document.getElementById("nbBouchon").value||"—",
-      utilise:document.getElementById("utilise").value||"—",
-      restant:document.getElementById("restant").value||"—",
-      notes:document.getElementById("notes").value.trim()||""
-    });
-    ["taskTitle","production","nbBouchon","utilise","restant","notes"].forEach(id=>document.getElementById(id).value="");
+    await push(rRef,rep);
+    ["taskTitle","fprod","fcons1","fnotes"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
     document.getElementById("repDate").value=td();
     showOk("okMsg");
   }catch(e){alert("Erreur: "+e.message);}
   btn.disabled=false;btn.textContent="✅ Soumettre le Rapport";
 };
 
-// ── MES RAPPORTS ──
+// ── MY REPORTS ──
 function renderMyReps(){
-  const name=document.getElementById("empName").value.trim().toLowerCase();
+  if(!currentUser)return;
   const cont=document.getElementById("myReps"),emp=document.getElementById("myEmp");
-  if(!name){cont.innerHTML="";emp.style.display="flex";document.getElementById("myBadge").textContent="0";return;}
-  const mine=allReports.filter(r=>(r.employee||"").toLowerCase()===name).slice(0,8);
+  const mine=allReports.filter(r=>r.employee===currentUser.name&&r.machine===currentUser.machine).slice(0,8);
   document.getElementById("myBadge").textContent=mine.length;
   emp.style.display=mine.length?"none":"flex";
   cont.innerHTML="";
   mine.forEach(r=>{
-    const pn=parseInt(r.production),pv=!isNaN(pn)?pn.toLocaleString("fr-FR"):(r.production||"—");
+    const mc=MACHINES[r.machine]||{};
     const d=document.createElement("div");d.className="mrc";
-    d.innerHTML=`<div class="mrch"><div class="mrcd">📅 ${fmtD(r.date)}</div><button class="editb" onclick="openEdit('${r._key}')">✏️ Modifier</button></div>
-    <div style="font-size:.76rem;color:var(--mu);margin-bottom:8px">📋 ${r.task||"—"}</div>
+    d.innerHTML=`<div class="mrch">
+      <div class="badge" style="background:${mc.color||"var(--ac)"}22;color:${mc.color||"var(--ac)"}">📅 ${fmtD(r.date)}</div>
+      <div style="font-size:.74rem;color:var(--mu);flex:1">${r.task&&r.task!=="—"?r.task:""}</div>
+      <button class="editb" onclick="openEdit('${r._key}')">✏️ Modifier</button>
+    </div>
     <div class="mrcg">
-      <div class="mrcf"><div class="mrfl">Production</div><div class="mrfv" style="color:var(--gr)">${pv}</div></div>
-      <div class="mrcf"><div class="mrfl">Utilisés</div><div class="mrfv" style="color:var(--bl)">${r.utilise||"—"}</div></div>
+      <div class="mrcf"><div class="mrfl">${mc.units?mc.units[0]:"Production"}</div><div class="mrfv" style="color:var(--gr)">${fmtNum(r.production)}</div></div>
+      ${r.cons1&&r.cons1!=="—"?`<div class="mrcf"><div class="mrfl">${r.cons1Label||"Consommable"}</div><div class="mrfv" style="color:var(--bl)">${r.cons1}</div></div>`:""}
     </div>`;
     cont.appendChild(d);
   });
 }
-document.getElementById("empName").addEventListener("input",renderMyReps);
 
 // ── EDIT ──
 window.openEdit=key=>{
   const r=allReports.find(x=>x._key===key);if(!r)return;
+  const mc=MACHINES[r.machine]||{};
   editKey=key;
   document.getElementById("ed").value=r.date||"";
   document.getElementById("et").value=r.task||"";
-  document.getElementById("ep").value=r.production==="—"?"":r.production;
-  document.getElementById("enb").value=r.nbBouchon==="—"?"":r.nbBouchon;
-  document.getElementById("eu").value=r.utilise==="—"?"":r.utilise;
-  document.getElementById("er").value=r.restant==="—"?"":r.restant;
+  document.getElementById("ep").value=r.production||"";
+  document.getElementById("editProdField").querySelector("label").textContent=mc.units?mc.units[0]:"Production";
+  if(r.cons1&&r.cons1!=="—"){
+    document.getElementById("editCons1Field").style.display="block";
+    document.getElementById("editCons1Label").textContent=r.cons1Label||mc.units?.[1]||"Consommable";
+    document.getElementById("ec1").value=r.cons1||"";
+  }else{
+    document.getElementById("editCons1Field").style.display="none";
+  }
   document.getElementById("en").value=r.notes||"";
   document.getElementById("eov").classList.add("on");
 };
 window.closeEdit=()=>{document.getElementById("eov").classList.remove("on");editKey=null;};
-window.calcEd=()=>{
-  const nb=parseFloat(document.getElementById("enb").value)||0;
-  const ut=parseFloat(document.getElementById("eu").value)||0;
-  document.getElementById("er").value=(nb||ut)?Math.max(0,nb-ut):"";
-};
 window.saveEdit=async()=>{
   if(!editKey)return;
+  const r=allReports.find(x=>x._key===editKey);
   try{
-    await update(ref(db,"rapports/"+editKey),{
+    await update(ref(db,"rapports_v2/"+editKey),{
       date:document.getElementById("ed").value,
-      task:document.getElementById("et").value||"Production",
-      production:document.getElementById("ep").value||"—",
-      nbBouchon:document.getElementById("enb").value||"—",
-      utilise:document.getElementById("eu").value||"—",
-      restant:document.getElementById("er").value||"—",
+      task:document.getElementById("et").value||"—",
+      production:document.getElementById("ep").value||"0",
+      cons1:document.getElementById("editCons1Field").style.display!=="none"?(document.getElementById("ec1").value||"0"):(r?r.cons1:"—"),
       notes:document.getElementById("en").value||"",
       editedAt:new Date().toLocaleString("fr-FR")
     });
@@ -524,234 +628,146 @@ window.saveEdit=async()=>{
   }catch(e){alert("Erreur: "+e.message);}
 };
 
-// ══════════════════════════════
-// CHAT AUTH
-// ══════════════════════════════
-let authMode="register"; // "register" or "login"
-
-function initChat(){
-  const saved=localStorage.getItem("aet_u");
-  if(saved){
-    try{chatUser=JSON.parse(saved);showChatBox();}
-    catch(e){showChatAuth();}
-  }else{showChatAuth();}
-}
-
-function showChatAuth(){
-  chatUser=null;
-  document.getElementById("chatAuth").style.display="block";
-  document.getElementById("chatBox").style.display="none";
-}
-
-function showChatBox(){
-  document.getElementById("chatAuth").style.display="none";
-  document.getElementById("chatBox").style.display="block";
-  document.getElementById("cava").textContent=chatUser.name.charAt(0).toUpperCase();
-  document.getElementById("cwelcome").textContent="Bonjour, "+chatUser.name+" !";
-  renderChatMsgs();
-  setTimeout(()=>scrollChat(),100);
-}
-
-window.toggleAuth=()=>{
-  authMode=authMode==="register"?"login":"register";
-  const isReg=authMode==="register";
-  document.getElementById("caTitle").textContent=isReg?"👤 Créer votre compte":"🔑 Se connecter";
-  document.getElementById("caBtn").textContent=isReg?"✅ S'inscrire":"🔑 Se connecter";
-  document.getElementById("caToggle").textContent=isReg?"Se connecter":"S'inscrire";
-  document.getElementById("caErr").style.display="none";
-};
-
-window.doAuth=async()=>{
-  const name=document.getElementById("caName").value.trim();
-  const pwd=document.getElementById("caPwd").value;
-  const err=document.getElementById("caErr");
-  err.style.display="none";
-  if(!name){err.textContent="Entrez votre prénom";err.style.display="block";return;}
-  if(pwd.length<3){err.textContent="Mot de passe trop court (min 3 caractères)";err.style.display="block";return;}
-  
-  const key=name.toLowerCase().replace(/[^a-z0-9]/g,"_");
-  const uRef=ref(db,"chat_users/"+key);
-  
-  try{
-    const snap=await get(uRef);
-    if(authMode==="register"){
-      if(snap.exists()){
-        err.textContent="Ce prénom est déjà pris. Choisissez un autre prénom ou connectez-vous.";
-        err.style.display="block";return;
-      }
-      const userData={name,pwd:btoa(unescape(encodeURIComponent(pwd))),createdAt:Date.now()};
-      await set(uRef,userData);
-      chatUser={name,key};
-      localStorage.setItem("aet_u",JSON.stringify({name,key}));
-      showChatBox();
-      await push(chatRef,{name,text:"👋 "+name+" a rejoint le groupe !",ts:Date.now(),time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}),sys:true});
-    }else{
-      if(!snap.exists()){err.textContent="Prénom non trouvé. Inscrivez-vous d'abord.";err.style.display="block";return;}
-      const data=snap.val();
-      if(data.pwd!==btoa(unescape(encodeURIComponent(pwd)))){err.textContent="Mot de passe incorrect.";err.style.display="block";return;}
-      chatUser={name:data.name,key};
-      localStorage.setItem("aet_u",JSON.stringify({name:data.name,key}));
-      showChatBox();
-    }
-  }catch(e){err.textContent="Erreur: "+e.message;err.style.display="block";}
-};
-
-window.logoutChat=()=>{
-  localStorage.removeItem("aet_u");
-  chatUser=null;
-  showChatAuth();
-};
-
-// ── SEND MSG ──
-window.sendMsg=async()=>{
-  if(!chatUser){initChat();return;}
-  const inp=document.getElementById("cinput");
-  const text=inp.value.trim();
-  if(!text)return;
-  inp.value="";
-  try{
-    await push(chatRef,{
-      name:chatUser.name,text,ts:Date.now(),
-      time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})
-    });
-  }catch(e){alert("Erreur: "+e.message);}
-  inp.focus();
-};
-
-// ── RENDER CHAT ──
-function renderChatMsgs(){
-  const cont=document.getElementById("cmsgs");
-  if(!cont)return;
-  if(!allMsgs.length){
-    cont.innerHTML='<div class="cempty">💬 Aucun message pour l\'instant…</div>';
-    return;
-  }
-  const atBottom=cont.scrollHeight-cont.scrollTop-cont.clientHeight<80;
-  cont.innerHTML="";
-  allMsgs.forEach(m=>{
-    const isSys=m.sys;
-    const isMe=!isSys&&chatUser&&m.name===chatUser.name;
-    const div=document.createElement("div");
-    div.className="cmsg "+(isSys?"sys":isMe?"me":"other");
-    if(isSys){
-      div.innerHTML=`<div class="cmbub">${esc(m.text)}</div>`;
-    }else{
-      div.innerHTML=
-        (!isMe?`<div class="cmsender">${esc(m.name)}</div>`:"")+
-        `<div class="cmbub">${esc(m.text)}</div>`+
-        `<div class="cmtime">${m.time||""}</div>`;
-    }
-    cont.appendChild(div);
-  });
-  if(atBottom||allMsgs.length<=3)scrollChat();
-}
-
-function scrollChat(){
-  const c=document.getElementById("cmsgs");
-  if(c)c.scrollTop=c.scrollHeight;
-}
-
-// ── MANAGER ──
-window.tryMgr=()=>{
-  if(managerOk){sv("manager");refresh();return;}
-  document.getElementById("pwModal").classList.add("on");
-  setTimeout(()=>document.getElementById("pwInput").focus(),100);
-};
-window.checkPw=()=>{
-  if(document.getElementById("pwInput").value===PW){
-    managerOk=true;closePw();sv("manager");refresh();
-  }else{
-    document.getElementById("pwErr").style.display="block";
-    document.getElementById("pwInput").value="";shk("pwInput");
-  }
-};
-window.closePw=()=>{
-  document.getElementById("pwModal").classList.remove("on");
-  document.getElementById("pwInput").value="";
-  document.getElementById("pwErr").style.display="none";
-};
-
+// ── DASHBOARD ──
+window.tryMgr=()=>{};// all users can access
 function refresh(){
-  renderCards();renderMonthly();
+  renderCards();renderMachineStats();
   const t=td();
   document.getElementById("stToday").textContent=allReports.filter(r=>r.date===t).length;
-  document.getElementById("stProd").textContent=allReports.reduce((s,r)=>s+(parseInt(r.production)||0),0).toLocaleString("fr-FR");
-  document.getElementById("stUtil").textContent=allReports.reduce((s,r)=>s+(parseFloat(r.utilise)||0),0).toLocaleString("fr-FR");
+  document.getElementById("stTotal").textContent=allReports.length;
   document.getElementById("totBadge").textContent=allReports.length+" rapports";
 }
 
-function renderMonthly(){
-  const mn={},mf=["","Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
+function renderMachineStats(){
+  const stats={};
+  Object.keys(MACHINES).forEach(k=>stats[k]={prod:0,cons:0,n:0});
   allReports.forEach(r=>{
-    if(!r.date)return;
-    const[y,m]=r.date.split("-"),k=y+"-"+m;
-    if(!mn[k])mn[k]={prod:0,util:0,n:0};
-    mn[k].prod+=parseInt(r.production)||0;
-    mn[k].util+=parseFloat(r.utilise)||0;
-    mn[k].n++;
+    if(stats[r.machine]){
+      stats[r.machine].prod+=parseInt(r.production)||0;
+      stats[r.machine].cons+=parseFloat(r.cons1)||0;
+      stats[r.machine].n++;
+    }
   });
-  document.getElementById("mw").innerHTML=Object.keys(mn).sort().reverse().map(k=>{
-    const[y,m]=k.split("-");
-    return`<div class="mc"><div class="mt">${mf[+m]} ${y}</div>
-      <div class="mr"><span>🏭 Production</span><strong>${mn[k].prod.toLocaleString("fr-FR")}</strong></div>
-      <div class="mr"><span>🔩 Bouchons</span><strong>${mn[k].util}</strong></div>
-      <div class="mr"><span>📋 Rapports</span><strong>${mn[k].n}</strong></div></div>`;
-  }).join("")||'<div style="color:var(--mu);font-size:.8rem">Aucune donnée</div>';
+  const container=document.getElementById("machineStats");
+  container.innerHTML=Object.entries(MACHINES).map(([key,mc])=>{
+    const s=stats[key];
+    const hascons=mc.fields.includes("cons1");
+    return`<div class="msc">
+      <div class="msc-title" style="color:${mc.color}">${mc.label}</div>
+      <div class="msc-row"><span>${mc.units[0]}</span><strong>${fmtNum(s.prod)}</strong></div>
+      ${hascons?`<div class="msc-row"><span>${mc.units[1]}</span><strong>${s.cons}</strong></div>`:""}
+      <div class="msc-row"><span>📋 Rapports</span><strong>${s.n}</strong></div>
+    </div>`;
+  }).join("");
 }
 
 window.renderCards=()=>{
   const search=(document.getElementById("srch").value||"").toLowerCase();
+  const fm=document.getElementById("fmachine").value;
   const fd=document.getElementById("fdate").value;
   let list=allReports.slice();
-  if(search)list=list.filter(r=>(r.employee||"").toLowerCase().includes(search)||(r.task||"").toLowerCase().includes(search));
+  if(search)list=list.filter(r=>(r.employee||"").toLowerCase().includes(search));
+  if(fm)list=list.filter(r=>r.machine===fm);
   if(fd)list=list.filter(r=>r.date===fd);
   const cont=document.getElementById("repCards"),emp=document.getElementById("empState");
   cont.innerHTML="";emp.style.display=list.length?"none":"flex";
   list.forEach(r=>{
-    const pn=parseInt(r.production),pv=!isNaN(pn)?pn.toLocaleString("fr-FR"):(r.production||"—");
-    const isEx=(r.submittedAt||"").includes("Excel");
+    const mc=MACHINES[r.machine]||{};
     const d=document.createElement("div");d.className="rc";
     d.innerHTML=`<div class="rch">
       <div class="rcn">👤 ${r.employee||"—"}</div>
+      <span class="mbadge m-${r.machine||""}">${mc.label||r.machine||"—"}</span>
       <div class="rcd">${fmtD(r.date)}</div>
-      <button class="ab d" style="padding:3px 8px;font-size:.68rem" onclick="delRep('${r._key}')">🗑</button>
+      <button class="ab d" style="padding:3px 7px;font-size:.66rem;margin-left:auto" onclick="delRep('${r._key}')">🗑</button>
     </div>
-    ${r.task&&r.task!=="—"?`<div class="rct">📋 ${r.task}${r.editedAt?' <span style="color:var(--pu);font-size:.68rem">(modifié)</span>':""}</div>`:""}
+    ${r.task&&r.task!=="—"?`<div style="font-size:.76rem;color:var(--mu);margin-bottom:6px">📋 ${r.task}${r.editedAt?' <span style="color:var(--pu);font-size:.65rem">(modifié)</span>':""}</div>`:""}
     <div class="rcg">
-      <div class="rcf"><div class="rfl">Production</div><div class="rfv g">${pv}</div></div>
-      <div class="rcf"><div class="rfl">Nb Bouchons</div><div class="rfv">${r.nbBouchon||"—"}</div></div>
-      <div class="rcf"><div class="rfl">Utilisés</div><div class="rfv b">${r.utilise||"—"}</div></div>
-      <div class="rcf"><div class="rfl">Restants</div><div class="rfv">${r.restant||"—"}</div></div>
+      <div class="rcf"><div class="rfl">${mc.units?mc.units[0]:"Production"}</div><div class="rfv" style="color:var(--gr)">${fmtNum(r.production)}</div></div>
+      ${r.cons1&&r.cons1!=="—"?`<div class="rcf"><div class="rfl">${r.cons1Label||mc.units?.[1]||"Consommable"}</div><div class="rfv" style="color:var(--bl)">${r.cons1}</div></div>`:""}
     </div>
     ${r.notes?`<div class="rno">💬 ${r.notes}</div>`:""}
-    <div class="rtm">${isEx?"📊 ":""}${r.submittedAt||"—"}</div>`;
+    <div class="rtm">${r.submittedAt||"—"}</div>`;
     cont.appendChild(d);
   });
 };
 
-window.delRep=async key=>{if(!confirm("Supprimer ?"))return;await remove(ref(db,"rapports/"+key));};
-window.clearAll=async()=>{if(!confirm("Effacer TOUS ?"))return;await remove(rRef);};
+window.resetFilters=()=>{
+  document.getElementById("srch").value="";
+  document.getElementById("fmachine").value="";
+  document.getElementById("fdate").value="";
+  renderCards();
+};
+
+window.delRep=async key=>{if(!confirm("Supprimer ?"))return;await remove(ref(db,"rapports_v2/"+key));};
+window.clearAll=async()=>{if(!confirm("Effacer TOUS les rapports ?"))return;await remove(rRef);};
 window.expCSV=()=>{
-  const rows=[["Date","Employé","Tâche","Production","Bouchons","Utilisés","Restants","Notes","Envoyé"]];
-  allReports.forEach(r=>rows.push([r.date,r.employee,r.task,r.production,r.nbBouchon,r.utilise,r.restant,r.notes,r.submittedAt]));
+  const rows=[["Date","Employé","Machine","Tâche","Production","Consommable","Qté consommable","Notes","Envoyé"]];
+  allReports.forEach(r=>rows.push([r.date,r.employee,r.machineLabel||r.machine,r.task,r.production,r.cons1Label||"—",r.cons1||"—",r.notes,r.submittedAt]));
   const csv=rows.map(r=>r.map(v=>`"${v||""}"`).join(",")).join("\n");
   const a=document.createElement("a");
   a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv);
   a.download="rapports_aet.csv";a.click();
 };
 
-window.doImport=async()=>{
-  const btn=document.getElementById("importBtn"),pg=document.getElementById("ipg");
-  btn.disabled=true;let ok=0;
-  for(const r of EXCEL){
-    try{await push(rRef,{timestamp:r.ts,submittedAt:r.s,employee:r.e,date:r.d,task:r.t,production:r.p,nbBouchon:r.nb,utilise:r.u,restant:r.r,notes:""});ok++;pg.textContent=ok+"/"+EXCEL.length+" importés…";}
-    catch(e){pg.textContent="Erreur: "+e.message;}
-  }
-  pg.textContent="✅ "+ok+" rapports importés !";
-  btn.textContent="✅";
-  setTimeout(()=>document.getElementById("importBanner").style.display="none",3000);
+// ── CHAT ──
+window.sendMsg=async()=>{
+  if(!currentUser)return;
+  const inp=document.getElementById("cinput");
+  const text=inp.value.trim();
+  if(!text)return;
+  inp.value="";
+  const mc=MACHINES[currentUser.machine];
+  try{
+    await push(chatRef,{
+      name:currentUser.name,
+      machine:currentUser.machine,
+      machineLabel:mc?mc.label:"",
+      text,ts:Date.now(),
+      time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})
+    });
+  }catch(e){alert("Erreur: "+e.message);}
+  inp.focus();
 };
 
+function renderChatMsgs(){
+  const cont=document.getElementById("cmsgs");
+  if(!cont)return;
+  if(!allMsgs.length){cont.innerHTML='<div class="cempty">💬 Aucun message pour l\'instant…</div>';return;}
+  const atBottom=cont.scrollHeight-cont.scrollTop-cont.clientHeight<80;
+  cont.innerHTML="";
+  allMsgs.forEach(m=>{
+    const isSys=m.sys;
+    const isMe=!isSys&&currentUser&&m.name===currentUser.name;
+    const mc=MACHINES[m.machine]||{};
+    const div=document.createElement("div");
+    div.className="cmsg "+(isSys?"sys":isMe?"me":"other");
+    if(isSys){
+      div.innerHTML=`<div class="cmbub">${esc(m.text)}</div>`;
+    }else{
+      const senderInfo=!isMe?`<div class="cmsender">${esc(m.name)} <span style="color:${mc.color||"var(--mu)"};font-size:.58rem">${mc.label||""}</span></div>`:"";
+      div.innerHTML=senderInfo+
+        `<div class="cmbub">${esc(m.text)}</div>`+
+        `<div class="cmtime">${m.time||""}</div>`;
+    }
+    cont.appendChild(div);
+  });
+  if(atBottom)scrollChat();
+}
+
+function renderOnlineUsers(){
+  const cont=document.getElementById("onlineUsers");
+  if(!cont)return;
+  const users=Object.values(allOnline);
+  if(!users.length){cont.innerHTML='<div class="ol-empty">Aucun utilisateur en ligne</div>';return;}
+  cont.innerHTML=users.map(u=>{
+    const mc=MACHINES[u.machine]||{};
+    return`<div class="ol-user"><div class="ol-dot"></div>${esc(u.name)} <span style="font-size:.65rem;color:var(--mu)">${mc.label||""}</span></div>`;
+  }).join("");
+}
+
+function scrollChat(){const c=document.getElementById("cmsgs");if(c)c.scrollTop=c.scrollHeight;}
+
+// ── VIEW SWITCH ──
 window.sv=name=>{
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
@@ -760,19 +776,44 @@ window.sv=name=>{
   if(name==="chat"){
     chatOpen=true;lastMsgCount=allMsgs.length;
     document.getElementById("cbadge").classList.remove("on");
-    initChat();
+    renderOnlineUsers();
     setTimeout(scrollChat,200);
   }else{chatOpen=false;}
-  if(name==="manager"&&managerOk)refresh();
+  if(name==="dashboard") refresh();
 };
 
+// ── AUTH MODAL (admin) ──
+window.checkPw=()=>{
+  if(document.getElementById("pwInput").value===ADMIN_PW){
+    adminOk=true;closePw();
+  }else{
+    document.getElementById("pwErr").style.display="block";
+    document.getElementById("pwInput").value="";
+  }
+};
+window.closePw=()=>{
+  document.getElementById("pwModal").classList.remove("on");
+  document.getElementById("pwInput").value="";
+  document.getElementById("pwErr").style.display="none";
+};
+
+// ── HELPERS ──
 function td(){return new Date().toISOString().split("T")[0];}
 function fmtD(d){if(!d)return"—";const[y,m,j]=d.split("-");return`${j}/${m}/${y}`;}
-function shk(id){const el=document.getElementById(id);el.classList.add("sh");setTimeout(()=>el.classList.remove("sh"),350);}
-function showOk(id){const m=document.getElementById(id);m.classList.add("on");setTimeout(()=>m.classList.remove("on"),3000);}
+function fmtNum(v){const n=parseInt(v);return isNaN(n)?v||"0":n.toLocaleString("fr-FR");}
+function shk(id){const el=document.getElementById(id);if(!el)return;el.classList.add("sh");setTimeout(()=>el.classList.remove("sh"),350);}
+function showOk(id){const m=document.getElementById(id);if(!m)return;m.classList.add("on");setTimeout(()=>m.classList.remove("on"),3000);}
 function esc(t){return(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-document.getElementById("repDate").value=td();
+// ── AUTO LOGIN ──
+const saved=localStorage.getItem("aet_sess");
+if(saved){
+  try{
+    currentUser=JSON.parse(saved);
+    showApp();
+    startSession();
+  }catch(e){localStorage.removeItem("aet_sess");}
+}
 </script>
 </body>
 </html>
