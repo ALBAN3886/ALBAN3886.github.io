@@ -151,11 +151,34 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .csend:hover{background:#8b5cf6}
 
 @media(max-width:600px){
-  .sg{grid-template-columns:1fr 1fr}
+  .sg{grid-template-columns:1fr 1fr;gap:7px}
   .msg{grid-template-columns:1fr}
   .g2{grid-template-columns:1fr}
   .full{grid-column:1}
-  .tab{padding:5px 7px;font-size:.67rem}
+  .tab{padding:4px 6px;font-size:.62rem;white-space:nowrap}
+  nav{padding:8px 10px;gap:4px}
+  .tabs{gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:1;max-width:100%}
+  .tabs::-webkit-scrollbar{display:none}
+  .logo{font-size:.68rem;flex-shrink:0;line-height:1.2}
+  .nr{gap:3px;min-width:0;flex:1;justify-content:flex-end;overflow:hidden}
+  .view{padding:12px 10px}
+  .sc{padding:10px}
+  .sv{font-size:1.15rem}
+  .pbtns{gap:4px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+  .pbtns::-webkit-scrollbar{display:none}
+  .pbtn{padding:5px 10px;font-size:.68rem;white-space:nowrap;flex-shrink:0}
+  .fb{gap:5px}
+  .fb input,.fb select{font-size:.73rem;padding:7px 8px}
+  .sh{flex-wrap:wrap;gap:6px}
+  .sa{flex-wrap:wrap}
+  .cmsgs{height:260px}
+  .cinbar input{font-size:.8rem}
+  th{padding:7px 8px;font-size:.58rem}
+  td{padding:7px 8px;font-size:.75rem}
+  .ptitle{font-size:1.1rem}
+  .card{padding:12px}
+  .ld{display:none}
+  .ll{display:none}
 }
 </style>
 </head>
@@ -287,7 +310,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <table><thead><tr><th>Date</th><th>Tâche</th><th>Production</th><th>Conso.</th><th>Notes</th><th></th></tr></thead>
       <tbody id="myTbody"></tbody></table>
     </div>
-    <div class="emp" id="myEmp" style="display:flex"><div class="ei">📋</div><div style="font-size:.77rem">Aucun rapport</div></div>
+    <div class="emp" id="myEmp" style="display:none"><div class="ei">📋</div><div style="font-size:.77rem">Aucun rapport</div></div>
   </div>
 </div>
 
@@ -438,15 +461,15 @@ onValue(rRef, snap=>{
   snap.forEach(c=>allReports.push({_k:c.key,...c.val()}));
   allReports.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
   setDot(true);
-  if(currentUser) renderMyReps();
-  if(currentUser && document.getElementById("view-dashboard").classList.contains("active")) renderDash();
+  renderMyReps();
+  renderDash();
 });
 onValue(chatRef, snap=>{
   const prevLen=allMsgs.length;
   allMsgs=[];
   snap.forEach(c=>allMsgs.push({_k:c.key,...c.val()}));
   allMsgs.sort((a,b)=>(a.ts||0)-(b.ts||0));
-  if(currentUser) renderMsgs();
+  renderMsgs();
   if(!chatOpen && allMsgs.length>prevLen && prevLen>0){
     const b=document.getElementById("cbadge");
     const diff=allMsgs.length-prevLen;
@@ -551,6 +574,9 @@ function startSession(){
   presRef=ref(db,"online/"+currentUser.key);
   set(presRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()}).catch(()=>{});
   onDisconnect(presRef).remove().catch(()=>{});
+  // Post join message in chat
+  const _mc=MACHINES[currentUser.machine]||{};
+  push(chatRef,{sys:true,text:"🟢 "+currentUser.name+" ("+(_mc.label||"?")+") a rejoint le chat",ts:Date.now(),time:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}).catch(()=>{});
   setInterval(()=>{
     if(presRef) set(presRef,{name:currentUser.name,machine:currentUser.machine,ts:Date.now()}).catch(()=>{});
   },30000);
@@ -670,6 +696,8 @@ function renderMyReps(){
 
 // ── DASHBOARD ──
 function renderDash(){
+  if(!document.getElementById("stToday"))return;
+  if(!document.getElementById("view-dashboard").classList.contains("active"))return;
   renderTable();
   renderMachStats();
   const t=td();
@@ -774,12 +802,13 @@ async function doSaveEdit(){
 function renderMsgs(){
   const cont=document.getElementById("cmsgs");
   if(!cont)return;
-  const atBot=cont.scrollHeight-cont.scrollTop-cont.clientHeight<80;
+  // Determine if user was at bottom BEFORE clearing
+  const wasAtBot=cont.scrollHeight<=cont.scrollTop+cont.clientHeight+80;
   cont.innerHTML="";
   if(!allMsgs.length){
     const d=document.createElement("div");
     d.style.cssText="text-align:center;color:var(--mu);padding:24px;font-size:.8rem;opacity:.6";
-    d.textContent="Aucun message pour l'instant";
+    d.textContent="Aucun message pour l'instant 💬";
     cont.appendChild(d);
     return;
   }
@@ -795,7 +824,7 @@ function renderMsgs(){
     }else{
       if(!isMe){
         const s=document.createElement("div");s.className="csen";
-        s.textContent=m.name+(mc.label?" ("+mc.label+")":"");
+        s.textContent=m.name+(mc.label?" · "+mc.label:"");
         div.appendChild(s);
       }
       const b=document.createElement("div");b.className="cbub";b.textContent=m.text||"";
@@ -805,7 +834,10 @@ function renderMsgs(){
     }
     cont.appendChild(div);
   });
-  if(atBot) cont.scrollTop=cont.scrollHeight;
+  // Always scroll to bottom on first load or when already at bottom
+  if(wasAtBot || cont.scrollHeight===cont.clientHeight){
+    cont.scrollTop=cont.scrollHeight;
+  }
 }
 
 function renderOnline(){
@@ -862,7 +894,12 @@ function showView(name){
     lastMsgLen=allMsgs.length;
     document.getElementById("cbadge").classList.remove("on");
     renderOnline();
-    setTimeout(()=>{const c=document.getElementById("cmsgs");if(c)c.scrollTop=c.scrollHeight;},200);
+    // Re-render messages now that chat view is visible, then scroll to bottom
+    renderMsgs();
+    setTimeout(()=>{
+      const c=document.getElementById("cmsgs");
+      if(c) c.scrollTop=c.scrollHeight;
+    },100);
   }else{chatOpen=false;}
   if(name==="dashboard") renderDash();
   if(name==="rapport") renderMyReps();
