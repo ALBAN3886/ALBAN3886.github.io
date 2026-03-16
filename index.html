@@ -523,6 +523,15 @@ window.submitReport = async () => {
     await push(rRef, rep);
     ["taskTitle","production","nbBouchon","utilise","restant","notes"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("repDate").value=td();
+// Restore chat name from localStorage
+const savedName = localStorage.getItem("chatName_aet");
+if (savedName) {
+  document.getElementById("chatName").value = savedName;
+  chatUserName = savedName;
+  document.getElementById("chatInput").disabled = false;
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("chatInput").placeholder = "Écrivez un message, "+savedName+"…";
+}
     showSuccess("successMsg");
   } catch(e){alert("Erreur: "+e.message);}
   btn.disabled=false; btn.textContent="✅ Soumettre le Rapport";
@@ -608,6 +617,8 @@ window.setChatName = () => {
   document.getElementById("sendBtn").disabled = false;
   document.getElementById("chatInput").placeholder = "Écrivez un message, "+n+"…";
   document.getElementById("chatInput").focus();
+  // Save name to localStorage so it persists
+  localStorage.setItem("chatName_aet", n);
 };
 window.sendMsg = async () => {
   if (!chatUserName) { document.getElementById("chatName").focus(); return; }
@@ -776,6 +787,15 @@ function shk(id){const el=document.getElementById(id);el.classList.add("shake");
 function showSuccess(id){const m=document.getElementById(id);m.classList.add("show");setTimeout(()=>m.classList.remove("show"),3000);}
 
 document.getElementById("repDate").value=td();
+// Restore chat name from localStorage
+const savedName = localStorage.getItem("chatName_aet");
+if (savedName) {
+  document.getElementById("chatName").value = savedName;
+  chatUserName = savedName;
+  document.getElementById("chatInput").disabled = false;
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("chatInput").placeholder = "Écrivez un message, "+savedName+"…";
+}
 </script>
 </body>
 </html>
