@@ -191,6 +191,8 @@ textarea { resize:vertical; min-height:68px; }
 .send-btn:disabled { opacity:.4; cursor:wait; transform:none; }
 
 .chat-empty { text-align:center; color:var(--muted); padding:30px; font-size:.85rem; opacity:.6; }
+.chat-msg.system .msg-bubble { background:rgba(167,139,250,.1); border:1px solid rgba(167,139,250,.2); color:var(--purple); font-size:.8rem; text-align:center; border-radius:10px; }
+.chat-msg.system { align-self:center; max-width:90%; }
 
 @media(max-width:600px){
   .stats3{grid-template-columns:1fr 1fr}
@@ -379,18 +381,44 @@ textarea { resize:vertical; min-height:68px; }
   <div class="page-title">💬 Discussion Groupe</div>
   <div class="page-sub">Chat en temps réel avec toute l'équipe</div>
 
-  <div class="chat-name-bar">
-    <input type="text" id="chatName" placeholder="Entrez votre prénom pour chatter…" onkeydown="if(event.key==='Enter')setChatName()">
-    <button class="set-name-btn" onclick="setChatName()">✓ OK</button>
+  <!-- INSCRIPTION / CONNEXION -->
+  <div id="authBox" style="display:none">
+    <div class="form-card" style="max-width:400px;margin:0 auto">
+      <div id="authTitle" style="font-size:1.1rem;font-weight:800;margin-bottom:16px;text-align:center">👤 Créer votre compte</div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Votre prénom</label>
+        <input type="text" id="authName" placeholder="ex : Alban, Prosper…" maxlength="20">
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <label>Mot de passe</label>
+        <input type="password" id="authPwd" placeholder="Choisissez un mot de passe" onkeydown="if(event.key==='Enter')doAuth()">
+      </div>
+      <div id="authErr" style="color:var(--red);font-size:.8rem;margin-bottom:10px;display:none"></div>
+      <button class="submit-btn" style="margin-top:0" onclick="doAuth()" id="authBtn">✅ S'inscrire</button>
+      <div style="text-align:center;margin-top:12px;font-size:.82rem;color:var(--muted)">
+        Déjà inscrit ? <button onclick="toggleAuth()" style="background:none;border:none;color:var(--purple);cursor:pointer;font-weight:700;font-family:'Outfit',sans-serif" id="toggleBtn">Se connecter</button>
+      </div>
+    </div>
   </div>
 
-  <div class="chat-wrap">
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-empty">👋 Bienvenue dans le chat de l'équipe !<br>Entrez votre prénom et commencez à discuter.</div>
+  <!-- CHAT -->
+  <div id="chatBox" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem" id="chatAvatar">?</div>
+        <div>
+          <div style="font-weight:700;font-size:.9rem" id="chatWelcome">Bonjour !</div>
+          <div style="font-size:.7rem;color:var(--muted)" id="onlineCount">● En ligne</div>
+        </div>
+      </div>
+      <button onclick="logoutChat()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--muted);font-size:.75rem;cursor:pointer;font-family:'Outfit',sans-serif">Déconnexion</button>
     </div>
-    <div class="chat-input-bar">
-      <input type="text" id="chatInput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendMsg()" disabled>
-      <button class="send-btn" id="sendBtn" onclick="sendMsg()" disabled>➤</button>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty">💬 Aucun message pour l'instant…</div>
+    </div>
+    <div class="chat-input-bar" style="margin-top:12px">
+      <input type="text" id="chatInput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
     </div>
   </div>
 </div>
@@ -523,15 +551,7 @@ window.submitReport = async () => {
     await push(rRef, rep);
     ["taskTitle","production","nbBouchon","utilise","restant","notes"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("repDate").value=td();
-// Restore chat name from localStorage
-const savedName = localStorage.getItem("chatName_aet");
-if (savedName) {
-  document.getElementById("chatName").value = savedName;
-  chatUserName = savedName;
-  document.getElementById("chatInput").disabled = false;
-  document.getElementById("sendBtn").disabled = false;
-  document.getElementById("chatInput").placeholder = "Écrivez un message, "+savedName+"…";
-}
+// Chat auth handled by initChatView()
     showSuccess("successMsg");
   } catch(e){alert("Erreur: "+e.message);}
   btn.disabled=false; btn.textContent="✅ Soumettre le Rapport";
@@ -608,20 +628,86 @@ window.saveEdit = async () => {
   } catch(e){alert("Erreur: "+e.message);}
 };
 
-// ── CHAT ──
-window.setChatName = () => {
-  const n = document.getElementById("chatName").value.trim();
-  if (!n) return;
-  chatUserName = n;
-  document.getElementById("chatInput").disabled = false;
-  document.getElementById("sendBtn").disabled = false;
-  document.getElementById("chatInput").placeholder = "Écrivez un message, "+n+"…";
+// ── CHAT AUTH ──
+let isLoginMode = false;
+
+function initChatView() {
+  const saved = localStorage.getItem("aet_chat_user");
+  if (saved) {
+    try {
+      const u = JSON.parse(saved);
+      chatUserName = u.name;
+      showChatBox(u.name);
+    } catch(e) { showAuthBox(); }
+  } else { showAuthBox(); }
+}
+
+function showAuthBox() {
+  document.getElementById("authBox").style.display = "block";
+  document.getElementById("chatBox").style.display = "none";
+}
+
+function showChatBox(name) {
+  document.getElementById("authBox").style.display = "none";
+  document.getElementById("chatBox").style.display = "block";
+  document.getElementById("chatAvatar").textContent = name.charAt(0).toUpperCase();
+  document.getElementById("chatWelcome").textContent = "Bonjour, " + name + " !";
   document.getElementById("chatInput").focus();
-  // Save name to localStorage so it persists
-  localStorage.setItem("chatName_aet", n);
+  renderChat();
+}
+
+window.toggleAuth = () => {
+  isLoginMode = !isLoginMode;
+  document.getElementById("authTitle").textContent = isLoginMode ? "🔑 Se connecter" : "👤 Créer votre compte";
+  document.getElementById("authBtn").textContent = isLoginMode ? "🔑 Se connecter" : "✅ S'inscrire";
+  document.getElementById("toggleBtn").textContent = isLoginMode ? "S'inscrire" : "Se connecter";
+  document.getElementById("authErr").style.display = "none";
+};
+
+window.doAuth = async () => {
+  const name = document.getElementById("authName").value.trim();
+  const pwd  = document.getElementById("authPwd").value;
+  const err  = document.getElementById("authErr");
+  err.style.display = "none";
+  if (!name) { err.textContent="Entrez votre prénom"; err.style.display="block"; return; }
+  if (!pwd)  { err.textContent="Entrez un mot de passe"; err.style.display="block"; return; }
+  if (name.length > 20) { err.textContent="Prénom trop long (max 20 caractères)"; err.style.display="block"; return; }
+
+  const usersRef = ref(db, "chat_users/" + name.toLowerCase().replace(/\s/g,"_"));
+  
+  if (!isLoginMode) {
+    // INSCRIPTION
+    try {
+      const snap = await new Promise(res => { const u=usersRef; import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(({get})=>get(u).then(res)); });
+      if (snap.exists()) { err.textContent="Ce prénom est déjà pris ! Choisissez un autre ou connectez-vous."; err.style.display="block"; return; }
+      await set(usersRef, { name, pwdHash: btoa(pwd), createdAt: Date.now() });
+      localStorage.setItem("aet_chat_user", JSON.stringify({name, pwdHash: btoa(pwd)}));
+      chatUserName = name;
+      showChatBox(name);
+      // Send welcome message
+      await push(chatRef, { name, text: "👋 " + name + " a rejoint le chat !", ts: Date.now(), time: new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}), system: true });
+    } catch(e) { err.textContent="Erreur: "+e.message; err.style.display="block"; }
+  } else {
+    // CONNEXION
+    try {
+      const snap = await new Promise(res => { const u=usersRef; import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js").then(({get})=>get(u).then(res)); });
+      if (!snap.exists()) { err.textContent="Prénom non trouvé. Inscrivez-vous d'abord."; err.style.display="block"; return; }
+      const data = snap.val();
+      if (data.pwdHash !== btoa(pwd)) { err.textContent="Mot de passe incorrect."; err.style.display="block"; return; }
+      localStorage.setItem("aet_chat_user", JSON.stringify({name:data.name, pwdHash:data.pwdHash}));
+      chatUserName = data.name;
+      showChatBox(data.name);
+    } catch(e) { err.textContent="Erreur: "+e.message; err.style.display="block"; }
+  }
+};
+
+window.logoutChat = () => {
+  localStorage.removeItem("aet_chat_user");
+  chatUserName = "";
+  showAuthBox();
 };
 window.sendMsg = async () => {
-  if (!chatUserName) { document.getElementById("chatName").focus(); return; }
+  if (!chatUserName) { initChatView(); return; }
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text) return;
@@ -773,10 +859,11 @@ window.showView = name=>{
     chatViewed=true;
     lastMsgCount=allMsgs.length;
     document.getElementById("chatBadge").classList.remove("show");
+    initChatView();
     setTimeout(()=>{
       const c=document.getElementById("chatMessages");
-      c.scrollTop=c.scrollHeight;
-    },100);
+      if(c) c.scrollTop=c.scrollHeight;
+    },200);
   }
   if(name==="manager"&&managerUnlocked) refresh();
 };
@@ -787,15 +874,7 @@ function shk(id){const el=document.getElementById(id);el.classList.add("shake");
 function showSuccess(id){const m=document.getElementById(id);m.classList.add("show");setTimeout(()=>m.classList.remove("show"),3000);}
 
 document.getElementById("repDate").value=td();
-// Restore chat name from localStorage
-const savedName = localStorage.getItem("chatName_aet");
-if (savedName) {
-  document.getElementById("chatName").value = savedName;
-  chatUserName = savedName;
-  document.getElementById("chatInput").disabled = false;
-  document.getElementById("sendBtn").disabled = false;
-  document.getElementById("chatInput").placeholder = "Écrivez un message, "+savedName+"…";
-}
+// Chat auth handled by initChatView()
 </script>
 </body>
 </html>
