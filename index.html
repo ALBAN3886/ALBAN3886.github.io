@@ -3,167 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LineOps — App Industrielle</title>
-
+<title>LineOps Industrie</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;600;900&display=swap" rel="stylesheet">
 
 <style>
-body { margin:0; font-family:'Barlow',sans-serif; background:#0a0c10; color:#fff; }
-#loader { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#0a0c10; }
-#loginScreen { display:none; height:100vh; justify-content:center; align-items:center; }
-.login-box { background:#1c2333; padding:30px; border-radius:10px; width:300px; }
-#app { display:none; }
-.sidebar { width:220px; background:#0f1218; height:100vh; position:fixed; padding:20px; }
-.sidebar p { cursor:pointer; padding:8px; border-radius:6px; }
-.sidebar p:hover { background:#1c2333; }
-.main { margin-left:220px; padding:20px; }
-.card { background:#1c2333; padding:15px; border-radius:10px; margin-bottom:15px; }
-input { padding:8px; border:none; border-radius:6px; }
-button { padding:8px 12px; border:none; background:#00d4ff; cursor:pointer; border-radius:6px; }
-.chat-box { max-height:300px; overflow-y:auto; margin-bottom:10px; }
-.msg { background:#1c2333; padding:8px; margin-bottom:6px; border-radius:6px; }
-.own { background:#00d4ff; color:#000; }
+body{margin:0;font-family:'Barlow',sans-serif;background:#0a0c10;color:#fff}
+.container{padding:16px}
+.card{background:#141824;border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid #222}
+h1{font-size:20px}
+input,select{width:100%;padding:10px;border-radius:8px;border:none;margin-bottom:10px;background:#1c2333;color:#fff}
+button{width:100%;padding:10px;border:none;border-radius:8px;background:#ff7a00;color:#fff}
+.hidden{display:none}
+.online{color:#00ff94;font-size:12px}
+.offline{color:#888;font-size:12px}
 </style>
 </head>
 
 <body>
 
-<div id="loader">Chargement...</div>
-
-<div id="loginScreen">
-  <div class="login-box">
-    <h2>Connexion</h2>
-    <input id="user" placeholder="Nom"><br><br>
-    <select id="role">
-      <option>Operateur</option>
-      <option>Admin</option>
-    </select><br><br>
-    <button onclick="login()">Entrer</button>
+<div id="auth" class="container">
+  <div class="card">
+    <h1>Connexion / Inscription</h1>
+    <input id="name" placeholder="Nom">
+    <input id="pass" type="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter</button>
   </div>
 </div>
 
-<div id="app">
-  <div class="sidebar">
-    <h3>LineOps</h3>
-    <p onclick="showPage('dashboard')">Dashboard</p>
-    <p onclick="showPage('machines')">Machines</p>
-    <p onclick="showPage('chat')">Chat</p>
+<div id="app" class="container hidden">
+
+  <h1>📊 Production</h1>
+
+  <div class="card">
+    <b>👷 Employés en ligne</b>
+    <div id="users"></div>
   </div>
 
-  <div class="main">
-
-    <div id="dashboard" class="page">
-      <h1>Dashboard</h1>
-      <div class="card">Production: <span id="prod">0</span></div>
-      <div class="card">Alertes: <span id="alerts">0</span></div>
-    </div>
-
-    <div id="machines" class="page" style="display:none">
-      <h1>Machines</h1>
-      <div id="machineList"></div>
-      <button onclick="addMachine()">+ Ajouter</button>
-    </div>
-
-    <div id="chat" class="page" style="display:none">
-      <h1>Chat</h1>
-      <div class="chat-box" id="messages"></div>
-      <input id="msg" placeholder="Message">
-      <button onclick="sendMsg()">Envoyer</button>
-    </div>
-
+  <div class="card">
+    <b>➕ Ajouter rapport</b>
+    <input id="emp" placeholder="Employé">
+    <select id="machine">
+      <option>Soufflage</option>
+      <option>Remplissage</option>
+      <option>Étiquetage</option>
+      <option>Emballage</option>
+    </select>
+    <input id="prod" placeholder="Production">
+    <button onclick="addReport()">Ajouter</button>
   </div>
+
+  <div class="card">
+    <b>📋 Rapports</b>
+    <div id="reports"></div>
+  </div>
+
 </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <script>
-let currentUser = "";
-let role = "";
+const firebaseConfig = {
+  apiKey: "XXX",
+  authDomain: "XXX",
+  projectId: "XXX",
+  databaseURL: "XXX"
+};
 
-let machines = JSON.parse(localStorage.getItem('machines')||'[]');
-let messagesData = JSON.parse(localStorage.getItem('chat')||'[]');
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const rtdb = firebase.database();
 
-setTimeout(()=>{
-  loader.style.display='none';
-  loginScreen.style.display='flex';
-},1000);
+let currentUser="";
 
 function login(){
-  currentUser = user.value;
-  role = document.getElementById('role').value;
-  if(!currentUser) return alert("Nom requis");
+  currentUser = name.value;
+  if(!currentUser) return;
 
-  loginScreen.style.display='none';
-  app.style.display='block';
+  auth.classList.add('hidden');
+  app.classList.remove('hidden');
 
-  renderMachines();
-  renderMessages();
-  updateStats();
+  setOnline();
+  listenUsers();
+  listenReports();
 }
 
-function showPage(p){
-  document.querySelectorAll('.page').forEach(el=>el.style.display='none');
-  document.getElementById(p).style.display='block';
+function setOnline(){
+  let ref = rtdb.ref('status/'+currentUser);
+  ref.set({online:true});
+  ref.onDisconnect().set({online:false});
 }
 
-function addMachine(){
-  if(role !== 'Admin') return alert("Admin uniquement");
-  let name = prompt("Nom machine ?");
-  if(!name) return;
-  machines.push({name, status:"OK"});
-  localStorage.setItem('machines', JSON.stringify(machines));
-  renderMachines();
-}
-
-function renderMachines(){
-  machineList.innerHTML="";
-  machines.forEach((m,i)=>{
-    let div = document.createElement('div');
-    div.className='card';
-    div.innerHTML = `${m.name} - ${m.status} <button onclick="toggleStatus(${i})">Changer</button>`;
-    machineList.appendChild(div);
+function listenUsers(){
+  rtdb.ref('status').on('value',snap=>{
+    users.innerHTML="";
+    let data=snap.val()||{};
+    Object.keys(data).forEach(u=>{
+      let div=document.createElement('div');
+      div.innerHTML = u + " - " + (data[u].online?"<span class='online'>EN LIGNE</span>":"<span class='offline'>OFFLINE</span>");
+      users.appendChild(div);
+    });
   });
 }
 
-function toggleStatus(i){
-  machines[i].status = machines[i].status === 'OK' ? 'PANNE':'OK';
-  localStorage.setItem('machines', JSON.stringify(machines));
-  renderMachines();
-  updateStats();
+function addReport(){
+  let r={
+    emp:emp.value,
+    machine:machine.value,
+    prod:Number(prod.value),
+    time:Date.now()
+  };
+  if(!r.emp||!r.prod)return;
+  db.collection('reports').add(r);
 }
 
-function updateStats(){
-  let alerts = machines.filter(m=>m.status==='PANNE').length;
-  document.getElementById('prod').textContent = machines.length * 100;
-  document.getElementById('alerts').textContent = alerts;
-}
-
-function sendMsg(){
-  let val = msg.value;
-  if(!val) return;
-
-  messagesData.push({user:currentUser, text:val});
-  localStorage.setItem('chat', JSON.stringify(messagesData));
-  renderMessages();
-  msg.value='';
-}
-
-function renderMessages(){
-  messages.innerHTML="";
-  messagesData.forEach(m=>{
-    let div = document.createElement('div');
-    div.className = 'msg ' + (m.user===currentUser ? 'own':'');
-    div.textContent = m.user + ": " + m.text;
-    messages.appendChild(div);
+function listenReports(){
+  db.collection('reports').orderBy('time','desc').onSnapshot(snap=>{
+    reports.innerHTML="";
+    snap.forEach(doc=>{
+      let r=doc.data();
+      let d=document.createElement('div');
+      d.className='card';
+      d.innerHTML=`${r.emp} - ${r.machine} - ${r.prod}`;
+      reports.appendChild(d);
+    });
   });
-  messages.scrollTop = messages.scrollHeight;
 }
-
-window.addEventListener('storage', ()=>{
-  machines = JSON.parse(localStorage.getItem('machines')||'[]');
-  messagesData = JSON.parse(localStorage.getItem('chat')||'[]');
-  renderMachines();
-  renderMessages();
-  updateStats();
-});
 </script>
 
 </body>
