@@ -413,6 +413,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <button class="nav-icon" id="alertNavIcon" onclick="navigate('alertes')" title="Alertes">🔔</button>
     <div style="flex:1"></div>
     <button class="nav-icon" onclick="navigate('profil')" title="Mon Profil">👤</button>
+    <button class="nav-icon" id="adminNavIcon" onclick="navigate('admin')" title="Administration" style="display:none;color:#f59e0b">⚙️</button>
     <button class="nav-icon" onclick="logout()" title="Déconnexion" style="color:var(--danger)">⏻</button>
   </div>
 
@@ -452,6 +453,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Mon Compte</div>
     <div class="sidebar-item" onclick="navigate('profil')"><span class="si-icon">👤</span> Mon Profil</div>
+    <div class="sidebar-item" id="adminSidebarItem" onclick="navigate('admin')" style="display:none"><span class="si-icon" style="color:#f59e0b">⚙️</span> <span style="color:#f59e0b">Administration</span></div>
   </div>
 
   <!-- MAIN -->
@@ -665,6 +667,120 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <div id="pwdErr" style="color:var(--danger);font-size:12px"></div>
         </div>
       </div>
+    </div>
+
+    <!-- ADMIN RESET -->
+    <div class="page" id="page-admin">
+      <div class="page-header">
+        <div><h2>⚙️ Administration</h2><p>Gestion et réinitialisation des données</p></div>
+      </div>
+
+      <!-- UTILISATEURS ENREGISTRÉS -->
+      <div class="card">
+        <div class="card-title">👥 Comptes utilisateurs enregistrés</div>
+        <div id="adminUserList"><div class="empty"><div class="eico">👥</div><p>Chargement...</p></div></div>
+      </div>
+
+      <!-- NETTOYAGE SÉLECTIF -->
+      <div class="card" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04)">
+        <div class="card-title" style="color:var(--warn)">⚠️ Nettoyage sélectif des données</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">📋</div>
+            <div style="font-weight:700;margin-bottom:4px">Rapports</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Tous les rapports de production</div>
+            <button class="btn btn-ghost btn-sm" style="border-color:rgba(245,158,11,.4);color:var(--warn);width:100%" onclick="resetSection('reports','les rapports')">🗑️ Effacer</button>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">💬</div>
+            <div style="font-weight:700;margin-bottom:4px">Messagerie</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Toutes les discussions</div>
+            <button class="btn btn-ghost btn-sm" style="border-color:rgba(245,158,11,.4);color:var(--warn);width:100%" onclick="resetSection('chat','les messages')">🗑️ Effacer</button>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">🔔</div>
+            <div style="font-weight:700;margin-bottom:4px">Alertes</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Toutes les alertes</div>
+            <button class="btn btn-ghost btn-sm" style="border-color:rgba(245,158,11,.4);color:var(--warn);width:100%" onclick="resetSection('alerts','les alertes')">🗑️ Effacer</button>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">👥</div>
+            <div style="font-weight:700;margin-bottom:4px">Profils</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Tous les profils utilisateurs</div>
+            <button class="btn btn-ghost btn-sm" style="border-color:rgba(245,158,11,.4);color:var(--warn);width:100%" onclick="resetSection('userProfiles','les profils utilisateurs')">🗑️ Effacer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESET TOTAL DONNÉES -->
+      <div class="card" style="border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)">
+        <div class="card-title" style="color:var(--danger)">🚨 Réinitialisation complète des données</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7">
+          Supprime <strong style="color:var(--text)">TOUT</strong> : rapports, discussions, alertes, profils et présences.<br>
+          <span style="color:var(--danger)">⚠️ Irréversible.</span> Les comptes (email/mot de passe) restent — les techniciens devront recréer leur profil à la prochaine connexion.
+        </p>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px">
+          <div style="flex:1;min-width:200px">
+            <div class="form-label">Code secret admin</div>
+            <input type="password" class="form-input" id="resetConfirmCode" placeholder="••••••••">
+          </div>
+          <button onclick="resetAll()" style="background:var(--danger);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-family:var(--font-display);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.04em">
+            🗑️ TOUT EFFACER
+          </button>
+        </div>
+        <div id="resetMsg" style="font-size:13px;min-height:20px"></div>
+      </div>
+
+      <!-- GUIDE SUPPRESSION COMPTES FIREBASE -->
+      <div class="card" style="border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.03)">
+        <div class="card-title" style="color:var(--soufflage)">📖 Supprimer les comptes Firebase (étapes)</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7">
+          Pour supprimer les comptes email/mot de passe (pas possible depuis l'app), suis ces étapes sur <strong style="color:var(--text)">Firebase Console</strong> :
+        </p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--soufflage);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">1</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:3px">Ouvre Firebase Console</div>
+              <div style="font-size:12px;color:var(--muted)">Va sur <span style="color:var(--soufflage);font-family:monospace">console.firebase.google.com</span> et sélectionne ton projet <strong style="color:var(--text)">lineops-production</strong></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--soufflage);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">2</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:3px">Va dans Authentication</div>
+              <div style="font-size:12px;color:var(--muted)">Menu gauche → <strong style="color:var(--text)">Build</strong> → <strong style="color:var(--text)">Authentication</strong> → onglet <strong style="color:var(--text)">Users</strong></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--soufflage);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">3</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:3px">Sélectionne tous les utilisateurs</div>
+              <div style="font-size:12px;color:var(--muted)">Coche la case en haut du tableau pour tout sélectionner (sauf ton compte admin)</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--soufflage);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">4</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:3px">Supprime les comptes</div>
+              <div style="font-size:12px;color:var(--muted)">Clique sur les <strong style="color:var(--text)">3 points ⋮</strong> à droite de chaque utilisateur → <strong style="color:var(--danger)">Delete account</strong></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--ok);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">✓</div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:3px;color:var(--ok)">Les techniciens recréent leur compte</div>
+              <div style="font-size:12px;color:var(--muted)">Ils utilisent le bouton <strong style="color:var(--text)">"Créer un compte"</strong> sur la page de connexion et repartent de zéro</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px 16px;background:rgba(0,212,255,.06);border-radius:8px;border:1px solid rgba(0,212,255,.15)">
+          <a href="https://console.firebase.google.com/project/lineops-production/authentication/users" target="_blank" style="color:var(--soufflage);font-size:13px;font-weight:600;text-decoration:none">
+            🔗 Ouvrir directement la page Authentication →
+          </a>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -979,6 +1095,13 @@ function initApp() {
     document.getElementById('rapportSub').textContent = 'Mode administrateur';
     document.getElementById('formMachineTitle').textContent = '⚙️ Saisie Administrateur';
   }
+  // Show admin menu if needed
+  const isAdmin = currentUConf.role === 'Admin' || currentUConf.role === 'Superviseur';
+  const adminNav = document.getElementById('adminNavIcon');
+  const adminSide = document.getElementById('adminSidebarItem');
+  if (adminNav)  adminNav.style.display  = isAdmin ? 'flex' : 'none';
+  if (adminSide) adminSide.style.display = isAdmin ? 'flex' : 'none';
+
   buildDynamicFields();
 
   // Mark online + presence
@@ -996,6 +1119,32 @@ function initApp() {
 
 function setupListeners() {
   removeListeners();
+
+  // ── Force logout listener ──
+  // Chaque utilisateur connecté surveille ce flag.
+  // Si l'admin déclenche une réinitialisation, ils sont déconnectés instantanément.
+  let loginTs = Date.now();
+  const flRef = ref(db, 'system/forceLogout');
+  const flL = onValue(flRef, snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    // Seulement si le flag est POSTÉRIEUR à notre connexion et qu'on n'est pas l'admin qui a déclenché
+    if (data.ts > loginTs && data.by !== currentUConf?.name) {
+      removeListeners();
+      signOut(auth).then(() => {
+        currentUser = null; currentUConf = null;
+        document.getElementById('app').classList.remove('show');
+        document.getElementById('loginScreen').classList.add('show');
+        const err = document.getElementById('loginErr');
+        if (err) {
+          err.style.color = 'var(--warn)';
+          err.textContent = '🔄 L\'application a été réinitialisée par l\'administrateur. Veuillez créer un nouveau profil.';
+        }
+        loadDynamicUsers();
+      });
+    }
+  });
+  listeners.push({ ref:flRef, fn:flL });
 
   // Presence
   const pRef = ref(db,'presence');
@@ -1059,7 +1208,7 @@ function renderPresence() {
 }
 
 // ══════════ NAVIGATION ══════════
-const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil' };
+const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', admin:'Administration' };
 
 window.navigate = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1072,6 +1221,7 @@ window.navigate = function(page) {
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page==='historique') renderHistory();
   if (page==='profil') renderProfile();
+  if (page==='admin')  renderAdminPage();
 };
 
 function updateBadges() {
@@ -1584,6 +1734,99 @@ window.changePassword = async function() {
   } catch(e) {
     if (e.code === 'auth/wrong-password') errEl.textContent = 'Mot de passe actuel incorrect.';
     else errEl.textContent = 'Erreur : ' + e.message;
+  }
+};
+// ══════════ ADMIN ══════════
+function renderAdminPage() {
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) { navigate('dashboard'); return; }
+
+  const listEl = document.getElementById('adminUserList');
+  if (!listEl) return;
+
+  // Load users from DB
+  get(ref(db, 'userProfiles')).then(snap => {
+    const profiles = snap.val() || {};
+    const users = Object.entries(profiles);
+    if (users.length === 0) {
+      listEl.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun utilisateur enregistré</p></div>';
+      return;
+    }
+    listEl.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Nom</th><th>Poste / Rôle</th><th>E-mail</th><th>Téléphone</th><th></th></tr></thead>
+      <tbody>${users.map(([uid, p]) => `<tr>
+        <td style="font-weight:600">
+          ${p.photoURL ? `<img src="${p.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">` : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${(MACHINE_MAP[p.role]||{}).color||'#888'};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
+          ${esc(p.name||'—')}
+        </td>
+        <td><span style="color:${(MACHINE_MAP[p.role]||{}).color||'var(--muted)'}">${esc(p.role||'—')}</span></td>
+        <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
+        <td style="color:var(--muted);font-size:12px">${esc(p.phone||'—')}</td>
+        <td>
+          <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer ce profil">🗑️</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  });
+}
+
+window.deleteUserProfile = async function(uid) {
+  if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
+  await remove(ref(db, `userProfiles/${uid}`));
+  renderAdminPage();
+};
+
+window.resetSection = async function(section, label) {
+  if (!confirm(`Supprimer définitivement ${label} ? Cette action est irréversible.`)) return;
+  const msgEl = document.getElementById('resetMsg');
+  try {
+    await remove(ref(db, section));
+    if (msgEl) { msgEl.style.color = 'var(--ok)'; msgEl.textContent = `✅ ${label.charAt(0).toUpperCase()+label.slice(1)} supprimés avec succès.`; }
+    setTimeout(() => { if(msgEl) msgEl.textContent = ''; }, 4000);
+  } catch(e) {
+    if (msgEl) { msgEl.style.color = 'var(--danger)'; msgEl.textContent = 'Erreur : ' + e.message; }
+  }
+};
+
+window.resetAll = async function() {
+  const code  = document.getElementById('resetConfirmCode').value.trim();
+  const msgEl = document.getElementById('resetMsg');
+  msgEl.textContent = '';
+
+  if (code !== RESET_SECRET) {
+    msgEl.style.color = 'var(--danger)';
+    msgEl.textContent = '❌ Code secret incorrect.';
+    return;
+  }
+
+  if (!confirm('⚠️ ATTENTION : Cela va supprimer TOUTES les données et forcer la déconnexion de tous les utilisateurs.\n\nÊtes-vous absolument sûr ?')) return;
+
+  const btn = document.querySelector('[onclick="resetAll()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ En cours...'; }
+
+  try {
+    // 1. Écrire le flag forceLogout AVANT — tous les connectés seront déconnectés immédiatement
+    const resetTs = Date.now();
+    await set(ref(db, 'system/forceLogout'), { ts: resetTs, by: currentUConf?.name || 'Admin' });
+
+    // 2. Supprimer toutes les données
+    await Promise.all([
+      remove(ref(db, 'reports')),
+      remove(ref(db, 'chat')),
+      remove(ref(db, 'alerts')),
+      remove(ref(db, 'userProfiles')),
+      remove(ref(db, 'presence')),
+    ]);
+
+    msgEl.style.color = 'var(--ok)';
+    msgEl.textContent = '✅ Réinitialisation complète. Toutes les données supprimées, tous les utilisateurs déconnectés.';
+    document.getElementById('resetConfirmCode').value = '';
+    if (btn) { btn.disabled = false; btn.textContent = '🗑️ TOUT EFFACER'; }
+    setTimeout(() => renderAdminPage(), 1000);
+  } catch(e) {
+    msgEl.style.color = 'var(--danger)';
+    msgEl.textContent = 'Erreur : ' + e.message;
+    if (btn) { btn.disabled = false; btn.textContent = '🗑️ TOUT EFFACER'; }
   }
 };
 
