@@ -267,10 +267,9 @@ tbody tr:last-child { border:none; }
 tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 .td-num { font-family:var(--font-display); font-size:15px; font-weight:700; }
 
-/* CHAT */
 #page-chat { padding:0; height:calc(100vh - 56px); display:none; flex-direction:column; }
 #page-chat.active { display:flex; }
-.chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px; }
+.chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px; min-height:0; }
 .chat-msg { display:flex; gap:10px; align-items:flex-end; animation:fadeIn .2s ease; }
 .chat-msg.own { flex-direction:row-reverse; }
 .chat-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; color:#000; }
@@ -281,10 +280,10 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 .chat-msg.own .chat-meta { text-align:right; }
 .chat-system { text-align:center; font-size:11px; color:var(--muted); padding:3px 0; }
 .chat-alert-msg { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--danger); }
-.chat-input-area { border-top:1px solid var(--border); padding:14px 20px; background:var(--bg2); display:flex; gap:10px; align-items:center; }
-.chat-input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:10px 18px; font-family:var(--font-body); font-size:14px; color:var(--text); outline:none; transition:border-color .2s; }
+.chat-input-area { border-top:1px solid var(--border); padding:12px 16px; background:var(--bg2); display:flex; gap:10px; align-items:center; flex-shrink:0; }
+.chat-input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:10px 18px; font-family:var(--font-body); font-size:16px; color:var(--text); outline:none; transition:border-color .2s; -webkit-appearance:none; }
 .chat-input:focus { border-color:var(--soufflage); }
-.chat-send { width:42px; height:42px; background:var(--soufflage); border:none; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all .2s; color:#000; }
+.chat-send { width:46px; height:46px; background:var(--soufflage); border:none; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all .2s; color:#000; flex-shrink:0; }
 .chat-send:hover { background:#33dcff; transform:scale(1.05); }
 
 /* ALERTS */
@@ -322,7 +321,17 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
 
 @media(max-width:900px) { #app { grid-template-columns:0 200px 1fr; } .icon-bar{display:none} }
-@media(max-width:650px) { #app { grid-template-columns:1fr; grid-template-rows:56px 1fr; grid-template-areas:"topbar" "main"; } .sidebar{display:none} }
+@media(max-width:650px) {
+  #app { grid-template-columns:1fr; grid-template-rows:56px 1fr; grid-template-areas:"topbar" "main"; }
+  .sidebar{display:none}
+  /* Topbar mobile : boutons action visibles */
+  .topbar-mobile-actions { display:flex !important; }
+  .presence-pills { display:none; }
+  /* Chat mobile fix */
+  #page-chat { height:calc(100vh - 56px); }
+  .chat-input-area { padding:10px 12px; position:sticky; bottom:0; z-index:10; }
+  .chat-input { font-size:16px; } /* évite zoom auto iOS */
+}
 
 /* PROFIL */
 #profileAvatarBig img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
@@ -402,6 +411,40 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
 <!-- APP -->
 <div id="app">
+
+  <!-- MENU MOBILE OVERLAY -->
+  <div id="mobileMenuOverlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
+  <div id="mobileMenuPanel" style="display:none;position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:201;overflow-y:auto;padding:16px 0;transform:translateX(-100%);transition:transform .3s ease">
+    <div style="padding:12px 18px 20px;border-bottom:1px solid var(--border);margin-bottom:8px">
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--text)">TECHNICIEN</div>
+      <div style="font-size:13px;color:var(--soufflage);font-weight:700;letter-spacing:2px">EAU VITALE</div>
+    </div>
+    <div style="padding:4px 0">
+      <div class="sidebar-label">Navigation</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><span class="si-icon">🏭</span> Tableau de Bord</div>
+      <div class="sidebar-item" onclick="navigate('rapport');closeMobileMenu()"><span class="si-icon">📝</span> Mon Rapport</div>
+      <div class="sidebar-item" onclick="navigate('historique');closeMobileMenu()"><span class="si-icon">📋</span> Historique</div>
+      <div class="sidebar-item" onclick="navigate('stats');closeMobileMenu()"><span class="si-icon">📊</span> Statistiques</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Communication</div>
+      <div class="sidebar-item" onclick="navigate('chat');closeMobileMenu()"><span class="si-icon">💬</span> Messagerie</div>
+      <div class="sidebar-item" onclick="navigate('alertes');closeMobileMenu()"><span class="si-icon">🔔</span> Alertes</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Machines</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><div class="machine-dot" style="background:var(--soufflage)"></div> Soufflage</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><div class="machine-dot" style="background:var(--remplissage)"></div> Remplissage</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
+      <div class="sidebar-item" onclick="navigate('emballage');closeMobileMenu()"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Suivi Emballage</div>
+      <div class="sidebar-item" onclick="navigate('dashboard');closeMobileMenu()"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Mon Compte</div>
+      <div class="sidebar-item" onclick="navigate('profil');closeMobileMenu()"><span class="si-icon">👤</span> Mon Profil</div>
+      <div class="sidebar-item" id="adminMobileMenuBtn" onclick="navigate('admin');closeMobileMenu()" style="display:none"><span class="si-icon" style="color:#f59e0b">⚙️</span> <span style="color:#f59e0b">Administration</span></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-item" onclick="logout()" style="color:var(--danger)"><span class="si-icon">⏻</span> Déconnexion</div>
+    </div>
+  </div>
   <!-- ICON BAR -->
   <div class="icon-bar">
     <div class="brand-mini" style="font-size:11px;letter-spacing:0;line-height:1.1;text-align:center">TEV</div>
@@ -419,13 +462,22 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
   <!-- TOPBAR -->
   <div class="topbar">
-    <div style="display:flex;align-items:center">
+    <div style="display:flex;align-items:center;gap:8px">
+      <!-- Bouton menu mobile -->
+      <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:6px;border-radius:8px;line-height:1" title="Menu">☰</button>
       <div class="topbar-title" id="topTitle">Tableau de Bord</div>
       <div class="topbar-date" id="topDate"></div>
     </div>
     <div class="topbar-right">
       <div class="presence-pills" id="presencePills"></div>
-      <div class="user-badge" onclick="navigate('profil')" title="Mon profil">
+      <!-- Actions mobile visibles en permanence -->
+      <div class="topbar-mobile-actions" style="display:none;align-items:center;gap:6px">
+        <button onclick="navigate('chat')" id="chatMobileBtn" style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px;position:relative" title="Messagerie">💬<span id="chatMobileBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--danger);border-radius:50%"></span></button>
+        <button onclick="navigate('profil')" style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px" title="Mon profil">👤</button>
+        <button id="adminMobileBtn" onclick="navigate('admin')" style="display:none;background:none;border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px" title="Admin">⚙️</button>
+        <button onclick="logout()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:700;font-family:var(--font-display)" title="Déconnexion">⏻ Quitter</button>
+      </div>
+      <div class="user-badge" onclick="navigate('profil')" title="Mon profil" id="userBadgeDesktop">
         <div class="udot" id="myAvatarTop"></div>
         <div><div class="uname" id="myNameTop"></div><div class="urole" id="myRoleTop"></div></div>
       </div>
@@ -1170,6 +1222,9 @@ function initApp() {
   if (adminNav)  adminNav.style.display  = isAdmin ? 'flex' : 'none';
   if (adminSide) adminSide.style.display = isAdmin ? 'flex' : 'none';
 
+  // Init UI mobile
+  initMobileUI();
+
   buildDynamicFields();
 
   // Mark online + presence
@@ -1306,6 +1361,7 @@ function updateBadges() {
   ab.style.display = unreadAlert>0?'':'none'; ab.textContent = unreadAlert;
   document.getElementById('chatNavIcon').innerHTML = unreadChat>0?'💬<div class="nbadge"></div>':'💬';
   document.getElementById('alertNavIcon').innerHTML = unreadAlert>0?'🔔<div class="nbadge"></div>':'🔔';
+  updateMobileChatBadge();
 }
 
 // ══════════ DASHBOARD ══════════
@@ -1883,7 +1939,56 @@ window.changePassword = async function() {
     else errEl.textContent = 'Erreur : ' + e.message;
   }
 };
-// ══════════ ADMIN ══════════
+// ══════════ MOBILE UI ══════════
+function initMobileUI() {
+  const isMobile = window.innerWidth <= 650;
+  const mobileActions = document.querySelector('.topbar-mobile-actions');
+  const desktopBadge  = document.getElementById('userBadgeDesktop');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  if (mobileActions) mobileActions.style.display = isMobile ? 'flex' : 'none';
+  if (desktopBadge)  desktopBadge.style.display  = isMobile ? 'none' : 'flex';
+  if (mobileMenuBtn) mobileMenuBtn.style.display  = isMobile ? 'flex' : 'none';
+
+  // Afficher bouton admin mobile si admin
+  const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+  const adminMobileTopbar = document.getElementById('adminMobileBtn');
+  const adminMobileMenu   = document.getElementById('adminMobileMenuBtn');
+  if (adminMobileTopbar) adminMobileTopbar.style.display = isAdmin ? 'flex' : 'none';
+  if (adminMobileMenu)   adminMobileMenu.style.display   = isAdmin ? 'flex' : 'none';
+}
+
+window.toggleMobileMenu = function() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const panel   = document.getElementById('mobileMenuPanel');
+  const open    = panel.style.transform === 'translateX(0px)' || panel.style.transform === 'translateX(0)';
+  if (open) { closeMobileMenu(); } else { openMobileMenu(); }
+};
+
+window.openMobileMenu = function() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const panel   = document.getElementById('mobileMenuPanel');
+  overlay.style.display = 'block';
+  panel.style.display   = 'block';
+  setTimeout(() => { panel.style.transform = 'translateX(0)'; }, 10);
+};
+
+window.closeMobileMenu = function() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const panel   = document.getElementById('mobileMenuPanel');
+  panel.style.transform = 'translateX(-100%)';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    panel.style.display   = 'none';
+  }, 300);
+};
+
+// Mise à jour badge chat sur mobile
+function updateMobileChatBadge() {
+  const badge = document.getElementById('chatMobileBadge');
+  if (badge) badge.style.display = unreadChat > 0 ? 'block' : 'none';
+}
+
+window.addEventListener('resize', initMobileUI);
 function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
   if (!isAdmin) { navigate('dashboard'); return; }
