@@ -20,6 +20,7 @@
   --remplissage: #00ff94;
   --etiquette: #ffb800;
   --emballage: #ff6b35;
+  --b19: #a855f7;
   --admin: #c084fc;
   --ok: #22c55e;
   --warn: #f59e0b;
@@ -189,6 +190,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .stat-box::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; border-radius:0 0 10px 10px; }
 .stat-box.s1::after{background:var(--soufflage)} .stat-box.s2::after{background:var(--remplissage)}
 .stat-box.s3::after{background:var(--etiquette)} .stat-box.s4::after{background:var(--emballage)}
+.stat-box.s5::after{background:var(--b19)}
 .sval { font-family:var(--font-display); font-size:30px; font-weight:900; line-height:1; }
 .slabel { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:8px; }
 .ssub { font-size:11px; color:var(--muted); margin-top:6px; }
@@ -200,6 +202,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .mc-accent { position:absolute; top:0; left:0; right:0; height:3px; }
 .mc-soufflage .mc-accent{background:var(--soufflage)} .mc-remplissage .mc-accent{background:var(--remplissage)}
 .mc-etiquette .mc-accent{background:var(--etiquette)} .mc-emballage .mc-accent{background:var(--emballage)}
+.mc-b19 .mc-accent{background:var(--b19)}
 .mc-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
 .mc-name { font-family:var(--font-display); font-size:17px; font-weight:700; letter-spacing:.03em; }
 .mc-sub { font-size:11px; color:var(--muted); margin-top:3px; }
@@ -213,6 +216,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .mm-val { font-family:var(--font-display); font-size:22px; font-weight:700; }
 .mc-soufflage .mm-val{color:var(--soufflage)} .mc-remplissage .mm-val{color:var(--remplissage)}
 .mc-etiquette .mm-val{color:var(--etiquette)} .mc-emballage .mm-val{color:var(--emballage)}
+.mc-b19 .mm-val{color:var(--b19)}
 .mc-footer { display:flex; align-items:center; justify-content:space-between; padding-top:12px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); }
 
 /* FORM */
@@ -338,8 +342,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
     <!-- MODE CONNEXION -->
     <div id="modeLogin">
-      <div class="login-label">Sélectionner votre compte</div>
-      <div class="user-select" id="userSelect"></div>
+      <div class="login-label">Adresse e-mail</div>
+      <input type="email" class="login-input" id="emailInput" placeholder="prenom.nom@eauvitale.fr" onkeydown="if(event.key==='Enter')document.getElementById('pwdInput').focus()">
       <div class="login-label">Mot de passe</div>
       <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       <div style="text-align:right;margin-bottom:14px;margin-top:-8px">
@@ -358,6 +362,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <option value="Technicien Remplissage">🧴 Technicien Remplissage</option>
         <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
         <option value="Technicien Emballage">📦 Technicien Emballage</option>
+        <option value="Technicien B19">⚙️ Technicien B19</option>
         <option value="Superviseur">⚙️ Superviseur</option>
       </select>
       <div class="login-label">Adresse e-mail</div>
@@ -431,6 +436,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--remplissage)"></div> Remplissage</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
+    <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
   </div>
 
   <!-- MAIN -->
@@ -445,11 +451,12 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
       </div>
-      <div class="stats-row">
+      <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-box s1"><div class="slabel">🫧 Bouteilles Soufflées</div><div class="sval" id="gs1">—</div><div class="ssub">aujourd'hui</div></div>
         <div class="stat-box s2"><div class="slabel">🧴 Bouchons Utilisés</div><div class="sval" id="gs2">—</div><div class="ssub">aujourd'hui</div></div>
         <div class="stat-box s3"><div class="slabel">🏷️ Étiquettes Posées</div><div class="sval" id="gs3">—</div><div class="ssub">aujourd'hui</div></div>
         <div class="stat-box s4"><div class="slabel">📦 Sachets Utilisés</div><div class="sval" id="gs4">—</div><div class="ssub">aujourd'hui</div></div>
+        <div class="stat-box s5"><div class="slabel">⚙️ Production B19</div><div class="sval" id="gs5">—</div><div class="ssub">aujourd'hui</div></div>
       </div>
       <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
       <div class="card">
@@ -524,6 +531,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <option value="Remplissage">Remplissage</option>
           <option value="Étiquette">Étiquette</option>
           <option value="Emballage">Emballage</option>
+          <option value="B19">B19</option>
         </select>
         <select class="form-select" id="filterStatus" onchange="renderHistory()">
           <option value="">Tous les statuts</option>
@@ -545,6 +553,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <button class="itab" onclick="switchStatTab('Remplissage',this)">🧴 Remplissage</button>
         <button class="itab" onclick="switchStatTab('Étiquette',this)">🏷️ Étiquette</button>
         <button class="itab" onclick="switchStatTab('Emballage',this)">📦 Emballage</button>
+        <button class="itab" onclick="switchStatTab('B19',this)">⚙️ B19</button>
       </div>
       <div id="statContent"></div>
     </div>
@@ -609,6 +618,7 @@ const MACHINE_MAP = {
   'Technicien Remplissage': { machine:'Remplissage',  color:'#00ff94' },
   'Technicien Étiquette':   { machine:'Étiquette',    color:'#ffb800' },
   'Technicien Emballage':   { machine:'Emballage',    color:'#ff6b35' },
+  'Technicien B19':         { machine:'B19',          color:'#a855f7' },
   'Superviseur':            { machine:null,            color:'#c084fc' },
   'Admin':                  { machine:null,            color:'#c084fc' },
 };
@@ -626,6 +636,8 @@ const MACHINES = [
     fields:[{key:'prod',label:'Bouteilles étiquetées',unit:'unités'},{key:'etiquettes',label:'Étiquettes utilisées',unit:'pcs'},{key:'etiqRest',label:'Étiquettes restantes',unit:'pcs'}] },
   { id:'Emballage',   icon:'📦', color:'#ff6b35', cssClass:'mc-emballage',
     fields:[{key:'prod',label:'Cartons emballés',unit:'cartons'},{key:'sachets',label:'Sachets utilisés',unit:'pcs'},{key:'sachetsRest',label:'Sachets restants',unit:'pcs'}] },
+  { id:'B19',         icon:'⚙️', color:'#a855f7', cssClass:'mc-b19',
+    fields:[{key:'prod',label:'Production B19',unit:'unités'}] },
 ];
 
 // ══════════ STATE ══════════
@@ -708,17 +720,18 @@ window._selectUser = function(email) {
 };
 
 window.doLogin = async function() {
-  const pwd = document.getElementById('pwdInput').value;
-  const err = document.getElementById('loginErr');
-  if (!selectedEmail) { err.textContent = 'Veuillez sélectionner un compte.'; return; }
-  if (!pwd)           { err.textContent = 'Entrez votre mot de passe.'; return; }
+  const email = document.getElementById('emailInput').value.trim();
+  const pwd   = document.getElementById('pwdInput').value;
+  const err   = document.getElementById('loginErr');
+  if (!email) { err.textContent = 'Entrez votre adresse e-mail.'; return; }
+  if (!pwd)   { err.textContent = 'Entrez votre mot de passe.'; return; }
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
-    await signInWithEmailAndPassword(auth, selectedEmail, pwd);
+    await signInWithEmailAndPassword(auth, email, pwd);
     err.textContent = '';
   } catch(e) {
-    err.textContent = 'Mot de passe incorrect.';
+    err.textContent = 'Email ou mot de passe incorrect.';
     btn.disabled = false; btn.textContent = 'CONNEXION →';
   }
 };
@@ -776,12 +789,13 @@ window.logout = async function() {
   currentUser = null; currentUConf = null;
   document.getElementById('app').classList.remove('show');
   document.getElementById('loginScreen').classList.add('show');
+  const emailEl = document.getElementById('emailInput');
+  if (emailEl) emailEl.value = '';
   const pwdEl = document.getElementById('pwdInput');
   if (pwdEl) pwdEl.value = '';
   const err = document.getElementById('loginErr');
   if (err) { err.textContent = ''; err.style.color = 'var(--danger)'; }
   selectedEmail = null;
-  document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
   if (window.switchMode) switchMode('login');
 };
 
@@ -952,11 +966,13 @@ function renderDashboard() {
   const rempR = todayReps.find(r=>r.machine==='Remplissage');
   const etiqR = todayReps.find(r=>r.machine==='Étiquette');
   const embR  = todayReps.find(r=>r.machine==='Emballage');
+  const b19R  = todayReps.find(r=>r.machine==='B19');
 
   document.getElementById('gs1').textContent = soufR ? num(soufR.fields?.prod) : '—';
   document.getElementById('gs2').textContent = rempR ? num(rempR.fields?.bouchons) : '—';
   document.getElementById('gs3').textContent = etiqR ? num(etiqR.fields?.etiquettes) : '—';
   document.getElementById('gs4').textContent = embR  ? num(embR.fields?.sachets) : '—';
+  document.getElementById('gs5').textContent = b19R  ? num(b19R.fields?.prod) : '—';
 
   // Machine cards
   const mc = document.getElementById('machineCards');
@@ -966,8 +982,9 @@ function renderDashboard() {
     const status = r ? r.status : 'none';
     const sc = {ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[status]||'warn';
     const st = {ok:'✅ En fonctionnement',warn:'⚠️ Ralentissement',panne:'🔴 En panne',arret:'⏸️ Arrêt',none:'— Pas de rapport'}[status]||'—';
-    const uc = USERS_CONFIG.find(u=>u.machine===m.id);
+    const uc = dynamicUsers.find(u=>u.machine===m.id);
     const presOnline = uc ? Object.values(presence).find(p=>p.name===uc.name&&p.online) : null;
+    const hasSecondField = m.fields.length > 1;
     return `<div class="machine-card ${m.cssClass}">
       <div class="mc-accent"></div>
       <div class="mc-header">
@@ -979,7 +996,7 @@ function renderDashboard() {
       </div>
       <div class="mc-metrics">
         <div><div class="mm-label">Production</div><div class="mm-val">${r?num(r.fields?.prod):'—'}</div></div>
-        <div><div class="mm-label">${m.fields[1]?.label||''}</div><div class="mm-val">${r?num(r.fields?.[m.fields[1]?.key]):'—'}</div></div>
+        ${hasSecondField?`<div><div class="mm-label">${m.fields[1]?.label||''}</div><div class="mm-val">${r?num(r.fields?.[m.fields[1]?.key]):'—'}</div></div>`:'<div></div>'}
       </div>
       <div class="mc-footer">
         <span>${r?'Poste: '+r.shift:'Aucun rapport'}</span>
