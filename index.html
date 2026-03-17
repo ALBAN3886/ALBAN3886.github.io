@@ -323,6 +323,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
 @media(max-width:900px) { #app { grid-template-columns:0 200px 1fr; } .icon-bar{display:none} }
 @media(max-width:650px) { #app { grid-template-columns:1fr; grid-template-rows:56px 1fr; grid-template-areas:"topbar" "main"; } .sidebar{display:none} }
+
+/* PROFIL */
+#profileAvatarBig img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 </style>
 </head>
 <body>
@@ -409,6 +412,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <button class="nav-icon" id="chatNavIcon" onclick="navigate('chat')" title="Chat">💬</button>
     <button class="nav-icon" id="alertNavIcon" onclick="navigate('alertes')" title="Alertes">🔔</button>
     <div style="flex:1"></div>
+    <button class="nav-icon" onclick="navigate('profil')" title="Mon Profil">👤</button>
     <button class="nav-icon" onclick="logout()" title="Déconnexion" style="color:var(--danger)">⏻</button>
   </div>
 
@@ -420,7 +424,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     </div>
     <div class="topbar-right">
       <div class="presence-pills" id="presencePills"></div>
-      <div class="user-badge" onclick="logout()">
+      <div class="user-badge" onclick="navigate('profil')" title="Mon profil">
         <div class="udot" id="myAvatarTop"></div>
         <div><div class="uname" id="myNameTop"></div><div class="urole" id="myRoleTop"></div></div>
       </div>
@@ -445,6 +449,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Mon Compte</div>
+    <div class="sidebar-item" onclick="navigate('profil')"><span class="si-icon">👤</span> Mon Profil</div>
   </div>
 
   <!-- MAIN -->
@@ -582,6 +589,82 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <button class="btn btn-ghost btn-sm" onclick="clearAlerts()">Tout marquer lu</button>
       </div>
       <div id="alertsList"></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="page" id="page-profil">
+      <div class="page-header">
+        <div><h2>👤 Mon Profil</h2><p>Gérer mes informations personnelles</p></div>
+      </div>
+
+      <!-- PHOTO + INFOS RAPIDES -->
+      <div class="card" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="position:relative;flex-shrink:0">
+          <div id="profileAvatarBig" style="width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#000;overflow:hidden;border:3px solid var(--border2)"></div>
+          <label for="photoInput" style="position:absolute;bottom:0;right:0;background:var(--soufflage);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px" title="Changer la photo">📷</label>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoChange(event)">
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700" id="profileNameBig">—</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px" id="profileRoleBig">—</div>
+          <div style="color:var(--muted2);font-size:12px;margin-top:2px" id="profileEmailBig">—</div>
+        </div>
+      </div>
+
+      <!-- FORMULAIRE PROFIL -->
+      <div class="card">
+        <div class="card-title">✏️ Modifier mes informations</div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">Prénom &amp; Nom</div>
+            <input type="text" class="form-input" id="profName" placeholder="Votre nom complet">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Numéro de téléphone</div>
+            <input type="tel" class="form-input" id="profPhone" placeholder="Ex : 06 12 34 56 78">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Poste / Rôle</div>
+            <select class="form-select" id="profRole">
+              <option value="Technicien Soufflage">🫧 Technicien Soufflage</option>
+              <option value="Technicien Remplissage">🧴 Technicien Remplissage</option>
+              <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
+              <option value="Technicien Emballage">📦 Technicien Emballage</option>
+              <option value="Technicien B19">⚙️ Technicien B19</option>
+              <option value="Superviseur">🔧 Superviseur</option>
+              <option value="Admin">⚙️ Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveProfile()">💾 Enregistrer</button>
+          <div class="save-ok" id="profileSaveOk">✓ Profil mis à jour !</div>
+        </div>
+      </div>
+
+      <!-- CHANGER MOT DE PASSE -->
+      <div class="card">
+        <div class="card-title">🔑 Changer mon mot de passe</div>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="form-label">Mot de passe actuel</div>
+            <input type="password" class="form-input" id="pwdCurrent" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Nouveau mot de passe</div>
+            <input type="password" class="form-input" id="pwdNew" placeholder="Minimum 6 caractères">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Confirmer</div>
+            <input type="password" class="form-input" id="pwdNew2" placeholder="Répéter">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="changePassword()">🔒 Changer le mot de passe</button>
+          <div class="save-ok" id="pwdSaveOk">✓ Mot de passe modifié !</div>
+          <div id="pwdErr" style="color:var(--danger);font-size:12px"></div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -848,6 +931,17 @@ onAuthStateChanged(auth, async user => {
     }
     if (!conf) { await signOut(auth); return; }
     currentUConf = conf;
+
+    // Load extra profile data (phone, photoURL)
+    try {
+      const snap2 = await get(ref(db, `userProfiles/${user.uid}`));
+      if (snap2.exists()) {
+        const p = snap2.val();
+        if (p.phone)    currentUConf.phone    = p.phone;
+        if (p.photoURL) currentUConf.photoURL = p.photoURL;
+      }
+    } catch(e) {}
+
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('app').classList.add('show');
     initApp();
@@ -862,8 +956,12 @@ onAuthStateChanged(auth, async user => {
 function initApp() {
   // Topbar
   const av = document.getElementById('myAvatarTop');
-  av.textContent = currentUConf.name.charAt(0);
-  av.style.background = currentUConf.color;
+  if (currentUConf.photoURL) {
+    av.innerHTML = `<img src="${currentUConf.photoURL}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`;
+  } else {
+    av.textContent = currentUConf.name.charAt(0);
+    av.style.background = currentUConf.color;
+  }
   document.getElementById('myNameTop').textContent = currentUConf.name;
   document.getElementById('myRoleTop').textContent = currentUConf.role;
   document.getElementById('topDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -961,7 +1059,7 @@ function renderPresence() {
 }
 
 // ══════════ NAVIGATION ══════════
-const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes' };
+const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil' };
 
 window.navigate = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -973,6 +1071,7 @@ window.navigate = function(page) {
   if (page==='chat') { unreadChat=0; updateBadges(); scrollChat(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page==='historique') renderHistory();
+  if (page==='profil') renderProfile();
 };
 
 function updateBadges() {
@@ -1362,6 +1461,130 @@ window.exportPDF = function() {
       <td>${r.note||''}</td></tr>`).join('')}</tbody></table>
   </body></html>`;
   const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),500);
+};
+// ══════════ PROFIL ══════════
+function renderProfile() {
+  if (!currentUser || !currentUConf) return;
+
+  // Avatar big
+  const av = document.getElementById('profileAvatarBig');
+  if (currentUConf.photoURL) {
+    av.innerHTML = `<img src="${currentUConf.photoURL}" alt="photo">`;
+    av.style.background = 'transparent';
+  } else {
+    av.textContent = (currentUConf.name||'?').charAt(0).toUpperCase();
+    av.style.background = currentUConf.color || '#00d4ff';
+  }
+
+  document.getElementById('profileNameBig').textContent  = currentUConf.name  || '—';
+  document.getElementById('profileRoleBig').textContent  = currentUConf.role  || '—';
+  document.getElementById('profileEmailBig').textContent = currentUser.email  || '—';
+
+  // Fill form
+  document.getElementById('profName').value  = currentUConf.name  || '';
+  document.getElementById('profPhone').value = currentUConf.phone || '';
+  const roleEl = document.getElementById('profRole');
+  if (roleEl) {
+    for (let i = 0; i < roleEl.options.length; i++) {
+      if (roleEl.options[i].value === currentUConf.role) { roleEl.selectedIndex = i; break; }
+    }
+  }
+
+  // Reset password fields
+  ['pwdCurrent','pwdNew','pwdNew2'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const saveOk = document.getElementById('profileSaveOk');
+  if (saveOk) saveOk.classList.remove('show');
+  const pwdOk = document.getElementById('pwdSaveOk');
+  if (pwdOk) pwdOk.classList.remove('show');
+  const pwdErr = document.getElementById('pwdErr');
+  if (pwdErr) pwdErr.textContent = '';
+}
+
+// Photo
+window.handlePhotoChange = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('Photo trop lourde (max 2 Mo).'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataURL = e.target.result;
+    // Save to DB
+    await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), dataURL);
+    currentUConf.photoURL = dataURL;
+    // Update avatar in topbar
+    const topAv = document.getElementById('myAvatarTop');
+    topAv.innerHTML = `<img src="${dataURL}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`;
+    // Update big avatar
+    const bigAv = document.getElementById('profileAvatarBig');
+    bigAv.innerHTML = `<img src="${dataURL}" alt="photo">`;
+    bigAv.style.background = 'transparent';
+  };
+  reader.readAsDataURL(file);
+};
+
+// Save profile info
+window.saveProfile = async function() {
+  const name  = document.getElementById('profName').value.trim();
+  const phone = document.getElementById('profPhone').value.trim();
+  const role  = document.getElementById('profRole').value;
+  if (!name) { alert('Le nom ne peut pas être vide.'); return; }
+
+  const newMachine = (MACHINE_MAP[role] || {}).machine || null;
+  const newColor   = (MACHINE_MAP[role] || {}).color   || currentUConf.color;
+
+  await update(ref(db, `userProfiles/${currentUser.uid}`), { name, phone, role });
+
+  // Update local state
+  currentUConf.name    = name;
+  currentUConf.phone   = phone;
+  currentUConf.role    = role;
+  currentUConf.machine = newMachine;
+  currentUConf.color   = newColor;
+
+  // Update topbar
+  document.getElementById('myNameTop').textContent = name;
+  document.getElementById('myRoleTop').textContent = role;
+  const topAv = document.getElementById('myAvatarTop');
+  if (!currentUConf.photoURL) { topAv.textContent = name.charAt(0); topAv.style.background = newColor; }
+
+  // Update presence
+  await update(ref(db, `presence/${currentUser.uid}`), { name, role, color: newColor, machine: newMachine || '' });
+
+  // Refresh profile display
+  renderProfile();
+
+  const ok = document.getElementById('profileSaveOk');
+  ok.classList.add('show');
+  setTimeout(() => ok.classList.remove('show'), 3000);
+};
+
+// Change password
+window.changePassword = async function() {
+  const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } =
+    await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+
+  const current = document.getElementById('pwdCurrent').value;
+  const newPwd  = document.getElementById('pwdNew').value;
+  const newPwd2 = document.getElementById('pwdNew2').value;
+  const errEl   = document.getElementById('pwdErr');
+  const okEl    = document.getElementById('pwdSaveOk');
+  errEl.textContent = ''; okEl.classList.remove('show');
+
+  if (!current)         { errEl.textContent = 'Entrez votre mot de passe actuel.'; return; }
+  if (newPwd.length < 6){ errEl.textContent = 'Nouveau mot de passe : minimum 6 caractères.'; return; }
+  if (newPwd !== newPwd2){ errEl.textContent = 'Les mots de passe ne correspondent pas.'; return; }
+
+  try {
+    const credential = EmailAuthProvider.credential(currentUser.email, current);
+    await reauthenticateWithCredential(currentUser, credential);
+    await updatePassword(currentUser, newPwd);
+    okEl.classList.add('show');
+    ['pwdCurrent','pwdNew','pwdNew2'].forEach(id => { document.getElementById(id).value = ''; });
+    setTimeout(() => okEl.classList.remove('show'), 3000);
+  } catch(e) {
+    if (e.code === 'auth/wrong-password') errEl.textContent = 'Mot de passe actuel incorrect.';
+    else errEl.textContent = 'Erreur : ' + e.message;
+  }
 };
 
 </script>
