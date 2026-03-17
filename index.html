@@ -337,11 +337,60 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="brand">LINE<span>OPS</span></div>
       <div class="sub">Gestion de Ligne de Production</div>
     </div>
-    <div class="login-label">Sélectionner votre compte</div>
-    <div class="user-select" id="userSelect"></div>
-    <div class="login-label">Mot de passe</div>
-    <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px;margin-bottom:24px;">
+      <button id="tabLogin" onclick="switchAuthTab('login')" style="flex:1;padding:9px;border-radius:6px;border:none;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:var(--soufflage);color:#000;transition:all .2s;">CONNEXION</button>
+      <button id="tabRegister" onclick="switchAuthTab('register')" style="flex:1;padding:9px;border-radius:6px;border:none;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .2s;">INSCRIPTION</button>
+    </div>
+
+    <!-- CONNEXION -->
+    <div id="formLogin">
+      <div class="login-label">Email</div>
+      <input type="email" class="login-input" id="loginEmail" placeholder="votre@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="login-label">Mot de passe</div>
+      <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--muted)">OU</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <button onclick="doGoogleLogin()" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.4 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.3-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.6-3.5-11.2-8.3l-6.6 5.1C9.7 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.4l6.2 5.2c-.4.3 5.9-4.3 5.9-14.6 0-1.3-.1-2.7-.3-4z"/></svg>
+        Continuer avec Google
+      </button>
+    </div>
+
+    <!-- INSCRIPTION -->
+    <div id="formRegister" style="display:none">
+      <div class="login-label">Nom complet</div>
+      <input type="text" class="login-input" id="regName" placeholder="Jean Dupont">
+      <div class="login-label">Email</div>
+      <input type="email" class="login-input" id="regEmail" placeholder="votre@email.com">
+      <div class="login-label">Mot de passe</div>
+      <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères">
+      <div class="login-label">Rôle</div>
+      <select class="login-input" id="regRole" style="cursor:pointer">
+        <option value="">-- Choisir un rôle --</option>
+        <option value="Admin">⚙️ Administrateur</option>
+        <option value="Opérateur Soufflage">🫧 Opérateur Soufflage</option>
+        <option value="Opératrice Remplissage">🧴 Opérateur Remplissage</option>
+        <option value="Opérateur Étiquette">🏷️ Opérateur Étiquette</option>
+        <option value="Opératrice Emballage">📦 Opérateur Emballage</option>
+      </select>
+      <button class="btn-login" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--muted)">OU</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <button onclick="doGoogleRegister()" style="width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.7 33.4 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.3-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.4 35.6 26.8 36 24 36c-5.2 0-9.6-3.5-11.2-8.3l-6.6 5.1C9.7 39.6 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.4l6.2 5.2c-.4.3 5.9-4.3 5.9-14.6 0-1.3-.1-2.7-.3-4z"/></svg>
+        S'inscrire avec Google
+      </button>
+    </div>
+
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
@@ -535,7 +584,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -607,70 +657,186 @@ function getLast14Days() {
   return Array.from({length:14},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(13-i)); return d.toISOString().split('T')[0]; });
 }
 
-// ══════════ BUILD LOGIN ══════════
-function buildLogin() {
-  const wrap = document.getElementById('userSelect');
-  wrap.innerHTML = USERS_CONFIG.map(u => `
-    <div class="user-chip" id="chip_${btoa(u.email)}" onclick="window._selectUser('${u.email}')">
-      <div class="chip-name"><span class="chip-dot" style="background:${u.color}"></span>${u.name}</div>
-      <div class="chip-role">${u.role}</div>
-    </div>`).join('');
-}
-
-let selectedEmail = null;
-window._selectUser = function(email) {
-  selectedEmail = email;
-  document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
-  document.getElementById('chip_'+btoa(email)).classList.add('selected');
-  document.getElementById('pwdInput').focus();
+// ══════════ AUTH UI ══════════
+window.switchAuthTab = function(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLogin').style.background = isLogin ? 'var(--soufflage)' : 'none';
+  document.getElementById('tabLogin').style.color = isLogin ? '#000' : 'var(--muted)';
+  document.getElementById('tabRegister').style.background = isLogin ? 'none' : 'var(--soufflage)';
+  document.getElementById('tabRegister').style.color = isLogin ? 'var(--muted)' : '#000';
+  document.getElementById('loginErr').textContent = '';
 };
 
+function getRoleConfig(role) {
+  const map = {
+    'Admin':                    { machine:null,          color:'#c084fc' },
+    'Opérateur Soufflage':      { machine:'Soufflage',   color:'#00d4ff' },
+    'Opératrice Remplissage':   { machine:'Remplissage', color:'#00ff94' },
+    'Opérateur Remplissage':    { machine:'Remplissage', color:'#00ff94' },
+    'Opérateur Étiquette':      { machine:'Étiquette',   color:'#ffb800' },
+    'Opératrice Emballage':     { machine:'Emballage',   color:'#ff6b35' },
+    'Opérateur Emballage':      { machine:'Emballage',   color:'#ff6b35' },
+  };
+  return map[role] || { machine:null, color:'#7a8faa' };
+}
+
+// ── CONNEXION EMAIL ──
 window.doLogin = async function() {
-  const pwd = document.getElementById('pwdInput').value;
-  if (!selectedEmail) { document.getElementById('loginErr').textContent = 'Veuillez sélectionner un compte.'; return; }
-  if (!pwd) { document.getElementById('loginErr').textContent = 'Entrez votre mot de passe.'; return; }
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd   = document.getElementById('pwdInput').value;
+  const err   = document.getElementById('loginErr');
+  if (!email) { err.textContent = 'Entrez votre email.'; return; }
+  if (!pwd)   { err.textContent = 'Entrez votre mot de passe.'; return; }
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
-    await signInWithEmailAndPassword(auth, selectedEmail, pwd);
-    document.getElementById('loginErr').textContent = '';
+    await signInWithEmailAndPassword(auth, email, pwd);
+    err.textContent = '';
   } catch(e) {
-    document.getElementById('loginErr').textContent = 'Mot de passe incorrect.';
+    const msgs = { 'auth/user-not-found':'Aucun compte avec cet email.', 'auth/wrong-password':'Mot de passe incorrect.', 'auth/invalid-email':'Email invalide.', 'auth/invalid-credential':'Email ou mot de passe incorrect.' };
+    err.textContent = msgs[e.code] || 'Erreur de connexion.';
     btn.disabled = false; btn.textContent = 'CONNEXION →';
   }
 };
 
+// ── CONNEXION GOOGLE ──
+window.doGoogleLogin = async function() {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    // Check si profil existe déjà dans DB
+    const snap = await new Promise(res => {
+      const r = ref(db, `userProfiles/${user.uid}`);
+      onValue(r, res, { onlyOnce: true });
+    });
+    if (!snap.val()) {
+      // Nouveau compte Google — demander le rôle
+      showRoleModal(user);
+    }
+  } catch(e) {
+    document.getElementById('loginErr').textContent = 'Connexion Google annulée.';
+  }
+};
+
+// ── INSCRIPTION EMAIL ──
+window.doRegister = async function() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pwd   = document.getElementById('regPwd').value;
+  const role  = document.getElementById('regRole').value;
+  const err   = document.getElementById('loginErr');
+  if (!name)  { err.textContent = 'Entrez votre nom.'; return; }
+  if (!email) { err.textContent = 'Entrez votre email.'; return; }
+  if (!pwd || pwd.length < 6) { err.textContent = 'Mot de passe minimum 6 caractères.'; return; }
+  if (!role)  { err.textContent = 'Choisissez un rôle.'; return; }
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+    await updateProfile(cred.user, { displayName: name });
+    const rc = getRoleConfig(role);
+    await set(ref(db, `userProfiles/${cred.user.uid}`), { name, email, role, machine: rc.machine, color: rc.color, createdAt: Date.now() });
+    err.textContent = '';
+  } catch(e) {
+    const msgs = { 'auth/email-already-in-use':'Cet email est déjà utilisé.', 'auth/invalid-email':'Email invalide.', 'auth/weak-password':'Mot de passe trop faible.' };
+    err.textContent = msgs[e.code] || 'Erreur lors de la création.';
+    btn.disabled = false; btn.textContent = 'CRÉER MON COMPTE →';
+  }
+};
+
+// ── INSCRIPTION GOOGLE ──
+window.doGoogleRegister = async function() {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    showRoleModal(result.user);
+  } catch(e) {
+    document.getElementById('loginErr').textContent = 'Connexion Google annulée.';
+  }
+};
+
+// ── MODAL CHOIX DE RÔLE (après Google) ──
+function showRoleModal(user) {
+  const existing = document.getElementById('roleModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'roleModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:36px;width:400px;max-width:90vw;">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:900;margin-bottom:8px;">Choisir votre rôle</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">Bonjour ${user.displayName || user.email} — sélectionnez votre poste</div>
+    <select id="modalRole" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-family:var(--font-body);font-size:15px;color:var(--text);outline:none;margin-bottom:16px;">
+      <option value="">-- Choisir un rôle --</option>
+      <option value="Admin">⚙️ Administrateur</option>
+      <option value="Opérateur Soufflage">🫧 Opérateur Soufflage</option>
+      <option value="Opérateur Remplissage">🧴 Opérateur Remplissage</option>
+      <option value="Opérateur Étiquette">🏷️ Opérateur Étiquette</option>
+      <option value="Opérateur Emballage">📦 Opérateur Emballage</option>
+    </select>
+    <div id="modalErr" style="color:var(--danger);font-size:12px;min-height:18px;margin-bottom:10px;"></div>
+    <button onclick="confirmRole('${user.uid}','${user.displayName||user.email}','${user.email}')" style="width:100%;padding:13px;background:var(--soufflage);color:#000;border:none;border-radius:8px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;">CONFIRMER →</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+window.confirmRole = async function(uid, name, email) {
+  const role = document.getElementById('modalRole').value;
+  if (!role) { document.getElementById('modalErr').textContent = 'Choisissez un rôle.'; return; }
+  const rc = getRoleConfig(role);
+  await set(ref(db, `userProfiles/${uid}`), { name, email, role, machine: rc.machine, color: rc.color, createdAt: Date.now() });
+  document.getElementById('roleModal')?.remove();
+};
+
+// ── DÉCONNEXION ──
 window.logout = async function() {
   if (!currentUser) return;
-  // Mark offline
   await update(ref(db, `presence/${currentUser.uid}`), { online: false, ts: serverTimestamp() });
-  // Chat system msg
   await push(ref(db,'chat'), { system:true, text:`${currentUConf.name} s'est déconnecté 🔴`, ts: serverTimestamp() });
   removeListeners();
   await signOut(auth);
   currentUser = null; currentUConf = null;
   document.getElementById('app').classList.remove('show');
   document.getElementById('loginScreen').classList.add('show');
-  document.getElementById('pwdInput').value = '';
   document.getElementById('loginErr').textContent = '';
-  selectedEmail = null;
-  document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
 };
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
   document.getElementById('loader').style.display = 'none';
   if (user) {
+    // Charger profil depuis DB
+    const snap = await new Promise(res => {
+      const r = ref(db, `userProfiles/${user.uid}`);
+      onValue(r, res, { onlyOnce: true });
+    });
+    const profile = snap.val();
+    if (!profile) {
+      // Pas encore de profil (Google sans rôle) → attendre
+      document.getElementById('loginScreen').classList.add('show');
+      // Écouter quand le profil sera créé
+      const profileRef = ref(db, `userProfiles/${user.uid}`);
+      onValue(profileRef, s => {
+        if (s.val()) {
+          currentUser = user;
+          currentUConf = { ...s.val() };
+          document.getElementById('loginScreen').classList.remove('show');
+          document.getElementById('app').classList.add('show');
+          initApp();
+        }
+      });
+      return;
+    }
     currentUser = user;
-    currentUConf = getUserConf(user.email);
-    if (!currentUConf) { await signOut(auth); return; }
+    currentUConf = { ...profile };
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('app').classList.add('show');
     initApp();
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
-    buildLogin();
   }
 });
 
@@ -766,14 +932,12 @@ function removeListeners() {
 // ══════════ PRESENCE ══════════
 function renderPresence() {
   const wrap = document.getElementById('presencePills');
-  wrap.innerHTML = USERS_CONFIG.map(u => {
-    const p = Object.values(presence).find(x => x.name === u.name);
-    const online = p && p.online;
-    return `<div class="presence-pill ${online?'online':''}" title="${u.role}">
+  const online = Object.values(presence).filter(p => p.online);
+  wrap.innerHTML = online.map(p => `
+    <div class="presence-pill online" title="${p.role||''}">
       <div class="pdot"></div>
-      <span style="color:${u.color};font-weight:600">${u.name.split(' ')[0]}</span>
-    </div>`;
-  }).join('');
+      <span style="color:${p.color||'var(--ok)'};font-weight:600">${(p.name||'?').split(' ')[0]}</span>
+    </div>`).join('');
 }
 
 // ══════════ NAVIGATION ══════════
