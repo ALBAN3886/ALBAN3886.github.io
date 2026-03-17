@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AP Industrie — Eau Vitale</title>
+<title>Technicien Eau Vitale</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -323,39 +323,32 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-logo" style="font-size:32px;letter-spacing:1px">AP INDUSTRIE<br><span style="font-size:22px;letter-spacing:3px">EAU VITALE</span></div>
-  <div class="loader-bar"><div class="loader-fill"></div></div>
-  <div class="loader-txt">Connexion à Firebase...</div>
-</div>
-
 <!-- LOGIN -->
-<div id="loginScreen">
+<div id="loginScreen" class="show">
   <div class="login-box">
     <div class="login-logo">
-      <div class="brand" style="font-size:30px;letter-spacing:1px">AP INDUSTRIE<br><span style="font-size:20px;letter-spacing:3px">EAU VITALE</span></div>
-      <div class="sub">Techniciens de Production</div>
+      <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px">EAU VITALE</span></div>
+      <div class="sub">Gestion de Ligne de Production</div>
     </div>
-    <!-- MODE TABS -->
-    <div style="display:flex;gap:6px;margin-bottom:22px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px;">
-      <button id="tabLogin" onclick="switchMode('login')" style="flex:1;padding:8px;border:none;border-radius:5px;font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;background:var(--soufflage);color:#000;transition:all .2s">CONNEXION</button>
-      <button id="tabRegister" onclick="switchMode('register')" style="flex:1;padding:8px;border:none;border-radius:5px;font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .2s">CRÉER UN COMPTE</button>
+    <!-- ONGLETS MODE -->
+    <div style="display:flex;gap:6px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px;">
+      <button id="tabLogin" onclick="switchMode('login')" style="flex:1;padding:8px;border:none;border-radius:5px;font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;background:var(--soufflage);color:#000;transition:all .2s">CONNEXION</button>
+      <button id="tabRegister" onclick="switchMode('register')" style="flex:1;padding:8px;border:none;border-radius:5px;font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .2s">CRÉER UN COMPTE</button>
     </div>
 
-    <!-- LOGIN MODE -->
+    <!-- MODE CONNEXION -->
     <div id="modeLogin">
       <div class="login-label">Sélectionner votre compte</div>
       <div class="user-select" id="userSelect"></div>
       <div class="login-label">Mot de passe</div>
       <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       <div style="text-align:right;margin-bottom:14px;margin-top:-8px">
-        <span onclick="switchMode('forgot')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline;">Mot de passe oublié ?</span>
+        <span onclick="switchMode('forgot')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
       </div>
       <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
     </div>
 
-    <!-- REGISTER MODE -->
+    <!-- MODE CRÉER COMPTE -->
     <div id="modeRegister" style="display:none">
       <div class="login-label">Prénom &amp; Nom</div>
       <input type="text" class="login-input" id="regName" placeholder="Ex : Jean-Pierre Dupont">
@@ -368,7 +361,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <option value="Superviseur">⚙️ Superviseur</option>
       </select>
       <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@apindustrie.fr">
+      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr">
       <div class="login-label">Mot de passe</div>
       <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères">
       <div class="login-label">Confirmer le mot de passe</div>
@@ -376,14 +369,14 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <button class="btn-login" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
     </div>
 
-    <!-- FORGOT MODE -->
+    <!-- MODE MOT DE PASSE OUBLIÉ -->
     <div id="modeForgot" style="display:none">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Entrez votre adresse e-mail. Vous recevrez un lien pour réinitialiser votre mot de passe.</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Entrez votre e-mail pour recevoir un lien de réinitialisation.</div>
       <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@apindustrie.fr">
+      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@eauvitale.fr">
       <button class="btn-login" id="forgotBtn" onclick="doForgot()">ENVOYER LE LIEN →</button>
       <div style="text-align:center;margin-top:14px">
-        <span onclick="switchMode('login')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline;">← Retour à la connexion</span>
+        <span onclick="switchMode('login')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">← Retour connexion</span>
       </div>
     </div>
 
@@ -395,7 +388,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 <div id="app">
   <!-- ICON BAR -->
   <div class="icon-bar">
-    <div class="brand-mini" style="font-size:14px;letter-spacing:0">AP</div>
+    <div class="brand-mini" style="font-size:11px;letter-spacing:0;line-height:1.1;text-align:center">TEV</div>
     <button class="nav-icon active" onclick="navigate('dashboard')" title="Tableau de bord">🏭</button>
     <button class="nav-icon" onclick="navigate('rapport')" title="Mon rapport">📝</button>
     <button class="nav-icon" onclick="navigate('historique')" title="Historique">📋</button>
@@ -582,9 +575,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getDatabase, ref, set, push, onValue, update, remove, serverTimestamp, off }
+import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
 // ══════════ FIREBASE CONFIG ══════════
 const firebaseConfig = {
@@ -601,18 +593,16 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
-// ══════════ USERS CONFIG (static fallback + dynamic from DB) ══════════
+// ══════════ SAFETY TIMEOUT ══════════
+setTimeout(() => {
+  loadDynamicUsers();
+}, 100);
+
+// ══════════ USERS CONFIG ══════════
 const USERS_CONFIG = [
-  { email:'admin@apindustrie.fr', name:'Administrateur', role:'Admin', machine:null, color:'#c084fc' },
+  { email:'admin@eauvitale.fr', name:'Administrateur', role:'Admin', machine:null, color:'#c084fc' },
 ];
 let dynamicUsers = [...USERS_CONFIG];
-
-function getUserConf(email) {
-  const u = dynamicUsers.find(u => u.email === email);
-  if (u) return u;
-  // fallback: build from DB profile if present
-  return null;
-}
 
 const MACHINE_MAP = {
   'Technicien Soufflage':   { machine:'Soufflage',   color:'#00d4ff' },
@@ -622,6 +612,10 @@ const MACHINE_MAP = {
   'Superviseur':            { machine:null,            color:'#c084fc' },
   'Admin':                  { machine:null,            color:'#c084fc' },
 };
+
+function getUserConf(email) {
+  return dynamicUsers.find(u => u.email === email) || null;
+}
 
 const MACHINES = [
   { id:'Soufflage',   icon:'🫧', color:'#00d4ff', cssClass:'mc-soufflage',
@@ -660,22 +654,11 @@ function timeAgo(ts) {
   return Math.floor(diff/86400000)+'j';
 }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function getUserConf(email) { return USERS_CONFIG.find(u => u.email === email); }
 function getLast14Days() {
   return Array.from({length:14},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(13-i)); return d.toISOString().split('T')[0]; });
 }
 
 // ══════════ BUILD LOGIN ══════════
-function buildLogin() {
-  const wrap = document.getElementById('userSelect');
-  wrap.innerHTML = dynamicUsers.map(u => `
-    <div class="user-chip" id="chip_${btoa(u.email).replace(/=/g,'')}" onclick="window._selectUser('${u.email}')">
-      <div class="chip-name"><span class="chip-dot" style="background:${u.color}"></span>${u.name}</div>
-      <div class="chip-role">${u.role}</div>
-    </div>`).join('');
-}
-
-// Load dynamic users from DB
 function loadDynamicUsers() {
   const uRef = ref(db, 'userProfiles');
   onValue(uRef, snap => {
@@ -683,48 +666,59 @@ function loadDynamicUsers() {
     const fromDB = Object.values(profiles).map(p => ({
       email: p.email, name: p.name, role: p.role,
       machine: (MACHINE_MAP[p.role] || {}).machine || null,
-      color: (MACHINE_MAP[p.role] || {}).color || '#00d4ff'
+      color:   (MACHINE_MAP[p.role] || {}).color   || '#00d4ff'
     }));
-    dynamicUsers = [...USERS_CONFIG, ...fromDB.filter(u => !USERS_CONFIG.find(s=>s.email===u.email))];
+    dynamicUsers = [...USERS_CONFIG, ...fromDB.filter(u => !USERS_CONFIG.find(s => s.email === u.email))];
     buildLogin();
   });
 }
 
+function buildLogin() {
+  const wrap = document.getElementById('userSelect');
+  if (!wrap) return;
+  wrap.innerHTML = dynamicUsers.map(u => {
+    const safeId = 'chip_' + u.email.replace(/[^a-zA-Z0-9]/g, '_');
+    return `<div class="user-chip" id="${safeId}" onclick="window._selectUser('${u.email}')">
+      <div class="chip-name"><span class="chip-dot" style="background:${u.color}"></span>${u.name}</div>
+      <div class="chip-role">${u.role}</div>
+    </div>`;
+  }).join('');
+}
+
 window.switchMode = function(mode) {
-  document.getElementById('modeLogin').style.display    = mode==='login'    ? '' : 'none';
-  document.getElementById('modeRegister').style.display = mode==='register' ? '' : 'none';
-  document.getElementById('modeForgot').style.display   = mode==='forgot'   ? '' : 'none';
-  document.getElementById('loginErr').textContent = '';
+  document.getElementById('modeLogin').style.display    = mode === 'login'    ? '' : 'none';
+  document.getElementById('modeRegister').style.display = mode === 'register' ? '' : 'none';
+  document.getElementById('modeForgot').style.display   = mode === 'forgot'   ? '' : 'none';
+  const err = document.getElementById('loginErr');
+  err.textContent = ''; err.style.color = 'var(--danger)';
   const tabL = document.getElementById('tabLogin');
   const tabR = document.getElementById('tabRegister');
-  if (tabL && tabR) {
-    tabL.style.background = mode==='login' ? 'var(--soufflage)' : 'none';
-    tabL.style.color = mode==='login' ? '#000' : 'var(--muted)';
-    tabR.style.background = mode==='register' ? 'var(--soufflage)' : 'none';
-    tabR.style.color = mode==='register' ? '#000' : 'var(--muted)';
-  }
+  if (tabL) { tabL.style.background = mode === 'login' ? 'var(--soufflage)' : 'none'; tabL.style.color = mode === 'login' ? '#000' : 'var(--muted)'; }
+  if (tabR) { tabR.style.background = mode === 'register' ? 'var(--soufflage)' : 'none'; tabR.style.color = mode === 'register' ? '#000' : 'var(--muted)'; }
 };
 
 let selectedEmail = null;
 window._selectUser = function(email) {
   selectedEmail = email;
   document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
-  const chip = document.getElementById('chip_'+btoa(email).replace(/=/g,''));
+  const chip = document.getElementById('chip_' + email.replace(/[^a-zA-Z0-9]/g, '_'));
   if (chip) chip.classList.add('selected');
-  document.getElementById('pwdInput').focus();
+  const pwdEl = document.getElementById('pwdInput');
+  if (pwdEl) pwdEl.focus();
 };
 
 window.doLogin = async function() {
   const pwd = document.getElementById('pwdInput').value;
-  if (!selectedEmail) { document.getElementById('loginErr').textContent = 'Veuillez sélectionner un compte.'; return; }
-  if (!pwd) { document.getElementById('loginErr').textContent = 'Entrez votre mot de passe.'; return; }
+  const err = document.getElementById('loginErr');
+  if (!selectedEmail) { err.textContent = 'Veuillez sélectionner un compte.'; return; }
+  if (!pwd)           { err.textContent = 'Entrez votre mot de passe.'; return; }
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
     await signInWithEmailAndPassword(auth, selectedEmail, pwd);
-    document.getElementById('loginErr').textContent = '';
+    err.textContent = '';
   } catch(e) {
-    document.getElementById('loginErr').textContent = 'Mot de passe incorrect.';
+    err.textContent = 'Mot de passe incorrect.';
     btn.disabled = false; btn.textContent = 'CONNEXION →';
   }
 };
@@ -736,22 +730,21 @@ window.doRegister = async function() {
   const pwd   = document.getElementById('regPwd').value;
   const pwd2  = document.getElementById('regPwd2').value;
   const err   = document.getElementById('loginErr');
-  if (!name)  { err.textContent = 'Entrez votre prénom et nom.'; return; }
-  if (!email) { err.textContent = 'Entrez votre adresse e-mail.'; return; }
-  if (pwd.length < 6) { err.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; return; }
+  err.style.color = 'var(--danger)';
+  if (!name)          { err.textContent = 'Entrez votre prénom et nom.'; return; }
+  if (!email)         { err.textContent = 'Entrez votre adresse e-mail.'; return; }
+  if (pwd.length < 6) { err.textContent = 'Mot de passe : minimum 6 caractères.'; return; }
   if (pwd !== pwd2)   { err.textContent = 'Les mots de passe ne correspondent pas.'; return; }
   const btn = document.getElementById('registerBtn');
   btn.disabled = true; btn.textContent = 'Création...';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-    // Save profile to DB
     await set(ref(db, `userProfiles/${cred.user.uid}`), { name, role, email, createdAt: Date.now() });
     err.style.color = 'var(--ok)';
     err.textContent = '✅ Compte créé ! Connexion en cours...';
   } catch(e) {
-    err.style.color = 'var(--danger)';
     if (e.code === 'auth/email-already-in-use') err.textContent = 'Cette adresse e-mail est déjà utilisée.';
-    else if (e.code === 'auth/invalid-email') err.textContent = 'Adresse e-mail invalide.';
+    else if (e.code === 'auth/invalid-email')   err.textContent = 'Adresse e-mail invalide.';
     else err.textContent = 'Erreur : ' + e.message;
     btn.disabled = false; btn.textContent = 'CRÉER MON COMPTE →';
   }
@@ -760,6 +753,7 @@ window.doRegister = async function() {
 window.doForgot = async function() {
   const email = document.getElementById('forgotEmail').value.trim();
   const err   = document.getElementById('loginErr');
+  err.style.color = 'var(--danger)';
   if (!email) { err.textContent = 'Entrez votre adresse e-mail.'; return; }
   const btn = document.getElementById('forgotBtn');
   btn.disabled = true; btn.textContent = 'Envoi...';
@@ -768,7 +762,6 @@ window.doForgot = async function() {
     err.style.color = 'var(--ok)';
     err.textContent = '✅ Lien envoyé ! Vérifiez votre boîte mail.';
   } catch(e) {
-    err.style.color = 'var(--danger)';
     err.textContent = 'Adresse e-mail introuvable.';
   }
   btn.disabled = false; btn.textContent = 'ENVOYER LE LIEN →';
@@ -776,43 +769,42 @@ window.doForgot = async function() {
 
 window.logout = async function() {
   if (!currentUser) return;
-  // Mark offline
-  await update(ref(db, `presence/${currentUser.uid}`), { online: false, ts: serverTimestamp() });
-  // Chat system msg
-  await push(ref(db,'chat'), { system:true, text:`${currentUConf.name} s'est déconnecté 🔴`, ts: serverTimestamp() });
+  try { await update(ref(db, `presence/${currentUser.uid}`), { online: false, ts: serverTimestamp() }); } catch(e){}
+  try { await push(ref(db,'chat'), { system:true, text:`${currentUConf?.name||'Utilisateur'} s'est déconnecté 🔴`, ts: serverTimestamp() }); } catch(e){}
   removeListeners();
   await signOut(auth);
   currentUser = null; currentUConf = null;
   document.getElementById('app').classList.remove('show');
   document.getElementById('loginScreen').classList.add('show');
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('loginErr').textContent = '';
-  document.getElementById('loginErr').style.color = 'var(--danger)';
+  const pwdEl = document.getElementById('pwdInput');
+  if (pwdEl) pwdEl.value = '';
+  const err = document.getElementById('loginErr');
+  if (err) { err.textContent = ''; err.style.color = 'var(--danger)'; }
   selectedEmail = null;
   document.querySelectorAll('.user-chip').forEach(c => c.classList.remove('selected'));
-  switchMode('login');
+  if (window.switchMode) switchMode('login');
 };
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
-  document.getElementById('loader').style.display = 'none';
   if (user) {
     currentUser = user;
-    // Try static first, then load from DB profile
     let conf = getUserConf(user.email);
     if (!conf) {
-      // Load from DB
-      const { get } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-      const snap = await get(ref(db, `userProfiles/${user.uid}`));
-      if (snap.exists()) {
-        const p = snap.val();
-        conf = {
-          email: p.email, name: p.name, role: p.role,
-          machine: (MACHINE_MAP[p.role] || {}).machine || null,
-          color: (MACHINE_MAP[p.role] || {}).color || '#00d4ff'
-        };
-        dynamicUsers.push(conf);
-      }
+      try {
+        const snap = await get(ref(db, `userProfiles/${user.uid}`));
+        if (snap.exists()) {
+          const p = snap.val();
+          conf = {
+            email:   p.email || user.email,
+            name:    p.name,
+            role:    p.role,
+            machine: (MACHINE_MAP[p.role] || {}).machine || null,
+            color:   (MACHINE_MAP[p.role] || {}).color   || '#00d4ff'
+          };
+          if (!dynamicUsers.find(u2 => u2.email === conf.email)) dynamicUsers.push(conf);
+        }
+      } catch(e) { console.warn('Profile load error', e); }
     }
     if (!conf) { await signOut(auth); return; }
     currentUConf = conf;
@@ -1303,7 +1295,7 @@ window.exportPDF = function() {
     td{padding:8px;border-bottom:1px solid #eee;font-size:13px;}
     .panne{color:#dc2626;font-weight:bold;} .ok{color:#16a34a;} .warn{color:#d97706;}
   </style></head><body>
-    <h1>📋 Rapport de Production — AP Industrie Eau Vitale</h1>
+    <h1>📋 Rapport de Production — Technicien Eau Vitale</h1>
     <div class="sub">Exporté le ${new Date().toLocaleDateString('fr-FR')} par ${currentUConf?.name}</div>
     <table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th></tr></thead>
     <tbody>${rows.map(r=>`<tr>
