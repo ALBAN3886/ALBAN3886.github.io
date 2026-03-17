@@ -1114,7 +1114,13 @@ function loadDynamicUsers() {
       color:   (MACHINE_MAP[p.role] || {}).color   || '#00d4ff'
     }));
     dynamicUsers = [...USERS_CONFIG, ...fromDB.filter(u => !USERS_CONFIG.find(s => s.email === u.email))];
+    // Mettre à jour le cache photos
+    Object.entries(profiles).forEach(([uid, p]) => {
+      photosCache[uid] = { photoURL: p.photoURL||null, color: (MACHINE_MAP[p.role]||{}).color||'#888', name: p.name||'' };
+    });
     buildLogin();
+    // Si connecté, re-render chat pour afficher nouvelles photos
+    if (currentUser) renderChat();
   });
 }
 
@@ -1298,6 +1304,11 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) {}
 
+    // Charger le cache de photos de tous les utilisateurs
+    await loadPhotosCache();
+    // Ajouter soi-même au cache
+    photosCache[user.uid] = { photoURL: currentUConf.photoURL||null, color: currentUConf.color, name: currentUConf.name };
+
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('app').classList.add('show');
     initApp();
@@ -1445,12 +1456,20 @@ function removeListeners() {
 // ══════════ PRESENCE ══════════
 function renderPresence() {
   const wrap = document.getElementById('presencePills');
-  wrap.innerHTML = USERS_CONFIG.map(u => {
-    const p = Object.values(presence).find(x => x.name === u.name);
-    const online = p && p.online;
-    return `<div class="presence-pill ${online?'online':''}" title="${u.role}">
-      <div class="pdot"></div>
-      <span style="color:${u.color};font-weight:600">${u.name.split(' ')[0]}</span>
+  if (!wrap) return;
+  const onlineUsers = Object.values(presence).filter(p => p.online);
+  wrap.innerHTML = onlineUsers.map(p => {
+    const uid = Object.keys(presence).find(k => presence[k] === p) || '';
+    const cached = photosCache[uid];
+    const photo  = cached?.photoURL || null;
+    const color  = p.color || cached?.color || '#888';
+    const initial = (p.name||'?').charAt(0).toUpperCase();
+    const avatarEl = photo
+      ? `<img src="${photo}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+      : `<div style="width:22px;height:22px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
+    return `<div class="presence-pill online" title="${p.role||''}">
+      ${avatarEl}
+      <span style="color:${color};font-weight:600;font-size:12px">${(p.name||'').split(' ')[0]}</span>
     </div>`;
   }).join('');
 }
@@ -1841,6 +1860,30 @@ function chartOpts() {
 }
 
 // ══════════ CHAT ══════════
+// Cache photos par userId — chargé depuis userProfiles
+let photosCache = {}; // { uid: { photoURL, color, name } }
+
+async function loadPhotosCache() {
+  try {
+    const snap = await get(ref(db, 'userProfiles'));
+    const profiles = snap.val() || {};
+    Object.entries(profiles).forEach(([uid, p]) => {
+      photosCache[uid] = { photoURL: p.photoURL||null, color: (MACHINE_MAP[p.role]||{}).color||'#888', name: p.name||'' };
+    });
+  } catch(e) {}
+}
+
+function avatarHTML(userId, name, color, size=36) {
+  const cached = photosCache[userId];
+  const photo  = cached?.photoURL || (userId === currentUser?.uid ? currentUConf?.photoURL : null);
+  const bgColor = cached?.color || color || '#888';
+  const initial = (name||'?').charAt(0).toUpperCase();
+  if (photo) {
+    return `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15)"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`;
+  }
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(size*0.38)}px;color:#fff;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15)">${initial}</div>`;
+}
+
 window.sendChat = async function() {
   const inp = document.getElementById('chatInput');
   const txt = inp.value.trim();
@@ -1849,7 +1892,9 @@ window.sendChat = async function() {
   await push(ref(db,'chat'), {
     ts: serverTimestamp(), system:false, alert:false,
     userId: currentUser.uid, name: currentUConf.name,
-    color: currentUConf.color, text: txt,
+    color: currentUConf.color,
+    photoURL: currentUConf.photoURL || null,
+    text: txt,
   });
 };
 
@@ -1859,11 +1904,21 @@ function renderChat() {
   const msgs = Object.values(allChat).sort((a,b)=>(a.ts||0)-(b.ts||0));
   cont.innerHTML = msgs.map(msg => {
     if (msg.system) return `<div class="chat-system">${esc(msg.text)}</div>`;
-    if (msg.alert) return `<div class="chat-alert-msg">🚨 ${esc(msg.text)}</div>`;
+    if (msg.alert)  return `<div class="chat-alert-msg">🚨 ${esc(msg.text)}</div>`;
     const own = msg.userId === currentUser?.uid;
+    // Photo : depuis le message lui-même OU depuis le cache
+    const cached = photosCache[msg.userId];
+    const photo  = msg.photoURL || cached?.photoURL || null;
+    const bgColor = msg.color || cached?.color || '#888';
+    const initial = (msg.name||'?').charAt(0).toUpperCase();
+    const avatarEl = photo
+      ? `<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)"><img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${initial}';this.parentElement.style.background='${bgColor}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.color='#fff';this.parentElement.style.fontWeight='700'"></div>`
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)">${initial}</div>`;
+
     return `<div class="chat-msg ${own?'own':''}">
-      <div class="chat-avatar" style="background:${msg.color||'#888'}">${(msg.name||'?').charAt(0)}</div>
-      <div>
+      ${avatarEl}
+      <div style="max-width:70%">
+        ${!own ? `<div style="font-size:11px;font-weight:600;color:${bgColor};margin-bottom:3px;padding-left:2px">${esc(msg.name)}</div>` : ''}
         <div class="chat-bubble">${esc(msg.text)}</div>
         <span class="chat-meta">${own?'Vous':esc(msg.name)} · ${timeAgo(msg.ts)}</span>
       </div>
@@ -1979,16 +2034,19 @@ window.handlePhotoChange = function(event) {
   const reader = new FileReader();
   reader.onload = async (e) => {
     const dataURL = e.target.result;
-    // Save to DB
     await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), dataURL);
     currentUConf.photoURL = dataURL;
-    // Update avatar in topbar
+    // Mettre à jour le cache local
+    if (!photosCache[currentUser.uid]) photosCache[currentUser.uid] = {};
+    photosCache[currentUser.uid].photoURL = dataURL;
+    // Mettre à jour avatar topbar
     const topAv = document.getElementById('myAvatarTop');
-    topAv.innerHTML = `<img src="${dataURL}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`;
-    // Update big avatar
+    if (topAv) topAv.innerHTML = `<img src="${dataURL}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
+    // Mettre à jour big avatar profil
     const bigAv = document.getElementById('profileAvatarBig');
-    bigAv.innerHTML = `<img src="${dataURL}" alt="photo">`;
-    bigAv.style.background = 'transparent';
+    if (bigAv) { bigAv.innerHTML = `<img src="${dataURL}" alt="photo">`; bigAv.style.background='transparent'; }
+    // Re-render chat pour afficher nouvelle photo
+    renderChat();
   };
   reader.readAsDataURL(file);
 };
