@@ -464,21 +464,29 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="page-header">
         <div><h2>🏭 Tableau de Bord</h2><p>Vue en temps réel — <span id="dashDate"></span></p></div>
         <div class="btn-row">
+          <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="renderDashboard()">
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Export Excel</button>
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
       </div>
       <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
-        <div class="stat-box s1"><div class="slabel">🫧 Production Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub">aujourd'hui</div></div>
-        <div class="stat-box s2"><div class="slabel">🧴 Production Remplissage</div><div class="sval" id="gs2">—</div><div class="ssub">aujourd'hui</div></div>
-        <div class="stat-box s3"><div class="slabel">🏷️ Production Étiquette</div><div class="sval" id="gs3">—</div><div class="ssub">aujourd'hui</div></div>
-        <div class="stat-box s4"><div class="slabel">📦 Production Emballage</div><div class="sval" id="gs4">—</div><div class="ssub">aujourd'hui</div></div>
-        <div class="stat-box s5"><div class="slabel">⚙️ Production B19</div><div class="sval" id="gs5">—</div><div class="ssub">aujourd'hui</div></div>
+        <div class="stat-box s1"><div class="slabel">🫧 Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub" id="gs1date">—</div></div>
+        <div class="stat-box s2"><div class="slabel">🧴 Remplissage</div><div class="sval" id="gs2">—</div><div class="ssub" id="gs2date">—</div></div>
+        <div class="stat-box s3"><div class="slabel">🏷️ Étiquette</div><div class="sval" id="gs3">—</div><div class="ssub" id="gs3date">—</div></div>
+        <div class="stat-box s4"><div class="slabel">📦 Emballage</div><div class="sval" id="gs4">—</div><div class="ssub" id="gs4date">—</div></div>
+        <div class="stat-box s5"><div class="slabel">⚙️ B19</div><div class="sval" id="gs5">—</div><div class="ssub" id="gs5date">—</div></div>
       </div>
       <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
+
+      <!-- TABLEAU CARTONS EMBALLAGE -->
+      <div class="card" id="emballageCartonsCard">
+        <div class="card-title" style="color:var(--emballage)">📦 Détail Emballage — Cartons</div>
+        <div id="emballageCartonsTable"><div class="empty"><div class="eico">📦</div><p>Aucun rapport Emballage</p></div></div>
+      </div>
+
       <div class="card">
-        <div class="card-title">📋 Tous les rapports du jour</div>
-        <div class="table-wrap" id="allReportsTable"><div class="empty"><div class="eico">📋</div><p>Aucun rapport aujourd'hui</p></div></div>
+        <div class="card-title">📋 Rapports du <span id="dashReportDateLabel">jour sélectionné</span></div>
+        <div class="table-wrap" id="allReportsTable"><div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div></div>
       </div>
     </div>
 
@@ -1089,6 +1097,11 @@ function initApp() {
   document.getElementById('topDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('dashDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('f-date').value = today();
+  // Picker dashboard = hier par défaut
+  const yest = new Date(); yest.setDate(yest.getDate()-1);
+  const yy=yest.getFullYear(), ym=String(yest.getMonth()+1).padStart(2,'0'), yd=String(yest.getDate()).padStart(2,'0');
+  const picker = document.getElementById('dashDatePicker');
+  if (picker && !picker.value) picker.value = `${yy}-${ym}-${yd}`;
 
   // Rapport UI
   if (currentUConf.machine) {
@@ -1240,25 +1253,54 @@ function updateBadges() {
 
 // ══════════ DASHBOARD ══════════
 function renderDashboard() {
-  const t = today();
-  const todayReps = Object.values(allReports).filter(r => r.date === t);
+  const picker = document.getElementById('dashDatePicker');
+  // Par défaut : hier (dernier jour travaillé visible)
+  if (!picker.value) {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const y = yesterday.getFullYear();
+    const m = String(yesterday.getMonth()+1).padStart(2,'0');
+    const d = String(yesterday.getDate()).padStart(2,'0');
+    picker.value = `${y}-${m}-${d}`;
+  }
+  const selDate = picker.value; // date sélectionnée
+  const allReps = Object.values(allReports);
 
-  const soufR = todayReps.filter(r=>r.machine==='Soufflage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-  const rempR = todayReps.filter(r=>r.machine==='Remplissage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-  const etiqR = todayReps.filter(r=>r.machine==='Étiquette').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-  const embR  = todayReps.filter(r=>r.machine==='Emballage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-  const b19R  = todayReps.filter(r=>r.machine==='B19').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+  // Pour chaque machine : prend le dernier rapport de la date sélectionnée
+  // Si aucun ce jour-là, prend le plus récent toutes dates confondues
+  function getForDate(machine) {
+    const dayReps = allReps.filter(r=>r.machine===machine && r.date===selDate).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if (dayReps.length) return dayReps[0];
+    // Fallback : dernier rapport toutes dates
+    const all = allReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    return all[0] || null;
+  }
 
-  document.getElementById('gs1').textContent = soufR ? num(soufR.fields?.prod) : '—';
-  document.getElementById('gs2').textContent = rempR ? num(rempR.fields?.prod) : '—';
-  document.getElementById('gs3').textContent = etiqR ? num(etiqR.fields?.prod) : '—';
-  document.getElementById('gs4').textContent = embR  ? num(embR.fields?.prod)  : '—';
-  document.getElementById('gs5').textContent = b19R  ? num(b19R.fields?.prod)  : '—';
+  const soufR = getForDate('Soufflage');
+  const rempR = getForDate('Remplissage');
+  const etiqR = getForDate('Étiquette');
+  const embR  = getForDate('Emballage');
+  const b19R  = getForDate('B19');
 
-  // Machine cards
+  function setGs(id, dateId, r) {
+    document.getElementById(id).textContent = r ? num(r.fields?.prod) : '—';
+    document.getElementById(dateId).textContent = r ? formatDate(r.date) : '—';
+  }
+  setGs('gs1','gs1date',soufR);
+  setGs('gs2','gs2date',rempR);
+  setGs('gs3','gs3date',etiqR);
+  setGs('gs4','gs4date',embR);
+  setGs('gs5','gs5date',b19R);
+
+  // Label tableau
+  const labelEl = document.getElementById('dashReportDateLabel');
+  if (labelEl) labelEl.textContent = formatDate(selDate);
+
+  // Machine cards — rapports de la date sélectionnée
+  const selReps = allReps.filter(r => r.date === selDate);
   const mc = document.getElementById('machineCards');
   mc.innerHTML = MACHINES.map(m => {
-    const mrs = todayReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const mrs = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
     const r = mrs[0];
     const status = r ? r.status : 'none';
     const sc = {ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[status]||'warn';
@@ -1280,33 +1322,71 @@ function renderDashboard() {
         ${hasSecondField?`<div><div class="mm-label">${m.fields[1]?.label||''}</div><div class="mm-val">${r?num(r.fields?.[m.fields[1]?.key]):'—'}</div></div>`:'<div></div>'}
       </div>
       <div class="mc-footer">
-        <span>${r?'Poste: '+r.shift:'Aucun rapport'}</span>
+        <span>${r?formatDate(r.date)+' — '+r.shift:'Aucun rapport'}</span>
         <span>${r?timeAgo(r.ts):''}</span>
       </div>
     </div>`;
   }).join('');
 
-  // All reports table — aujourd'hui seulement
+  // ── Tableau cartons Emballage ──
+  const embReps = selReps.filter(r=>r.machine==='Emballage').sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const cartEl = document.getElementById('emballageCartonsTable');
+  if (embReps.length === 0) {
+    cartEl.innerHTML = '<div class="empty" style="padding:20px"><div class="eico">📦</div><p>Aucun rapport Emballage ce jour</p></div>';
+  } else {
+    // Calcul total cartons
+    const totalCartons = embReps.reduce((s,r) => s + (r.fields?.prod||0), 0);
+    cartEl.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--emballage)">
+          ${num(totalCartons)} <span style="font-size:14px;color:var(--muted);font-weight:400">cartons total</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">${embReps.length} rapport${embReps.length>1?'s':''} — ${formatDate(selDate)}</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Poste</th><th>Opérateur</th><th>📦 Cartons emballés</th><th>Sachets utilisés</th><th>Sachets restants</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+          <tbody>${embReps.map(r => {
+            const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
+            const st={ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||'';
+            const uc = dynamicUsers.find(u=>u.name===r.operatorName);
+            const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+            const canDel = isAdmin || r.userId===currentUser?.uid;
+            return `<tr>
+              <td style="font-weight:600">${r.shift}</td>
+              <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
+              <td><span style="font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--emballage)">${num(r.fields?.prod)}</span></td>
+              <td class="td-num" style="color:var(--muted2)">${num(r.fields?.sachets)}</td>
+              <td class="td-num" style="color:var(--muted2)">${num(r.fields?.sachetsRest)}</td>
+              <td><span class="status-badge ${sc}" style="font-size:10px">${st}</span></td>
+              <td style="color:var(--muted);font-size:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.note||'—'}</td>
+              <td>${canDel?`<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>`:''}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+  }
+
+  // ── Tableau tous rapports du jour ──
   const tbl = document.getElementById('allReportsTable');
-  const todaySorted = todayReps.sort((a,b)=>(b.ts||0)-(a.ts||0));
-  if (todaySorted.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport aujourd\'hui</p></div>'; return; }
+  const sorted = selReps.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if (sorted.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport ce jour</p></div>'; return; }
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
-  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th><th></th></tr></thead>
-  <tbody>${todaySorted.map(r=>{
+  tbl.innerHTML = `<table><thead><tr><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+  <tbody>${sorted.map(r=>{
     const m=MACHINES.find(x=>x.id===r.machine);
     const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
     const st={ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||'';
-    const uc = dynamicUsers.find(u=>u.name===r.operatorName);
-    const canDelete = isAdmin || r.userId === currentUser?.uid;
+    const uc=dynamicUsers.find(u=>u.name===r.operatorName);
+    const canDel=isAdmin||r.userId===currentUser?.uid;
     return `<tr>
-      <td>${formatDate(r.date)}</td>
-      <td><span style="color:${m?.color||'#fff'};font-weight:600">${m?.icon||''} ${r.machine}</span></td>
+      <td><span style="color:${m?.color||'#fff'};font-weight:700">${m?.icon||''} ${r.machine}</span></td>
       <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td>${r.shift}</td>
       <td class="td-num" style="color:${m?.color||'#fff'}">${num(r.fields?.prod)}</td>
       <td><span class="status-badge ${sc}" style="font-size:10px">${st}</span></td>
-      <td style="color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.note)}">${r.note||'—'}</td>
-      <td>${canDelete?`<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>`:''}</td>
+      <td style="color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.note)}">${r.note||'—'}</td>
+      <td>${canDel?`<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>`:''}</td>
     </tr>`;
   }).join('')}</tbody></table>`;
 }
