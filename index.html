@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Technicien Eau Vitale</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -267,9 +269,9 @@ tbody tr:last-child { border:none; }
 tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 .td-num { font-family:var(--font-display); font-size:15px; font-weight:700; }
 
-#page-chat { padding:0; height:calc(100vh - 56px); display:none; flex-direction:column; }
+#page-chat { padding:0; height:calc(100vh - 56px); display:none; flex-direction:column; overflow:hidden; }
 #page-chat.active { display:flex; }
-.chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px; min-height:0; }
+.chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px; min-height:0; -webkit-overflow-scrolling:touch; }
 .chat-msg { display:flex; gap:10px; align-items:flex-end; animation:fadeIn .2s ease; }
 .chat-msg.own { flex-direction:row-reverse; }
 .chat-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; color:#000; }
@@ -280,10 +282,10 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 .chat-msg.own .chat-meta { text-align:right; }
 .chat-system { text-align:center; font-size:11px; color:var(--muted); padding:3px 0; }
 .chat-alert-msg { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--danger); }
-.chat-input-area { border-top:1px solid var(--border); padding:12px 16px; background:var(--bg2); display:flex; gap:10px; align-items:center; flex-shrink:0; }
-.chat-input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:10px 18px; font-family:var(--font-body); font-size:16px; color:var(--text); outline:none; transition:border-color .2s; -webkit-appearance:none; }
+.chat-input-area { border-top:1px solid var(--border); padding:12px 16px; background:var(--bg2); display:flex; gap:10px; align-items:center; flex-shrink:0; width:100%; box-sizing:border-box; }
+.chat-input { flex:1; min-width:0; background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:12px 18px; font-family:var(--font-body); font-size:16px; color:var(--text); outline:none; transition:border-color .2s; -webkit-appearance:none; }
 .chat-input:focus { border-color:var(--soufflage); }
-.chat-send { width:46px; height:46px; background:var(--soufflage); border:none; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all .2s; color:#000; flex-shrink:0; }
+.chat-send { width:46px; height:46px; min-width:46px; background:var(--soufflage); border:none; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all .2s; color:#000; flex-shrink:0; }
 .chat-send:hover { background:#33dcff; transform:scale(1.05); }
 
 /* ALERTS */
@@ -320,17 +322,31 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
 
-@media(max-width:900px) { #app { grid-template-columns:0 200px 1fr; } .icon-bar{display:none} }
-@media(max-width:650px) {
+@media(max-width:900px) {
+  #app { grid-template-columns:64px 1fr; grid-template-areas:"icon topbar" "icon main"; }
+  .sidebar { display:none; }
+}
+
+@media(max-width:600px) {
   #app { grid-template-columns:1fr; grid-template-rows:56px 1fr; grid-template-areas:"topbar" "main"; }
-  .sidebar{display:none}
-  /* Topbar mobile : boutons action visibles */
+  .icon-bar { display:none !important; }
+  .sidebar { display:none; }
+  /* Boutons mobiles topbar */
   .topbar-mobile-actions { display:flex !important; }
-  .presence-pills { display:none; }
-  /* Chat mobile fix */
-  #page-chat { height:calc(100vh - 56px); }
-  .chat-input-area { padding:10px 12px; position:sticky; bottom:0; z-index:10; }
-  .chat-input { font-size:16px; } /* évite zoom auto iOS */
+  .presence-pills { display:none !important; }
+  #userBadgeDesktop { display:none !important; }
+  #mobileMenuBtn { display:flex !important; }
+  /* Chat input toujours visible */
+  #page-chat {
+    height: calc(100dvh - 56px);
+    height: calc(100vh - 56px);
+  }
+  .chat-messages { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .chat-input-area {
+    flex-shrink:0;
+    padding:10px 12px;
+  }
+  .chat-input { font-size:16px !important; }
 }
 
 /* PROFIL */
@@ -1941,20 +1957,21 @@ window.changePassword = async function() {
 };
 // ══════════ MOBILE UI ══════════
 function initMobileUI() {
-  const isMobile = window.innerWidth <= 650;
+  const isMobile = window.innerWidth <= 900;
   const mobileActions = document.querySelector('.topbar-mobile-actions');
   const desktopBadge  = document.getElementById('userBadgeDesktop');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
   if (mobileActions) mobileActions.style.display = isMobile ? 'flex' : 'none';
   if (desktopBadge)  desktopBadge.style.display  = isMobile ? 'none' : 'flex';
   if (mobileMenuBtn) mobileMenuBtn.style.display  = isMobile ? 'flex' : 'none';
 
   // Afficher bouton admin mobile si admin
-  const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+  const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
   const adminMobileTopbar = document.getElementById('adminMobileBtn');
   const adminMobileMenu   = document.getElementById('adminMobileMenuBtn');
-  if (adminMobileTopbar) adminMobileTopbar.style.display = isAdmin ? 'flex' : 'none';
-  if (adminMobileMenu)   adminMobileMenu.style.display   = isAdmin ? 'flex' : 'none';
+  if (adminMobileTopbar) adminMobileTopbar.style.display = isAdminRole ? 'flex' : 'none';
+  if (adminMobileMenu)   adminMobileMenu.style.display   = isAdminRole ? 'flex' : 'none';
 }
 
 window.toggleMobileMenu = function() {
