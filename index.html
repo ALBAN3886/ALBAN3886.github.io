@@ -449,6 +449,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--remplissage)"></div> Remplissage</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
+    <div class="sidebar-item" onclick="navigate('emballage')"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Suivi Emballage</div>
     <div class="sidebar-item" onclick="navigate('dashboard')"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Mon Compte</div>
@@ -791,10 +792,44 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
     </div>
 
+    <!-- PAGE SUIVI EMBALLAGE -->
+    <div class="page" id="page-emballage">
+      <div class="page-header">
+        <div><h2>📦 Suivi Emballage — Cartons</h2><p>Récapitulatif automatique de tous les rapports Emballage</p></div>
+        <div class="btn-row">
+          <select class="form-input" id="embFilterMonth" style="width:auto;padding:7px 12px;font-size:13px" onchange="renderEmballagePage()">
+            <option value="">Tous les mois</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="exportEmballageCSV()">📥 Export CSV</button>
+        </div>
+      </div>
+      <!-- TOTAUX -->
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-box" style="border-bottom:3px solid var(--emballage)">
+          <div class="slabel">📦 Total Cartons</div>
+          <div class="sval" id="embTotalCartons" style="color:var(--emballage)">—</div>
+          <div class="ssub" id="embTotalPeriod">période sélectionnée</div>
+        </div>
+        <div class="stat-box" style="border-bottom:3px solid var(--emballage)">
+          <div class="slabel">📅 Jours travaillés</div>
+          <div class="sval" id="embTotalDays" style="color:var(--emballage)">—</div>
+          <div class="ssub">avec au moins 1 rapport</div>
+        </div>
+        <div class="stat-box" style="border-bottom:3px solid var(--emballage)">
+          <div class="slabel">📊 Moyenne / Jour</div>
+          <div class="sval" id="embAvgDay" style="color:var(--emballage)">—</div>
+          <div class="ssub">cartons par jour</div>
+        </div>
+      </div>
+      <!-- TABLEAU -->
+      <div class="card" style="margin-top:4px">
+        <div class="card-title" style="color:var(--emballage)">📋 Détail par jour — mis à jour automatiquement</div>
+        <div id="emballagePageTable"></div>
+      </div>
+    </div>
+
   </div>
 </div>
-
-<!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged }
@@ -969,6 +1004,20 @@ window.doRegister = async function() {
   if (!email)         { err.textContent = 'Entrez votre adresse e-mail.'; return; }
   if (pwd.length < 6) { err.textContent = 'Mot de passe : minimum 6 caractères.'; return; }
   if (pwd !== pwd2)   { err.textContent = 'Les mots de passe ne correspondent pas.'; return; }
+
+  // Vérifier unicité Admin / Superviseur
+  if (role === 'Admin' || role === 'Superviseur') {
+    try {
+      const snap = await get(ref(db, 'userProfiles'));
+      const profiles = snap.val() || {};
+      const existing = Object.values(profiles).find(p => p.role === role);
+      if (existing) {
+        err.textContent = `❌ Un ${role} existe déjà (${existing.name}). Ce rôle est unique.`;
+        return;
+      }
+    } catch(e) { console.warn(e); }
+  }
+
   const btn = document.getElementById('registerBtn');
   btn.disabled = true; btn.textContent = 'Création...';
   try {
@@ -1172,7 +1221,14 @@ function setupListeners() {
 
   // Reports
   const rRef = ref(db,'reports');
-  const rL = onValue(rRef, snap => { allReports = snap.val() || {}; renderDashboard(); renderHistory(); });
+  const rL = onValue(rRef, snap => {
+    allReports = snap.val() || {};
+    renderDashboard();
+    renderHistory();
+    // Refresh suivi emballage si page active
+    const embPage = document.getElementById('page-emballage');
+    if (embPage && embPage.classList.contains('active')) renderEmballagePage();
+  });
   listeners.push({ ref:rRef, fn:rL });
 
   // Chat
@@ -1227,7 +1283,7 @@ function renderPresence() {
 }
 
 // ══════════ NAVIGATION ══════════
-const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', admin:'Administration' };
+const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', admin:'Administration', emballage:'Suivi Emballage' };
 
 window.navigate = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1241,6 +1297,7 @@ window.navigate = function(page) {
   if (page==='historique') renderHistory();
   if (page==='profil') renderProfile();
   if (page==='admin')  renderAdminPage();
+  if (page==='emballage') renderEmballagePage();
 };
 
 function updateBadges() {
@@ -1918,6 +1975,179 @@ window.resetAll = async function() {
     msgEl.textContent = 'Erreur : ' + e.message;
     if (btn) { btn.disabled = false; btn.textContent = '🗑️ TOUT EFFACER'; }
   }
+};
+// ══════════ SUIVI EMBALLAGE ══════════
+window.renderEmballagePage = function() {
+  const allEmbReps = Object.values(allReports)
+    .filter(r => r.machine === 'Emballage')
+    .sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0);
+
+  // Remplir le filtre mois
+  const monthSel = document.getElementById('embFilterMonth');
+  if (monthSel) {
+    const months = [...new Set(allEmbReps.map(r => r.date.substring(0,7)))].sort().reverse();
+    const curVal = monthSel.value;
+    // Par défaut : mois en cours
+    const defaultMonth = today().substring(0,7);
+    monthSel.innerHTML = '<option value="">Tous les mois</option>' +
+      months.map(m => {
+        const [y,mo] = m.split('-');
+        const label = new Date(y, mo-1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+        return `<option value="${m}">${label}</option>`;
+      }).join('');
+    // Sélectionner valeur courante ou mois actuel par défaut
+    monthSel.value = curVal && months.includes(curVal) ? curVal : (months.includes(defaultMonth) ? defaultMonth : (months[0]||''));
+  }
+
+  const filterMonth = monthSel?.value || '';
+  const filtered = filterMonth
+    ? allEmbReps.filter(r => r.date.startsWith(filterMonth))
+    : allEmbReps;
+
+  // Grouper par jour
+  const byDay = {};
+  filtered.forEach(r => {
+    if (!byDay[r.date]) byDay[r.date] = [];
+    byDay[r.date].push(r);
+  });
+
+  // Générer tous les jours du mois sélectionné (même sans rapport)
+  let allDaysInMonth = [];
+  if (filterMonth) {
+    const [y, mo] = filterMonth.split('-').map(Number);
+    const daysInMonth = new Date(y, mo, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      allDaysInMonth.push(`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+    }
+  } else {
+    allDaysInMonth = Object.keys(byDay).sort();
+  }
+
+  const days = allDaysInMonth; // du 1er au dernier jour du mois
+  const totalCartons = filtered.reduce((s,r) => s+(r.fields?.prod||0), 0);
+  const workedDays = Object.keys(byDay).length;
+  const avg = workedDays > 0 ? Math.round(totalCartons / workedDays) : 0;
+
+  document.getElementById('embTotalCartons').textContent = num(totalCartons);
+  document.getElementById('embTotalDays').textContent = workedDays;
+  document.getElementById('embAvgDay').textContent = num(avg);
+  document.getElementById('embTotalPeriod').textContent = filterMonth
+    ? new Date(filterMonth+'-01').toLocaleDateString('fr-FR',{month:'long',year:'numeric'})
+    : 'toutes périodes';
+
+  const tableEl = document.getElementById('emballagePageTable');
+  if (!tableEl) return;
+
+  if (filtered.length === 0 && !filterMonth) {
+    tableEl.innerHTML = '<div class="empty"><div class="eico">📦</div><p>Aucun rapport Emballage enregistré</p></div>';
+    return;
+  }
+
+  const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+  const todayStr = today();
+
+  // Calcul du cumul progressif
+  let cumul = 0;
+
+  tableEl.innerHTML = `<div class="table-wrap"><table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Matin</th>
+        <th>Après-midi</th>
+        <th>Nuit</th>
+        <th style="color:var(--emballage)">📦 Total Jour</th>
+        <th style="color:var(--ok)">∑ Cumul Mois</th>
+        <th>Opérateur(s)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      ${days.map(date => {
+        const reps = byDay[date] || [];
+        const matin = reps.filter(r=>r.shift==='Matin');
+        const aprem = reps.filter(r=>r.shift==='Après-midi');
+        const nuit  = reps.filter(r=>r.shift==='Nuit');
+        const totalDay = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+        const ops = [...new Set(reps.map(r=>r.operatorName))].join(', ');
+        const isFuture = date > todayStr;
+        const isToday  = date === todayStr;
+
+        // Cumul : seulement si la date a des données et n'est pas future
+        if (totalDay > 0 && !isFuture) cumul += totalDay;
+        const cumulDisplay = cumul;
+
+        function shiftCell(rArr) {
+          if (!rArr.length) return `<td style="color:var(--muted);text-align:center;${isFuture?'opacity:.3':''}">—</td>`;
+          const tot = rArr.reduce((s,r)=>s+(r.fields?.prod||0),0);
+          const op = rArr.map(r=>r.operatorName.split(' ')[0]).join(', ');
+          return `<td style="text-align:center">
+            <span style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--emballage)">${num(tot)}</span>
+            <span style="font-size:10px;color:var(--muted);display:block">${op}</span>
+          </td>`;
+        }
+
+        const delBtns = isAdmin ? reps.map(r =>
+          `<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger);border-radius:5px;padding:2px 6px;cursor:pointer;font-size:11px;margin:1px" title="Supprimer ${r.shift}">🗑️</button>`
+        ).join('') : '';
+
+        let rowStyle = '';
+        if (isToday) rowStyle = 'background:rgba(255,107,53,.08);';
+        else if (isFuture) rowStyle = 'opacity:.45;';
+        else if (reps.length === 0) rowStyle = 'opacity:.5;';
+
+        return `<tr style="${rowStyle}">
+          <td style="font-weight:700;white-space:nowrap;font-size:13px">
+            ${formatDate(date)}
+            ${isToday?'<span style="font-size:10px;color:var(--emballage);margin-left:4px">●</span>':''}
+          </td>
+          ${shiftCell(matin)}
+          ${shiftCell(aprem)}
+          ${shiftCell(nuit)}
+          <td style="text-align:center">
+            ${totalDay > 0
+              ? `<span style="font-family:var(--font-display);font-size:20px;font-weight:900;color:var(--emballage)">${num(totalDay)}</span>`
+              : `<span style="color:var(--muted);font-size:12px">${isFuture?'—':'Pas de rapport'}</span>`
+            }
+          </td>
+          <td style="text-align:center">
+            ${!isFuture && cumulDisplay > 0
+              ? `<span style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--ok)">${num(cumulDisplay)}</span>`
+              : `<span style="color:var(--muted);font-size:12px">—</span>`
+            }
+          </td>
+          <td style="font-size:12px;color:var(--muted2)">${ops||'—'}</td>
+          <td>${delBtns}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+    <tfoot>
+      <tr style="background:rgba(255,107,53,.1);font-weight:700">
+        <td colspan="4" style="text-align:right;padding:12px 16px;color:var(--emballage);font-family:var(--font-display);font-size:14px;letter-spacing:.05em">TOTAL DU MOIS</td>
+        <td style="text-align:center;padding:12px 16px">
+          <span style="font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--emballage)">${num(totalCartons)}</span>
+          <span style="font-size:11px;color:var(--muted);display:block">cartons</span>
+        </td>
+        <td style="text-align:center;padding:12px 16px">
+          <span style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--ok)">${num(totalCartons)}</span>
+          <span style="font-size:11px;color:var(--muted);display:block">cumul final</span>
+        </td>
+        <td colspan="2" style="color:var(--muted);font-size:12px;padding:12px 16px">${workedDays} j. travaillés<br>Moy. ${num(avg)} / j.</td>
+      </tr>
+    </tfoot>
+  </table></div>`;
+};
+
+window.exportEmballageCSV = function() {
+  const allEmbReps = Object.values(allReports).filter(r=>r.machine==='Emballage').sort((a,b)=>a.date>b.date?1:-1);
+  const filterMonth = document.getElementById('embFilterMonth')?.value||'';
+  const filtered = filterMonth ? allEmbReps.filter(r=>r.date.startsWith(filterMonth)) : allEmbReps;
+  const headers = ['Date','Poste','Opérateur','Cartons','Sachets utilisés','Sachets restants','Statut','Note'];
+  const rows = filtered.map(r=>[r.date,r.shift,r.operatorName,r.fields?.prod||0,r.fields?.sachets||0,r.fields?.sachetsRest||0,r.status,`"${r.note||''}"`]);
+  const csv = [headers,...rows].map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`emballage_${filterMonth||'complet'}.csv`; a.click();
 };
 
 </script>
