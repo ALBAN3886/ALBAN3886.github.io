@@ -460,7 +460,129 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 <body>
 
 <!-- LOGIN -->
-<div id="loginScreen" class="show">
+<!-- SPLASH MESSAGE -->
+<div id="splashScreen" style="
+  position:fixed; inset:0; z-index:9999;
+  background:linear-gradient(160deg, #0a0f1e 0%, #0d1a2e 50%, #0a1520 100%);
+  display:flex; align-items:center; justify-content:center;
+  padding:28px;
+  animation:fadeIn .6s ease;
+">
+  <!-- Étoiles décoratives -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.6;top:8%;left:12%"></div>
+    <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.4;top:15%;left:75%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.5;top:22%;left:45%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3;top:70%;left:20%"></div>
+    <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.5;top:80%;left:85%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.4;top:40%;left:90%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3;top:60%;left:5%"></div>
+    <div style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;opacity:.7;top:5%;left:55%;box-shadow:0 0 8px #ffd700"></div>
+    <div style="position:absolute;width:3px;height:3px;background:#ffd700;border-radius:50%;opacity:.5;top:88%;left:40%;box-shadow:0 0 6px #ffd700"></div>
+  </div>
+
+  <div style="
+    max-width:480px; width:100%;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;
+    padding:36px 32px 28px;
+    text-align:center;
+    backdrop-filter:blur(10px);
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    position:relative;
+  ">
+    <!-- Croix dorée -->
+    <div style="font-size:38px;margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
+
+    <!-- Message -->
+    <p style="
+      font-family:'Barlow',sans-serif;
+      font-size:16px;
+      line-height:1.85;
+      color:rgba(255,255,255,.88);
+      margin:0 0 10px;
+      letter-spacing:.01em;
+    ">
+      Cher amis, ceci n'est qu'une idée simple.<br>
+      Entre frères, <em style="color:#ffd700">apprendre ensemble</em>, grandir,<br>
+      se comprendre, aimer et aller loin ensemble.
+    </p>
+    <p style="
+      font-family:'Barlow',sans-serif;
+      font-size:15px;
+      line-height:1.8;
+      color:rgba(255,255,255,.7);
+      margin:0 0 10px;
+    ">
+      Ceci n'est qu'une idée, car on avance dans un monde professionnel<br>
+      et on a besoin de nous tous chaque jour.
+    </p>
+    <p style="
+      font-family:'Barlow',sans-serif;
+      font-size:15px;
+      line-height:1.8;
+      color:rgba(255,255,255,.7);
+      margin:0 0 22px;
+    ">
+      Ceci n'est pas une idée de l'administration,<br>
+      ni une imposition ou une chose pour mettre son prochain en danger.<br>
+      <em style="color:rgba(255,255,255,.9)">C'est entre nous et ça reste entre nous.</em>
+    </p>
+
+    <!-- Signature -->
+    <div style="
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:.1em;
+      color:#ffd700;
+      text-shadow:0 0 16px rgba(255,215,0,.5);
+      margin-bottom:28px;
+    ">✨ Soyez bénis. CHRIST ROI DES ROIS ✨</div>
+
+    <!-- Barre de progression -->
+    <div style="position:relative;margin-bottom:14px">
+      <div style="
+        width:100%; height:4px;
+        background:rgba(255,255,255,.1);
+        border-radius:2px; overflow:hidden;
+      ">
+        <div id="splashProgress" style="
+          height:100%;
+          background:linear-gradient(90deg,#ffd700,#ffaa00);
+          border-radius:2px;
+          width:0%;
+          transition:width .1s linear;
+          box-shadow:0 0 8px rgba(255,215,0,.4);
+        "></div>
+      </div>
+      <div id="splashCountdown" style="
+        font-family:'Barlow',sans-serif;
+        font-size:12px;
+        color:rgba(255,255,255,.4);
+        margin-top:8px;
+        letter-spacing:.05em;
+      ">Patientez 15 secondes...</div>
+    </div>
+
+    <!-- Bouton Continuer (désactivé au début) -->
+    <button id="splashBtn" onclick="closeSplash()" disabled style="
+      width:100%; padding:13px;
+      background:rgba(255,215,0,.15);
+      border:1.5px solid rgba(255,215,0,.3);
+      color:rgba(255,215,0,.4);
+      border-radius:10px;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:16px; font-weight:700;
+      letter-spacing:.05em;
+      cursor:not-allowed;
+      transition:all .4s;
+    ">CONTINUER →</button>
+  </div>
+</div>
+
+<div id="loginScreen" class="show" style="display:none">
   <div class="login-box">
     <div class="login-logo">
       <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px">EAU VITALE</span></div>
@@ -1361,6 +1483,10 @@ window.logout = async function() {
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
+  // Masquer le splash si encore visible (cas connexion automatique)
+  const splash = document.getElementById('splashScreen');
+  if (splash) splash.style.display = 'none';
+
   if (user) {
     currentUser = user;
     let conf = getUserConf(user.email);
@@ -2209,7 +2335,49 @@ window.changePassword = async function() {
     else errEl.textContent = 'Erreur : ' + e.message;
   }
 };
-// ══════════ USER DROPDOWN ══════════
+// ══════════ SPLASH SCREEN ══════════
+(function() {
+  const DURATION = 15; // secondes minimum de lecture
+  let elapsed = 0;
+  const progress = document.getElementById('splashProgress');
+  const countdown = document.getElementById('splashCountdown');
+  const btn = document.getElementById('splashBtn');
+
+  const interval = setInterval(() => {
+    elapsed++;
+    const pct = Math.min((elapsed / DURATION) * 100, 100);
+    if (progress) progress.style.width = pct + '%';
+
+    const remaining = DURATION - elapsed;
+    if (remaining > 0) {
+      if (countdown) countdown.textContent = `Patientez encore ${remaining} seconde${remaining > 1 ? 's' : ''}...`;
+    } else {
+      clearInterval(interval);
+      if (countdown) countdown.textContent = 'Vous pouvez continuer ✓';
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background = 'rgba(255,215,0,.25)';
+        btn.style.borderColor = 'rgba(255,215,0,.7)';
+        btn.style.color = '#ffd700';
+        btn.style.cursor = 'pointer';
+        btn.style.boxShadow = '0 0 16px rgba(255,215,0,.2)';
+      }
+    }
+  }, 1000);
+})();
+
+window.closeSplash = function() {
+  const splash = document.getElementById('splashScreen');
+  const login  = document.getElementById('loginScreen');
+  if (splash) {
+    splash.style.transition = 'opacity .6s ease';
+    splash.style.opacity = '0';
+    setTimeout(() => {
+      splash.style.display = 'none';
+      if (login) login.style.display = 'flex';
+    }, 600);
+  }
+};
 window.toggleUserMenu = function(e) {
   if (e) e.stopPropagation();
   document.getElementById('userDropdown')?.classList.toggle('open');
