@@ -1241,24 +1241,14 @@ function updateBadges() {
 // ══════════ DASHBOARD ══════════
 function renderDashboard() {
   const t = today();
-  // Filtre souple : prend les rapports du jour OU les plus récents si aucun aujourd'hui
-  const allReps = Object.values(allReports);
-  const todayReps = allReps.filter(r => r.date === t);
+  const todayReps = Object.values(allReports).filter(r => r.date === t);
 
-  // Pour chaque machine, prend le rapport du jour ou le plus récent toutes dates confondues
-  function getBest(machine) {
-    const todayR = todayReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-    if (todayR) return todayR;
-    return null; // N'affiche que si c'est aujourd'hui
-  }
+  const soufR = todayReps.filter(r=>r.machine==='Soufflage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+  const rempR = todayReps.filter(r=>r.machine==='Remplissage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+  const etiqR = todayReps.filter(r=>r.machine==='Étiquette').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+  const embR  = todayReps.filter(r=>r.machine==='Emballage').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+  const b19R  = todayReps.filter(r=>r.machine==='B19').sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
 
-  const soufR = getBest('Soufflage');
-  const rempR = getBest('Remplissage');
-  const etiqR = getBest('Étiquette');
-  const embR  = getBest('Emballage');
-  const b19R  = getBest('B19');
-
-  // Stats haut : toujours afficher "prod" (champ principal de chaque machine)
   document.getElementById('gs1').textContent = soufR ? num(soufR.fields?.prod) : '—';
   document.getElementById('gs2').textContent = rempR ? num(rempR.fields?.prod) : '—';
   document.getElementById('gs3').textContent = etiqR ? num(etiqR.fields?.prod) : '—';
@@ -1296,23 +1286,27 @@ function renderDashboard() {
     </div>`;
   }).join('');
 
-  // All reports table
+  // All reports table — aujourd'hui seulement
   const tbl = document.getElementById('allReportsTable');
-  const sorted = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,30);
-  if (sorted.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div>'; return; }
-  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th></tr></thead>
-  <tbody>${sorted.map(r=>{
+  const todaySorted = todayReps.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if (todaySorted.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport aujourd\'hui</p></div>'; return; }
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+  <tbody>${todaySorted.map(r=>{
     const m=MACHINES.find(x=>x.id===r.machine);
     const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
     const st={ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||'';
+    const uc = dynamicUsers.find(u=>u.name===r.operatorName);
+    const canDelete = isAdmin || r.userId === currentUser?.uid;
     return `<tr>
       <td>${formatDate(r.date)}</td>
       <td><span style="color:${m?.color||'#fff'};font-weight:600">${m?.icon||''} ${r.machine}</span></td>
-      <td><span style="color:${USERS_CONFIG.find(u=>u.name===r.operatorName)?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
+      <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td>${r.shift}</td>
       <td class="td-num" style="color:${m?.color||'#fff'}">${num(r.fields?.prod)}</td>
       <td><span class="status-badge ${sc}" style="font-size:10px">${st}</span></td>
       <td style="color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.note)}">${r.note||'—'}</td>
+      <td>${canDelete?`<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>`:''}</td>
     </tr>`;
   }).join('')}</tbody></table>`;
 }
