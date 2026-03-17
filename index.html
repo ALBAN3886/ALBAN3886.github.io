@@ -650,7 +650,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="page-header">
         <div><h2>🏭 Tableau de Bord</h2><p>Vue en temps réel — <span id="dashDate"></span></p></div>
         <div class="btn-row">
-          <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="renderDashboard()">
+          <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="this.dataset.manuallySet='1';renderDashboard()">
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Export Excel</button>
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
@@ -1423,11 +1423,9 @@ function initApp() {
   document.getElementById('topDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('dashDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   document.getElementById('f-date').value = today();
-  // Picker dashboard = hier par défaut
-  const yest = new Date(); yest.setDate(yest.getDate()-1);
-  const yy=yest.getFullYear(), ym=String(yest.getMonth()+1).padStart(2,'0'), yd=String(yest.getDate()).padStart(2,'0');
+  // Dashboard : toujours commencer sur hier
   const picker = document.getElementById('dashDatePicker');
-  if (picker && !picker.value) picker.value = `${yy}-${ym}-${yd}`;
+  if (picker) picker.value = getYesterday();
 
   // Rapport UI
   if (currentUConf.machine) {
@@ -1577,6 +1575,11 @@ window.navigate = function(page) {
   if (el) el.classList.add('active');
   document.getElementById('topTitle').textContent = PAGE_TITLES[page]||page;
   if (page==='stats') renderStats('global');
+  if (page==='dashboard') {
+    // Réinitialiser la date à hier à chaque fois qu'on ouvre le dashboard
+    const picker = document.getElementById('dashDatePicker');
+    if (picker) { delete picker.dataset.manuallySet; picker.value = getYesterday(); }
+  }
   if (page==='chat') { unreadChat=0; updateBadges(); scrollChat(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page==='historique') renderHistory();
@@ -1597,35 +1600,32 @@ function updateBadges() {
 }
 
 // ══════════ DASHBOARD ══════════
+function getYesterday() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function renderDashboard() {
   const picker = document.getElementById('dashDatePicker');
-  // Par défaut : hier (dernier jour travaillé visible)
-  if (!picker.value) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const y = yesterday.getFullYear();
-    const m = String(yesterday.getMonth()+1).padStart(2,'0');
-    const d = String(yesterday.getDate()).padStart(2,'0');
-    picker.value = `${y}-${m}-${d}`;
+  // Toujours recalculer hier si aucune sélection manuelle récente
+  if (!picker.dataset.manuallySet) {
+    picker.value = getYesterday();
   }
-  const selDate = picker.value; // date sélectionnée
+  const selDate = picker.value;
   const allReps = Object.values(allReports);
+  const selReps = allReps.filter(r => r.date === selDate);
 
-  // Pour chaque machine : prend le dernier rapport de la date sélectionnée
-  // Si aucun ce jour-là, prend le plus récent toutes dates confondues
-  function getForDate(machine) {
-    const dayReps = allReps.filter(r=>r.machine===machine && r.date===selDate).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    if (dayReps.length) return dayReps[0];
-    // Fallback : dernier rapport toutes dates
-    const all = allReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    return all[0] || null;
+  // Stats haut — uniquement la date sélectionnée, pas de fallback sur d'autres dates
+  function getBest(machine) {
+    return selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
   }
 
-  const soufR = getForDate('Soufflage');
-  const rempR = getForDate('Remplissage');
-  const etiqR = getForDate('Étiquette');
-  const embR  = getForDate('Emballage');
-  const b19R  = getForDate('B19');
+  const soufR = getBest('Soufflage');
+  const rempR = getBest('Remplissage');
+  const etiqR = getBest('Étiquette');
+  const embR  = getBest('Emballage');
+  const b19R  = getBest('B19');
 
   function setGs(id, dateId, r) {
     document.getElementById(id).textContent = r ? num(r.fields?.prod) : '—';
@@ -1642,7 +1642,6 @@ function renderDashboard() {
   if (labelEl) labelEl.textContent = formatDate(selDate);
 
   // Machine cards — rapports de la date sélectionnée
-  const selReps = allReps.filter(r => r.date === selDate);
   const mc = document.getElementById('machineCards');
   mc.innerHTML = MACHINES.map(m => {
     const mrs = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
