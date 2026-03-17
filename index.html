@@ -9,30 +9,68 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0c10;
-  --bg2: #0f1218;
-  --surface: #151a24;
-  --card: #1c2333;
-  --border: #252e42;
-  --border2: #2d3a52;
-  --text: #dce6f5;
-  --muted: #5a6a8a;
-  --muted2: #7a8faa;
-  --soufflage: #00d4ff;
-  --remplissage: #00ff94;
-  --etiquette: #ffb800;
-  --emballage: #ff6b35;
-  --b19: #a855f7;
-  --admin: #c084fc;
-  --ok: #22c55e;
-  --warn: #f59e0b;
-  --danger: #ef4444;
+  --bg: #f0f2f5;
+  --bg2: #ffffff;
+  --surface: #f8f9fb;
+  --card: #ffffff;
+  --border: #e2e6ed;
+  --border2: #c8d0dc;
+  --text: #1a2030;
+  --muted: #7a8599;
+  --muted2: #9aa3b5;
+  --soufflage: #0099cc;
+  --remplissage: #00aa66;
+  --etiquette: #cc8800;
+  --emballage: #e05520;
+  --b19: #8833cc;
+  --admin: #7c3aed;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body: 'Barlow', sans-serif;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
-body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:14px; }
+body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
+
+/* ══════════ LOGIN ══════════ */
+#loginScreen {
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:linear-gradient(135deg, #e8f4fd 0%, #f0f2f5 50%, #e8f0fe 100%);
+  z-index:1000;
+}
+#loginScreen.show { display:flex; }
+.login-box {
+  position:relative; width:440px;
+  background:#ffffff; border:1px solid var(--border);
+  border-radius:16px; padding:44px 40px;
+  box-shadow:0 8px 40px rgba(0,0,0,.12);
+  animation:fadeUp .4s ease;
+}
+.login-logo { text-align:center; margin-bottom:32px; }
+.login-logo .brand { font-family:var(--font-display); font-size:36px; font-weight:900; letter-spacing:1px; color:var(--text); }
+.login-logo .brand span { color:var(--soufflage); }
+.login-logo .sub { font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+
+.login-label { font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:8px; font-weight:600; }
+.login-input {
+  width:100%; background:var(--surface); border:1.5px solid var(--border);
+  border-radius:10px; padding:13px 16px;
+  font-family:var(--font-body); font-size:16px; color:var(--text);
+  outline:none; transition:border-color .2s, box-shadow .2s; margin-bottom:16px;
+}
+.login-input:focus { border-color:var(--soufflage); box-shadow:0 0 0 3px rgba(0,153,204,.12); }
+
+.btn-login {
+  width:100%; padding:15px; background:var(--soufflage); color:#fff;
+  border:none; border-radius:10px; font-family:var(--font-display);
+  font-size:17px; font-weight:700; letter-spacing:.05em; cursor:pointer; transition:all .2s;
+}
+.btn-login:hover { filter:brightness(1.1); transform:translateY(-1px); }
+.btn-login:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.login-err { font-size:13px; text-align:center; margin-top:10px; min-height:18px; color:var(--danger); }
 
 /* ══════════ LOADER ══════════ */
 #loader {
@@ -92,20 +130,13 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .user-chip .chip-role { font-size:11px; color:var(--muted); margin-top:2px; }
 .chip-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:5px; }
 
-.btn-login {
-  width:100%; padding:14px; background:var(--soufflage); color:#000;
-  border:none; border-radius:8px; font-family:var(--font-display);
-  font-size:16px; font-weight:700; letter-spacing:.05em; cursor:pointer; transition:all .2s;
-}
-.btn-login:hover { background:#33dcff; transform:translateY(-1px); }
-.btn-login:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-.login-err { color:var(--danger); font-size:12px; text-align:center; margin-top:10px; min-height:18px; }
+.btn-login { display:none; } /* duplicate removed - defined above */
 
 /* ══════════ APP LAYOUT ══════════ */
 #app {
   display:none; height:100vh;
   grid-template-columns:64px 220px 1fr;
-  grid-template-rows:56px 1fr;
+  grid-template-rows:60px 1fr;
   grid-template-areas:"icon topbar topbar" "icon sidebar main";
 }
 #app.show { display:grid; }
@@ -115,15 +146,15 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
   grid-area:icon; background:var(--bg2); border-right:1px solid var(--border);
   display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; z-index:10;
 }
-.brand-mini { font-family:var(--font-display); font-size:22px; font-weight:900; color:var(--soufflage); margin-bottom:16px; }
+.brand-mini { font-family:var(--font-display); font-size:15px; font-weight:900; color:var(--soufflage); margin-bottom:16px; }
 .nav-icon {
-  width:42px; height:42px; border-radius:10px;
+  width:44px; height:44px; border-radius:12px;
   display:flex; align-items:center; justify-content:center;
-  font-size:19px; cursor:pointer; transition:all .2s;
+  font-size:20px; cursor:pointer; transition:all .2s;
   color:var(--muted); background:none; border:none; position:relative;
 }
 .nav-icon:hover { background:var(--surface); color:var(--text); }
-.nav-icon.active { background:var(--surface); color:var(--soufflage); }
+.nav-icon.active { background:rgba(0,153,204,.12); color:var(--soufflage); }
 .nav-icon .nbadge {
   position:absolute; top:5px; right:5px; width:8px; height:8px;
   background:var(--danger); border-radius:50%; border:2px solid var(--bg2);
@@ -133,10 +164,40 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .topbar {
   grid-area:topbar; background:var(--bg2); border-bottom:1px solid var(--border);
   display:flex; align-items:center; justify-content:space-between; padding:0 20px 0 0; z-index:9;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
 }
-.topbar-title { font-family:var(--font-display); font-size:20px; font-weight:700; letter-spacing:.05em; padding:0 20px; }
-.topbar-date { font-size:12px; color:var(--muted); padding:0 20px; border-left:1px solid var(--border); }
+.topbar-title { font-family:var(--font-display); font-size:22px; font-weight:700; letter-spacing:.05em; padding:0 20px; color:var(--text); }
+.topbar-date { font-size:13px; color:var(--muted); padding:0 20px; border-left:1px solid var(--border); }
 .topbar-right { display:flex; align-items:center; gap:12px; }
+
+/* DROPDOWN USER MENU */
+.user-menu-wrap { position:relative; }
+.user-badge {
+  display:flex; align-items:center; gap:10px; padding:6px 14px;
+  background:var(--surface); border:1.5px solid var(--border); border-radius:24px;
+  cursor:pointer; transition:all .2s; user-select:none;
+}
+.user-badge:hover { border-color:var(--soufflage); background:#fff; }
+.udot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; }
+.uname { font-size:14px; font-weight:600; color:var(--text); }
+.urole { font-size:11px; color:var(--muted); }
+
+.user-dropdown {
+  position:absolute; top:calc(100% + 8px); right:0; width:200px;
+  background:#fff; border:1.5px solid var(--border); border-radius:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,.12); z-index:100;
+  overflow:hidden; display:none;
+}
+.user-dropdown.open { display:block; animation:fadeIn .15s ease; }
+.ud-item {
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  font-size:14px; font-weight:500; cursor:pointer; transition:background .15s; color:var(--text);
+  border:none; background:none; width:100%; text-align:left;
+}
+.ud-item:hover { background:var(--surface); }
+.ud-item.danger { color:var(--danger); }
+.ud-item.danger:hover { background:#fef2f2; }
+.ud-divider { height:1px; background:var(--border); margin:4px 0; }
 
 .presence-pills { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
 .presence-pill {
@@ -479,23 +540,32 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
   <!-- TOPBAR -->
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:8px">
-      <!-- Bouton menu mobile -->
-      <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:6px;border-radius:8px;line-height:1" title="Menu">☰</button>
+      <button id="mobileMenuBtn" onclick="toggleMobileMenu()" style="display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:8px;border-radius:10px;line-height:1" title="Menu">☰</button>
       <div class="topbar-title" id="topTitle">Tableau de Bord</div>
       <div class="topbar-date" id="topDate"></div>
     </div>
     <div class="topbar-right">
       <div class="presence-pills" id="presencePills"></div>
-      <!-- Actions mobile visibles en permanence -->
-      <div class="topbar-mobile-actions" style="display:none;align-items:center;gap:6px">
-        <button onclick="navigate('chat')" id="chatMobileBtn" style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px;position:relative" title="Messagerie">💬<span id="chatMobileBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--danger);border-radius:50%"></span></button>
-        <button onclick="navigate('profil')" style="background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px" title="Mon profil">👤</button>
-        <button id="adminMobileBtn" onclick="navigate('admin')" style="display:none;background:none;border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px" title="Admin">⚙️</button>
-        <button onclick="logout()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:700;font-family:var(--font-display)" title="Déconnexion">⏻ Quitter</button>
-      </div>
-      <div class="user-badge" onclick="navigate('profil')" title="Mon profil" id="userBadgeDesktop">
-        <div class="udot" id="myAvatarTop"></div>
-        <div><div class="uname" id="myNameTop"></div><div class="urole" id="myRoleTop"></div></div>
+
+      <!-- Boutons chat/alertes rapides sur mobile -->
+      <button onclick="navigate('chat')" id="chatMobileBtn" style="display:none;background:none;border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:18px;position:relative" title="Messagerie">💬<span id="chatMobileBadge" style="display:none;position:absolute;top:3px;right:3px;width:9px;height:9px;background:var(--danger);border-radius:50%"></span></button>
+
+      <!-- Menu utilisateur avec dropdown -->
+      <div class="user-menu-wrap" id="userMenuWrap">
+        <div class="user-badge" onclick="toggleUserMenu()" id="userBadgeDesktop">
+          <div class="udot" id="myAvatarTop"></div>
+          <div>
+            <div class="uname" id="myNameTop"></div>
+            <div class="urole" id="myRoleTop"></div>
+          </div>
+          <span style="color:var(--muted);font-size:11px;margin-left:4px">▾</span>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <button class="ud-item" onclick="navigate('profil');closeUserMenu()">👤 Mon Profil</button>
+          <button class="ud-item" id="adminDropdownBtn" onclick="navigate('admin');closeUserMenu()" style="display:none">⚙️ Administration</button>
+          <div class="ud-divider"></div>
+          <button class="ud-item danger" onclick="logout()">⏻ Déconnexion</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1231,14 +1301,7 @@ function initApp() {
     document.getElementById('rapportSub').textContent = 'Mode administrateur';
     document.getElementById('formMachineTitle').textContent = '⚙️ Saisie Administrateur';
   }
-  // Show admin menu if needed
-  const isAdmin = currentUConf.role === 'Admin' || currentUConf.role === 'Superviseur';
-  const adminNav = document.getElementById('adminNavIcon');
-  const adminSide = document.getElementById('adminSidebarItem');
-  if (adminNav)  adminNav.style.display  = isAdmin ? 'flex' : 'none';
-  if (adminSide) adminSide.style.display = isAdmin ? 'flex' : 'none';
-
-  // Init UI mobile
+  // Init UI mobile + admin visibility
   initMobileUI();
 
   buildDynamicFields();
@@ -1955,56 +2018,61 @@ window.changePassword = async function() {
     else errEl.textContent = 'Erreur : ' + e.message;
   }
 };
+// ══════════ USER DROPDOWN ══════════
+window.toggleUserMenu = function(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('userDropdown')?.classList.toggle('open');
+};
+window.closeUserMenu = function() {
+  document.getElementById('userDropdown')?.classList.remove('open');
+};
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('userMenuWrap')?.contains(e.target)) closeUserMenu();
+});
+
 // ══════════ MOBILE UI ══════════
 function initMobileUI() {
   const isMobile = window.innerWidth <= 900;
-  const mobileActions = document.querySelector('.topbar-mobile-actions');
-  const desktopBadge  = document.getElementById('userBadgeDesktop');
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const chatMobileBtn = document.getElementById('chatMobileBtn');
+  if (mobileMenuBtn) mobileMenuBtn.style.display = isMobile ? 'flex' : 'none';
+  if (chatMobileBtn) chatMobileBtn.style.display  = isMobile ? 'flex' : 'none';
 
-  if (mobileActions) mobileActions.style.display = isMobile ? 'flex' : 'none';
-  if (desktopBadge)  desktopBadge.style.display  = isMobile ? 'none' : 'flex';
-  if (mobileMenuBtn) mobileMenuBtn.style.display  = isMobile ? 'flex' : 'none';
-
-  // Afficher bouton admin mobile si admin
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
-  const adminMobileTopbar = document.getElementById('adminMobileBtn');
-  const adminMobileMenu   = document.getElementById('adminMobileMenuBtn');
-  if (adminMobileTopbar) adminMobileTopbar.style.display = isAdminRole ? 'flex' : 'none';
-  if (adminMobileMenu)   adminMobileMenu.style.display   = isAdminRole ? 'flex' : 'none';
+  const adminDd    = document.getElementById('adminDropdownBtn');
+  const adminNav   = document.getElementById('adminNavIcon');
+  const adminSide  = document.getElementById('adminSidebarItem');
+  const adminMMenu = document.getElementById('adminMobileMenuBtn');
+  if (adminDd)    adminDd.style.display    = isAdminRole ? 'flex' : 'none';
+  if (adminNav)   adminNav.style.display   = isAdminRole ? 'flex' : 'none';
+  if (adminSide)  adminSide.style.display  = isAdminRole ? 'flex' : 'none';
+  if (adminMMenu) adminMMenu.style.display = isAdminRole ? 'flex' : 'none';
 }
 
 window.toggleMobileMenu = function() {
+  const panel = document.getElementById('mobileMenuPanel');
   const overlay = document.getElementById('mobileMenuOverlay');
-  const panel   = document.getElementById('mobileMenuPanel');
-  const open    = panel.style.transform === 'translateX(0px)' || panel.style.transform === 'translateX(0)';
-  if (open) { closeMobileMenu(); } else { openMobileMenu(); }
+  const open = panel.style.transform === 'translateX(0px)' || panel.style.transform === 'translateX(0)';
+  if (open) {
+    panel.style.transform = 'translateX(-100%)';
+    setTimeout(() => { panel.style.display='none'; overlay.style.display='none'; }, 280);
+  } else {
+    panel.style.display='block'; overlay.style.display='block';
+    setTimeout(() => { panel.style.transform='translateX(0)'; }, 10);
+  }
 };
-
-window.openMobileMenu = function() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const panel   = document.getElementById('mobileMenuPanel');
-  overlay.style.display = 'block';
-  panel.style.display   = 'block';
-  setTimeout(() => { panel.style.transform = 'translateX(0)'; }, 10);
-};
-
 window.closeMobileMenu = function() {
+  const panel = document.getElementById('mobileMenuPanel');
   const overlay = document.getElementById('mobileMenuOverlay');
-  const panel   = document.getElementById('mobileMenuPanel');
+  if (!panel) return;
   panel.style.transform = 'translateX(-100%)';
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    panel.style.display   = 'none';
-  }, 300);
+  setTimeout(() => { panel.style.display='none'; overlay.style.display='none'; }, 280);
 };
 
-// Mise à jour badge chat sur mobile
 function updateMobileChatBadge() {
   const badge = document.getElementById('chatMobileBadge');
   if (badge) badge.style.display = unreadChat > 0 ? 'block' : 'none';
 }
-
 window.addEventListener('resize', initMobileUI);
 function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
