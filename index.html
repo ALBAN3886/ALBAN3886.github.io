@@ -252,19 +252,26 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 
 /* CHAT — comme WhatsApp */
 #page-chat {
-  padding:0;
+  padding:0 !important;
   display:none;
   flex-direction:row;
   flex:1;
   overflow:hidden;
   height:100%;
-  background:var(--bg);
+  background:#f0f2f5;
 }
-#page-chat.active { display:flex; }
-/* Mobile : contacts en plein écran, conversation par-dessus */
+#page-chat.active { display:flex !important; }
+
+#chatContactsPanel {
+  width:320px; min-width:320px; max-width:320px;
+  border-right:1px solid var(--border);
+  background:#fff; display:flex; flex-direction:column;
+  height:100%; flex-shrink:0;
+}
+
 @media(max-width:700px) {
-  #chatContactsPanel { width:100% !important; min-width:100% !important; }
-  #chatConvPanel { position:fixed; top:0; left:0; right:0; bottom:0; z-index:500; display:none !important; flex-direction:column; background:#fff; }
+  #chatContactsPanel { width:100% !important; min-width:100% !important; max-width:100% !important; }
+  #chatConvPanel { position:fixed !important; top:0; left:0; right:0; bottom:0; z-index:600; display:none !important; flex-direction:column; background:#fff; }
   #chatConvPanel.mobile-open { display:flex !important; }
   #chatBackBtn { display:flex !important; }
 }
@@ -933,61 +940,77 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div id="statContent"></div>
     </div>
 
-    <!-- CHAT -->
-    <!-- MESSAGERIE PRIVÉE -->
-    <div class="page" id="page-chat" style="padding:0;display:none;flex-direction:row;overflow:hidden">
+    <!-- CHAT MESSAGERIE WHATSAPP -->
+    <div class="page" id="page-chat">
 
-      <!-- PANNEAU GAUCHE : liste des contacts -->
-      <div id="chatContactsPanel" style="
-        width:280px; min-width:280px; border-right:1px solid var(--border);
-        background:#fff; display:flex; flex-direction:column; height:100%;
-      ">
-        <!-- En-tête -->
-        <div style="padding:16px 18px;border-bottom:1px solid var(--border);background:var(--soufflage)">
-          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:#fff;letter-spacing:.03em">💬 Messagerie</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px" id="chatOnlineCount">Chargement...</div>
+      <!-- PANNEAU GAUCHE : liste conversations -->
+      <div id="chatContactsPanel">
+
+        <!-- En-tête vert WhatsApp style -->
+        <div style="padding:14px 16px 12px;background:var(--soufflage);flex-shrink:0">
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#fff;letter-spacing:.02em">💬 Messagerie</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:3px" id="chatOnlineCount">Chargement...</div>
         </div>
-        <!-- Recherche -->
-        <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
-          <input id="contactSearch" oninput="filterContacts()" placeholder="🔍 Rechercher..." style="
-            width:100%;border:1.5px solid var(--border);border-radius:20px;
-            padding:8px 14px;font-size:14px;outline:none;background:var(--surface);color:var(--text);
-          ">
+
+        <!-- Barre de recherche -->
+        <div style="padding:10px 12px;background:#f0f2f5;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:22px;padding:8px 14px;gap:8px;border:1px solid var(--border)">
+            <span style="color:var(--muted);font-size:16px">🔍</span>
+            <input id="contactSearch" oninput="filterContacts()" placeholder="Rechercher ou commencer..." style="
+              flex:1;border:none;outline:none;font-size:14px;color:var(--text);background:transparent;
+            ">
+          </div>
         </div>
-        <!-- Liste contacts -->
-        <div id="contactsList" style="flex:1;overflow-y:auto;"></div>
+
+        <!-- Liste des conversations -->
+        <div id="contactsList" style="flex:1;overflow-y:auto;background:#fff;"></div>
       </div>
 
-      <!-- PANNEAU DROIT : conversation -->
-      <div id="chatConvPanel" style="flex:1;display:flex;flex-direction:column;height:100%;min-width:0">
+      <!-- PANNEAU DROIT : conversation active -->
+      <div id="chatConvPanel" style="flex:1;display:flex;flex-direction:column;height:100%;min-width:0;background:#f0f2f5">
 
-        <!-- Pas de conversation sélectionnée -->
-        <div id="chatNoConv" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:var(--muted);padding:40px">
-          <div style="font-size:60px">💬</div>
-          <div style="font-size:18px;font-weight:700;color:var(--text)">Messagerie privée</div>
-          <div style="font-size:14px;text-align:center;max-width:280px;line-height:1.6">Sélectionne un contact à gauche pour commencer une conversation privée</div>
+        <!-- Écran vide (desktop) -->
+        <div id="chatNoConv" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;color:var(--muted);padding:40px;background:#f8fafb">
+          <div style="font-size:72px;opacity:.4">💬</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text);opacity:.7">LineOps Messagerie</div>
+          <div style="font-size:14px;text-align:center;max-width:300px;line-height:1.7;opacity:.6">Sélectionnez une conversation dans la liste pour commencer à chatter avec vos collègues.</div>
         </div>
 
-        <!-- Conversation active (cachée par défaut) -->
-        <div id="chatConvActive" style="display:none;flex-direction:column;height:100%">
+        <!-- Conversation active -->
+        <div id="chatConvActive" style="display:none;flex-direction:column;height:100%;min-height:0">
+
           <!-- Header conversation -->
-          <div style="background:#fff;border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-            <button onclick="closeChatConv()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);padding:4px;display:none" id="chatBackBtn">←</button>
-            <div id="convAvatar" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff"></div>
+          <div style="background:var(--soufflage);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)">
+            <button onclick="closeChatConv()" id="chatBackBtn" style="background:none;border:none;font-size:24px;cursor:pointer;color:#fff;padding:4px 8px 4px 0;display:none;line-height:1">←</button>
+            <div id="convAvatar" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;background:rgba(255,255,255,.25)"></div>
             <div style="flex:1;min-width:0">
-              <div id="convName" style="font-weight:700;font-size:15px;color:var(--text)"></div>
-              <div id="convStatus" style="font-size:12px;color:var(--muted)"></div>
+              <div id="convName" style="font-weight:700;font-size:16px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+              <div id="convStatus" style="font-size:12px;color:rgba(255,255,255,.8)"></div>
             </div>
           </div>
-          <!-- Messages -->
-          <div id="convMessages" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:6px;background:#f8f9fb;-webkit-overflow-scrolling:touch;min-height:0"></div>
-          <!-- Saisie -->
-          <div style="background:#fff;border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;align-items:center;flex-shrink:0">
-            <input id="convInput" placeholder="Écrire un message privé..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendPrivateMsg();event.preventDefault()}" style="
-              flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--border);
-              border-radius:24px;padding:12px 18px;font-size:16px;color:var(--text);outline:none;
-            ">
-            <button onclick="sendPrivateMsg()" style="width:46px;height:46px;min-width:46px;background:var(--soufflage);border:none;border-radius:50%;cursor:pointer;font-size:20px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,153,204,.3)">➤</button>
+
+          <!-- Zone messages (fond style WhatsApp) -->
+          <div id="convMessages" style="
+            flex:1;overflow-y:auto;padding:16px 14px;
+            display:flex;flex-direction:column;gap:2px;
+            background:#e5ddd5 url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><circle cx=%2230%22 cy=%2230%22 r=%221%22 fill=%22rgba(0,0,0,.04)%22/></svg>');
+            -webkit-overflow-scrolling:touch;min-height:0;
+          "></div>
+
+          <!-- Zone de saisie -->
+          <div style="background:#f0f2f5;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0;border-top:1px solid #ddd">
+            <div style="flex:1;background:#fff;border-radius:24px;padding:10px 16px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+              <input id="convInput" placeholder="Tapez un message" onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendPrivateMsg();event.preventDefault()}" style="
+                flex:1;border:none;outline:none;font-size:15px;color:var(--text);background:transparent;min-width:0;
+              ">
+            </div>
+            <button onclick="sendPrivateMsg()" style="
+              width:48px;height:48px;min-width:48px;
+              background:var(--soufflage);border:none;border-radius:50%;
+              cursor:pointer;font-size:20px;color:#fff;
+              display:flex;align-items:center;justify-content:center;
+              flex-shrink:0;box-shadow:0 2px 8px rgba(0,153,204,.4);
+            ">➤</button>
           </div>
         </div>
       </div>
@@ -1757,16 +1780,17 @@ function setupListeners() {
   });
   listeners.push({ ref:aRef, fn:aL });
 
-  // Group Chat
+  // Démarrer groupe dès la connexion
   listenGroupChat();
 }
 
 function removeListeners() {
   listeners.forEach(l => off(l.ref));
   listeners = [];
-  if (groupListener) { groupListener = null; }
+  groupListener = null;
   groupMessages = {};
   activeConvType = null;
+  activeConvUserId = null;
 }
 
 // ══════════ PRESENCE ══════════
@@ -1809,7 +1833,7 @@ window.navigate = function(page) {
     const picker = document.getElementById('dashDatePicker');
     if (picker) { delete picker.dataset.manuallySet; picker.value = getYesterday(); }
   }
-  if (page==='chat') { unreadChat=0; updateBadges(); renderContacts(); }
+  if (page==='chat') { unreadChat=0; unreadGroup=0; updateBadges(); listenGroupChat(); renderContacts(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page==='historique') renderHistory();
   if (page==='profil') renderProfile();
@@ -2207,171 +2231,250 @@ function avatarHTML(userId, name, color, size=36) {
   return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(size*0.38)}px;color:#fff;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15)">${initial}</div>`;
 }
 
-// ══════════ MESSAGERIE PRIVÉE ══════════
+// ══════════ MESSAGERIE WHATSAPP ══════════
 let activeConvUserId = null;
+let activeConvType   = null; // 'group' | 'private'
 let privateMessages  = {};
 let privateListeners = {};
 let unreadPrivate    = {};
+let groupMessages    = {};
+let groupListener    = null;
+let unreadGroup      = 0;
 
 function getConvId(uid1, uid2) { return [uid1, uid2].sort().join('_'); }
-
-function renderChat() { renderContacts(); }
+function renderChat() { listenGroupChat(); renderContacts(); }
 function scrollChat() {}
 
-// ══ GROUPE CHAT ══
-let groupMessages = {};
-let groupListener = null;
-let unreadGroup = 0;
-let activeConvType = null; // 'group' | 'private'
-
+// ── Écouter le groupe équipe ──
 function listenGroupChat() {
   if (groupListener) return;
   const gRef = ref(db, 'groupChat');
-  let firstLoad = true;
+  let first = true;
   groupListener = onValue(gRef, snap => {
     const prev = Object.keys(groupMessages).length;
     groupMessages = snap.val() || {};
     const curr = Object.keys(groupMessages).length;
-    if (!firstLoad && curr > prev && activeConvType !== 'group') {
-      unreadGroup += curr - prev;
-      updateBadges();
+    if (!first && curr > prev && activeConvType !== 'group') {
+      unreadGroup += curr - prev; updateBadges();
     }
-    firstLoad = false;
+    first = false;
     if (activeConvType === 'group') renderGroupConversation();
     renderContacts();
   });
 }
 
+// ── Liste des conversations (style WhatsApp) ──
 function renderContacts() {
   const wrap = document.getElementById('contactsList');
   if (!wrap) return;
+
   const onlineCount = Object.values(presence).filter(p=>p.online).length;
   const onlineEl = document.getElementById('chatOnlineCount');
   if (onlineEl) onlineEl.textContent = `${onlineCount} membre${onlineCount>1?'s':''} en ligne`;
 
-  const users = dynamicUsers.filter(u => u.email !== currentUser?.email);
+  const users = (typeof dynamicUsers !== 'undefined' ? dynamicUsers : []).filter(u => u.email !== currentUser?.email);
   const search = (document.getElementById('contactSearch')?.value||'').toLowerCase();
 
-  // ── GROUPE ÉQUIPE ──
+  // ── Groupe Équipe ──
   const groupMsgs = Object.values(groupMessages).sort((a,b)=>(b.ts||0)-(a.ts||0));
   const lastGroup = groupMsgs[0];
   const isGroupActive = activeConvType === 'group';
-  const groupUnreadBadge = unreadGroup > 0
-    ? `<div style="background:var(--soufflage);color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${unreadGroup}</div>` : '';
 
-  const groupItem = `
-    <div style="padding:6px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;background:var(--surface)">💬 Groupe</div>
-    <div onclick="openGroupConversation()" style="
-      display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
-      border-bottom:1px solid var(--border);transition:background .15s;
-      background:${isGroupActive?'rgba(0,153,204,.08)':'#fff'};
-      border-left:3px solid ${isGroupActive?'var(--soufflage)':'transparent'};
-    ">
-      <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--soufflage),#0066aa);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏭</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:14px;color:var(--text)">Équipe Production</div>
-        <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${lastGroup ? esc(lastGroup.senderName)+': '+esc(lastGroup.text||'').substring(0,30) : 'Canal équipe — tout le monde'}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-        <div style="font-size:10px;color:var(--muted)">${lastGroup&&lastGroup.ts?timeAgo(lastGroup.ts):''}</div>
-        ${groupUnreadBadge}
-      </div>
+  const groupHTML = `
+    <div style="padding:6px 16px 5px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#888;font-weight:700;background:#f0f2f5;border-bottom:1px solid #e9ecef">
+      💬 GROUPE
     </div>
-    <div style="padding:6px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;background:var(--surface)">🔒 Privé</div>
-  `;
+    <div onclick="openGroupConversation()" style="
+      display:flex;align-items:center;gap:13px;padding:12px 16px;cursor:pointer;
+      border-bottom:1px solid #f0f2f5;transition:background .12s;
+      background:${isGroupActive?'#e8f4fd':'#fff'};
+    ">
+      <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#0099cc,#006699);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,153,204,.3)">🏭</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px">
+          <div style="font-weight:700;font-size:15px;color:#111">Équipe Production</div>
+          <div style="font-size:11px;color:#aaa">${lastGroup&&lastGroup.ts?timeAgo(lastGroup.ts):''}</div>
+        </div>
+        <div style="font-size:13px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastGroup?'<b style="color:#444">'+esc(lastGroup.senderName||'')+'</b>: '+esc((lastGroup.text||'').substring(0,40)):'Tout le monde peut écrire ici 👋'}</div>
+      </div>
+      ${unreadGroup>0?`<div style="background:#0099cc;color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${unreadGroup}</div>`:''}
+    </div>
+    <div style="padding:6px 16px 5px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#888;font-weight:700;background:#f0f2f5;border-bottom:1px solid #e9ecef">
+      🔒 MESSAGES PRIVÉS
+    </div>`;
 
-  // ── CONTACTS PRIVÉS ──
+  // ── Contacts privés ──
   const filtered = search ? users.filter(u=>(u.name||'').toLowerCase().includes(search)) : users;
-  const contactItems = filtered.length === 0
-    ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Aucun contact</div>`
+
+  if (filtered.length === 0 && !search) {
+    wrap.innerHTML = groupHTML + `<div style="padding:30px;text-align:center;color:#aaa;font-size:13px">Chargement des contacts...</div>`;
+    return;
+  }
+
+  const contactsHTML = filtered.length === 0
+    ? `<div style="padding:20px;text-align:center;color:#aaa;font-size:13px">Aucun contact trouvé</div>`
     : filtered.map(u => {
         const uid = Object.keys(photosCache).find(k => photosCache[k]?.name === u.name) || '';
         const photo = photosCache[uid]?.photoURL || null;
         const isOnline = Object.values(presence).some(p=>p.name===u.name&&p.online);
         const unread = unreadPrivate[uid] || 0;
         const isActive = uid === activeConvUserId && activeConvType === 'private';
-        // Last private message
         const convId = getConvId(currentUser.uid, uid);
         const privMsgs = Object.values(privateMessages[convId]||{}).sort((a,b)=>(b.ts||0)-(a.ts||0));
         const lastPriv = privMsgs[0];
         const avatarEl = photo
-          ? `<img src="${photo}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;flex-shrink:0">`
-          : `<div style="width:46px;height:46px;border-radius:50%;background:${u.color||'#888'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0">${(u.name||'?').charAt(0)}</div>`;
+          ? `<img src="${photo}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+          : `<div style="width:50px;height:50px;border-radius:50%;background:${u.color||'#888'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;flex-shrink:0">${(u.name||'?').charAt(0)}</div>`;
 
-        return `<div onclick="openConversation('${uid}','${u.name}','${u.color||'#888'}','${photo||''}')" style="
-          display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
-          border-bottom:1px solid var(--border);transition:background .15s;
-          background:${isActive?'rgba(0,153,204,.08)':'#fff'};
-          border-left:3px solid ${isActive?'var(--soufflage)':'transparent'};
+        return `<div onclick="openConversation('${uid}','${esc(u.name)}','${u.color||'#888'}','${photo||''}')" style="
+          display:flex;align-items:center;gap:13px;padding:12px 16px;cursor:pointer;
+          border-bottom:1px solid #f0f2f5;transition:background .12s;
+          background:${isActive?'#e8f4fd':'#fff'};
         ">
           <div style="position:relative;flex-shrink:0">
             ${avatarEl}
-            <div style="position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
+            <div style="position:absolute;bottom:2px;right:2px;width:13px;height:13px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
           </div>
           <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div>
-            <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${lastPriv ? esc(lastPriv.text||'').substring(0,35) : (isOnline?'● En ligne':'● Hors ligne')}</div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px">
+              <div style="font-weight:700;font-size:15px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${esc(u.name)}</div>
+              <div style="font-size:11px;color:#aaa;flex-shrink:0">${lastPriv&&lastPriv.ts?timeAgo(lastPriv.ts):''}</div>
+            </div>
+            <div style="font-size:13px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+              ${lastPriv?esc((lastPriv.text||'').substring(0,40)):(isOnline?'<span style="color:#22c55e">● En ligne</span>':'<span style="color:#aaa">● Hors ligne</span>')}
+            </div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-            <div style="font-size:10px;color:var(--muted)">${lastPriv&&lastPriv.ts?timeAgo(lastPriv.ts):''}</div>
-            ${unread > 0 ? `<div style="background:var(--soufflage);color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${unread}</div>` : ''}
-          </div>
+          ${unread>0?`<div style="background:#0099cc;color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${unread}</div>`:''}
         </div>`;
       }).join('');
 
-  wrap.innerHTML = groupItem + contactItems;
+  wrap.innerHTML = groupHTML + contactsHTML;
 }
 
-// Ouvrir le groupe
+window.filterContacts = function() { renderContacts(); };
+
+// ── Ouvrir le groupe ──
 window.openGroupConversation = function() {
   activeConvType = 'group';
   activeConvUserId = null;
-  unreadGroup = 0;
-  updateBadges();
+  unreadGroup = 0; updateBadges();
 
   const convName   = document.getElementById('convName');
   const convStatus = document.getElementById('convStatus');
   const convAvatar = document.getElementById('convAvatar');
-  if (convName) convName.textContent = '🏭 Équipe Production';
-  if (convStatus) {
-    const cnt = Object.values(presence).filter(p=>p.online).length;
-    convStatus.innerHTML = `<span style="color:#22c55e">● ${cnt} membre${cnt>1?'s':''} en ligne</span>`;
-  }
+  const cnt = Object.values(presence).filter(p=>p.online).length;
+  if (convName) convName.textContent = 'Équipe Production';
+  if (convStatus) convStatus.innerHTML = `<span style="color:rgba(255,255,255,.85)">● ${cnt} membre${cnt>1?'s':''} en ligne</span>`;
   if (convAvatar) {
     convAvatar.innerHTML = '🏭';
-    convAvatar.style.cssText = 'width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,var(--soufflage),#0066aa);';
+    convAvatar.style.cssText = 'width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.2);';
   }
 
-  const noConv = document.getElementById('chatNoConv');
-  const convActive = document.getElementById('chatConvActive');
-  if (noConv) noConv.style.display = 'none';
-  if (convActive) convActive.style.display = 'flex';
+  document.getElementById('chatNoConv').style.display = 'none';
+  document.getElementById('chatConvActive').style.display = 'flex';
+  document.getElementById('chatConvPanel').classList.add('mobile-open');
 
-  // Changer le placeholder
   const inp = document.getElementById('convInput');
   if (inp) inp.placeholder = 'Écrire à toute l\'équipe...';
 
-  document.getElementById('chatConvPanel')?.classList.add('mobile-open');
   renderGroupConversation();
+  renderContacts();
+  setTimeout(() => inp?.focus(), 200);
+};
+
+// ── Ouvrir conversation privée ──
+window.openConversation = function(uid, name, color, photo) {
+  if (!uid) return;
+  activeConvType = 'private';
+  activeConvUserId = uid;
+
+  const convName   = document.getElementById('convName');
+  const convStatus = document.getElementById('convStatus');
+  const convAvatar = document.getElementById('convAvatar');
+  if (convName) convName.textContent = name;
+  if (convStatus) {
+    const online = Object.values(presence).some(p=>p.name===name&&p.online);
+    convStatus.innerHTML = online ? '<span style="color:rgba(255,255,255,.9)">● En ligne</span>' : '<span style="color:rgba(255,255,255,.5)">● Hors ligne</span>';
+  }
+  if (convAvatar) {
+    if (photo) { convAvatar.innerHTML = `<img src="${photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover">`; convAvatar.style.background='transparent'; }
+    else { convAvatar.textContent = (name||'?').charAt(0).toUpperCase(); convAvatar.style.cssText=`width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;background:${color||'#888'};`; }
+  }
+
+  document.getElementById('chatNoConv').style.display = 'none';
+  document.getElementById('chatConvActive').style.display = 'flex';
+  document.getElementById('chatConvPanel').classList.add('mobile-open');
+
+  unreadPrivate[uid] = 0;
+  renderContacts();
+
+  const inp = document.getElementById('convInput');
+  if (inp) inp.placeholder = 'Écrire un message privé...';
+
+  const convId = getConvId(currentUser.uid, uid);
+  if (privateListeners[convId]) { privateListeners[convId](); delete privateListeners[convId]; }
+  const msgRef = ref(db, `privateMessages/${convId}`);
+  onValue(msgRef, snap => {
+    privateMessages[convId] = snap.val() || {};
+    if (activeConvType === 'private' && activeConvUserId === uid) renderConversation(convId, uid);
+    renderContacts();
+  });
+  privateListeners[convId] = () => off(msgRef);
+  setTimeout(() => inp?.focus(), 200);
+};
+
+window.closeChatConv = function() {
+  activeConvType = null; activeConvUserId = null;
+  document.getElementById('chatConvPanel').classList.remove('mobile-open');
+  document.getElementById('chatNoConv').style.display = 'flex';
+  document.getElementById('chatConvActive').style.display = 'none';
   renderContacts();
 };
 
+// ── Rendu messages groupe ──
 function renderGroupConversation() {
   const cont = document.getElementById('convMessages');
   if (!cont || activeConvType !== 'group') return;
   const msgs = Object.values(groupMessages).sort((a,b)=>(a.ts||0)-(b.ts||0));
 
   if (msgs.length === 0) {
-    cont.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);padding:30px;text-align:center">
-      <div style="font-size:44px">🏭</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text)">Canal Équipe Production</div>
-      <div style="font-size:13px;line-height:1.6">Tous les membres de l'équipe peuvent lire et écrire ici.<br>Comme un groupe WhatsApp.</div>
+    cont.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;padding:30px">
+      <div style="background:rgba(255,255,255,.85);border-radius:10px;padding:16px 20px;text-align:center;max-width:280px">
+        <div style="font-size:40px;margin-bottom:8px">🏭</div>
+        <div style="font-weight:700;font-size:15px;color:#333;margin-bottom:6px">Canal Équipe Production</div>
+        <div style="font-size:13px;color:#666;line-height:1.6">Tous les membres peuvent écrire ici.<br>Comme un groupe WhatsApp 👍</div>
+      </div>
     </div>`;
     return;
   }
+  cont.innerHTML = buildMessagesHTML(msgs, null);
+  setTimeout(() => { cont.scrollTop = cont.scrollHeight; }, 50);
+}
 
+// ── Rendu messages privés ──
+function renderConversation(convId, otherUid) {
+  const cont = document.getElementById('convMessages');
+  if (!cont || activeConvType !== 'private') return;
+  const msgs = Object.values(privateMessages[convId]||{}).sort((a,b)=>(a.ts||0)-(b.ts||0));
+
+  if (msgs.length === 0) {
+    cont.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;padding:30px">
+      <div style="background:rgba(255,255,255,.9);border-radius:10px;padding:16px 20px;text-align:center;max-width:260px">
+        <div style="font-size:40px;margin-bottom:8px">🔒</div>
+        <div style="font-weight:700;font-size:15px;color:#333;margin-bottom:6px">Conversation privée</div>
+        <div style="font-size:13px;color:#666;line-height:1.6">Vos messages sont confidentiels.<br>Seuls vous deux pouvez les lire.</div>
+      </div>
+    </div>`;
+    return;
+  }
+  cont.innerHTML = buildMessagesHTML(msgs, otherUid);
+  setTimeout(() => { cont.scrollTop = cont.scrollHeight; }, 50);
+}
+
+// ── HTML commun pour les bulles ──
+function buildMessagesHTML(msgs, otherUid) {
   let lastDate = '';
-  cont.innerHTML = msgs.map(msg => {
+  return msgs.map(msg => {
     let dateSep = '';
     if (msg.ts) {
       const td = new Date(); td.setHours(0,0,0,0);
@@ -2379,131 +2482,37 @@ function renderGroupConversation() {
       const md = new Date(msg.ts); md.setHours(0,0,0,0);
       let label = md.getTime()===td.getTime() ? "Aujourd'hui" : md.getTime()===yd.getTime() ? 'Hier'
         : new Date(msg.ts).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-      if (label !== lastDate) { lastDate = label; dateSep = `<div style="text-align:center;margin:14px 0 10px"><span style="background:#e2e8f0;border-radius:12px;padding:4px 14px;font-size:11px;color:#64748b;font-weight:600">${label}</span></div>`; }
+      if (label !== lastDate) { lastDate = label; dateSep = `<div style="text-align:center;margin:14px 0 8px"><span style="background:rgba(255,255,255,.85);border-radius:10px;padding:4px 14px;font-size:11px;color:#666;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)">${label}</span></div>`; }
     }
-    const own = msg.senderId === currentUser.uid;
-    const photo = own ? (currentUConf?.photoURL||null) : (photosCache[msg.senderId]?.photoURL||null);
-    const bgColor = own ? (currentUConf?.color||'#888') : (photosCache[msg.senderId]?.color||'#888');
+    const own = msg.senderId === currentUser?.uid;
+    const uid = msg.senderId;
+    const photo = own ? (currentUConf?.photoURL||null) : (photosCache[uid]?.photoURL||null);
+    const bgColor = own ? (currentUConf?.color||'#0099cc') : (photosCache[uid]?.color||'#888');
     const initial = (msg.senderName||'?').charAt(0).toUpperCase();
     const timeStr = msg.ts ? new Date(msg.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
     const avatarEl = photo
-      ? `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
-      : `<div style="width:32px;height:32px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
+      ? `<div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div style="width:30px;height:30px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
 
-    return dateSep + `<div style="display:flex;align-items:flex-end;gap:8px;${own?'flex-direction:row-reverse;':''}margin-bottom:4px">
-      ${avatarEl}
-      <div style="max-width:72%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
-        ${!own?`<div style="font-size:11px;color:${bgColor};font-weight:700;margin-bottom:2px;padding:0 4px">${esc(msg.senderName)}</div>`:''}
-        <div style="padding:10px 14px;font-size:15px;line-height:1.5;word-break:break-word;border-radius:${own?'18px 4px 18px 18px':'4px 18px 18px 18px'};background:${own?'var(--soufflage)':'#fff'};color:${own?'#fff':'var(--text)'};box-shadow:0 1px 4px rgba(0,0,0,.08)">${esc(msg.text)}</div>
-        <span style="font-size:10px;color:var(--muted);margin-top:3px">${timeStr}</span>
+    return dateSep + `<div style="display:flex;align-items:flex-end;gap:6px;${own?'flex-direction:row-reverse;':''}margin-bottom:3px">
+      ${!own ? avatarEl : ''}
+      <div style="max-width:75%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
+        ${!own&&activeConvType==='group'?`<div style="font-size:11px;color:${bgColor};font-weight:700;margin-bottom:2px;padding:0 6px">${esc(msg.senderName)}</div>`:''}
+        <div style="
+          padding:8px 12px;font-size:15px;line-height:1.5;word-break:break-word;
+          border-radius:${own?'16px 2px 16px 16px':'2px 16px 16px 16px'};
+          background:${own?'#dcf8c6':'#fff'};
+          color:#111;
+          box-shadow:0 1px 2px rgba(0,0,0,.12);
+        ">${esc(msg.text)}</div>
+        <span style="font-size:10px;color:#999;margin-top:2px;padding:0 4px">${timeStr}${own?' ✓✓':''}</span>
       </div>
+      ${own ? avatarEl : ''}
     </div>`;
   }).join('');
-  setTimeout(() => { cont.scrollTop = cont.scrollHeight; }, 50);
 }
 
-window.filterContacts = function() { renderContacts(); };
-
-window.openConversation = function(uid, name, color, photo) {
-  if (!uid) return;
-  activeConvType = 'private';
-  activeConvUserId = uid;
-
-  // Header
-  const convName   = document.getElementById('convName');
-  const convStatus = document.getElementById('convStatus');
-  const convAvatar = document.getElementById('convAvatar');
-  if (convName) convName.textContent = name;
-  if (convStatus) {
-    const online = Object.values(presence).some(p=>p.name===name&&p.online);
-    convStatus.innerHTML = online ? '<span style="color:#22c55e">● En ligne</span>' : '<span style="color:#ccc">● Hors ligne</span>';
-  }
-  if (convAvatar) {
-    if (photo) { convAvatar.innerHTML = `<img src="${photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover">`; convAvatar.style.background='transparent'; }
-    else { convAvatar.textContent = (name||'?').charAt(0).toUpperCase(); convAvatar.style.background = color||'#888'; }
-  }
-
-  // Afficher conversation
-  const noConv    = document.getElementById('chatNoConv');
-  const convActive = document.getElementById('chatConvActive');
-  if (noConv) noConv.style.display = 'none';
-  if (convActive) convActive.style.display = 'flex';
-  document.getElementById('chatConvPanel')?.classList.add('mobile-open');
-
-  // Reset badge
-  unreadPrivate[uid] = 0;
-  renderContacts();
-
-  // Écouter messages privés
-  const convId = getConvId(currentUser.uid, uid);
-  if (privateListeners[convId]) { privateListeners[convId](); delete privateListeners[convId]; }
-  const msgRef = ref(db, `privateMessages/${convId}`);
-  const unsub = onValue(msgRef, snap => {
-    privateMessages[convId] = snap.val() || {};
-    renderConversation(convId, uid);
-  });
-  privateListeners[convId] = () => off(msgRef);
-  // Placeholder privé
-  const inp3 = document.getElementById('convInput');
-  if (inp3) inp3.placeholder = 'Écrire un message privé...';
-  setTimeout(() => document.getElementById('convInput')?.focus(), 200);
-};
-
-window.closeChatConv = function() {
-  activeConvUserId = null;
-  document.getElementById('chatConvPanel')?.classList.remove('mobile-open');
-  const noConv = document.getElementById('chatNoConv');
-  const convActive = document.getElementById('chatConvActive');
-  if (noConv) noConv.style.display = 'flex';
-  if (convActive) convActive.style.display = 'none';
-};
-
-function renderConversation(convId, otherUid) {
-  const cont = document.getElementById('convMessages');
-  if (!cont) return;
-  const msgs = Object.values(privateMessages[convId]||{}).sort((a,b)=>(a.ts||0)-(b.ts||0));
-
-  if (msgs.length === 0) {
-    cont.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);padding:30px;text-align:center">
-      <div style="font-size:44px">🔒</div>
-      <div style="font-size:15px;font-weight:700;color:var(--text)">Conversation privée</div>
-      <div style="font-size:13px;line-height:1.6">Vos messages sont confidentiels.<br>Seuls vous deux pouvez les lire.</div>
-    </div>`;
-    return;
-  }
-
-  let lastDate = '';
-  cont.innerHTML = msgs.map(msg => {
-    let dateSep = '';
-    if (msg.ts) {
-      const today = new Date(); today.setHours(0,0,0,0);
-      const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
-      const msgDay = new Date(msg.ts); msgDay.setHours(0,0,0,0);
-      let label = msgDay.getTime()===today.getTime() ? "Aujourd'hui"
-        : msgDay.getTime()===yesterday.getTime() ? 'Hier'
-        : new Date(msg.ts).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-      if (label !== lastDate) { lastDate = label; dateSep = `<div style="text-align:center;margin:14px 0 10px"><span style="background:#e2e8f0;border-radius:12px;padding:4px 14px;font-size:11px;color:#64748b;font-weight:600">${label}</span></div>`; }
-    }
-    const own = msg.senderId === currentUser.uid;
-    const photo = own ? (currentUConf?.photoURL||null) : (photosCache[otherUid]?.photoURL||null);
-    const bgColor = own ? (currentUConf?.color||'#888') : (photosCache[otherUid]?.color||'#888');
-    const initial = (msg.senderName||'?').charAt(0).toUpperCase();
-    const timeStr = msg.ts ? new Date(msg.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
-    const avatarEl = photo
-      ? `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
-      : `<div style="width:32px;height:32px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
-
-    return dateSep + `<div style="display:flex;align-items:flex-end;gap:8px;${own?'flex-direction:row-reverse;':''}margin-bottom:4px">
-      ${avatarEl}
-      <div style="max-width:72%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
-        <div style="padding:10px 14px;font-size:15px;line-height:1.5;word-break:break-word;border-radius:${own?'18px 4px 18px 18px':'4px 18px 18px 18px'};background:${own?'var(--soufflage)':'#fff'};color:${own?'#fff':'var(--text)'};box-shadow:0 1px 4px rgba(0,0,0,.08)">${esc(msg.text)}</div>
-        <span style="font-size:10px;color:var(--muted);margin-top:3px">${timeStr}</span>
-      </div>
-    </div>`;
-  }).join('');
-  setTimeout(() => { cont.scrollTop = cont.scrollHeight; }, 50);
-}
-
+// ── Envoyer un message ──
 window.sendPrivateMsg = async function() {
   const inp = document.getElementById('convInput');
   const txt = inp?.value.trim();
@@ -2511,7 +2520,6 @@ window.sendPrivateMsg = async function() {
   inp.value = '';
 
   if (activeConvType === 'group') {
-    // Envoyer dans le canal groupe
     await push(ref(db, 'groupChat'), {
       ts: serverTimestamp(),
       senderId: currentUser.uid,
@@ -2522,8 +2530,6 @@ window.sendPrivateMsg = async function() {
     });
     return;
   }
-
-  // Sinon message privé
   if (!activeConvUserId) return;
   const convId = getConvId(currentUser.uid, activeConvUserId);
   await push(ref(db, `privateMessages/${convId}`), {
@@ -2536,7 +2542,7 @@ window.sendPrivateMsg = async function() {
   });
 };
 
-window.sendChat = async function() {}; // conservé pour compatibilité
+window.sendChat = async function() {};
 
 window.clearSystemMessages = async function() {
   if (!confirm('Supprimer tous les anciens messages système de Firebase ?')) return;
@@ -2837,15 +2843,15 @@ function initMobileUI() {
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
 
-  // Chat visible pour TOUS les utilisateurs
+  // Chat visible seulement pour Admin/Superviseur
   const chatSide  = document.getElementById('chatSidebarItem');
   const chatMMenu = document.getElementById('chatMobileMenuItem');
   const chatNav   = document.getElementById('chatNavIcon');
   const chatMBtn  = document.getElementById('chatMobileBtn');
-  if (chatSide)  chatSide.style.display  = 'flex';
-  if (chatMMenu) chatMMenu.style.display = 'flex';
-  if (chatNav)   chatNav.style.display   = 'flex';
-  if (chatMBtn)  chatMBtn.style.display  = isMobile ? 'flex' : 'none';
+  if (chatSide)  chatSide.style.display  = isAdminRole ? 'flex' : 'none';
+  if (chatMMenu) chatMMenu.style.display = isAdminRole ? 'flex' : 'none';
+  if (chatNav)   chatNav.style.display   = isAdminRole ? 'flex' : 'none';
+  if (chatMBtn)  chatMBtn.style.display  = (isMobile && isAdminRole) ? 'flex' : 'none';
 
   // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
