@@ -1676,6 +1676,10 @@ function removeListeners() {
 function renderPresence() {
   const wrap = document.getElementById('presencePills');
   if (!wrap) return;
+  // Visible uniquement pour Admin et Superviseur
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
   const onlineUsers = Object.values(presence).filter(p => p.online);
   wrap.innerHTML = onlineUsers.map(p => {
     const uid = Object.keys(presence).find(k => presence[k] === p) || '';
