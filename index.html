@@ -453,6 +453,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
   .chat-input-area { padding:10px 12px !important; }
 }
 
+@keyframes splashPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,.2)} 50%{box-shadow:0 0 28px rgba(255,215,0,.5)} }
+
 /* PROFIL */
 #profileAvatarBig img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 </style>
@@ -563,7 +565,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         color:rgba(255,255,255,.4);
         margin-top:8px;
         letter-spacing:.05em;
-      ">Patientez 15 secondes...</div>
+      ">Patientez 30 secondes...</div>
     </div>
 
     <!-- Bouton Continuer (désactivé au début) -->
@@ -1483,10 +1485,6 @@ window.logout = async function() {
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
-  // Masquer le splash si encore visible (cas connexion automatique)
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.style.display = 'none';
-
   if (user) {
     currentUser = user;
     let conf = getUserConf(user.email);
@@ -1525,8 +1523,12 @@ onAuthStateChanged(auth, async user => {
     photosCache[user.uid] = { photoURL: currentUConf.photoURL||null, color: currentUConf.color, name: currentUConf.name };
 
     document.getElementById('loginScreen').classList.remove('show');
-    document.getElementById('app').classList.add('show');
+    document.getElementById('loginScreen').style.display = 'none';
+
+    // Montrer le splash 30s AVANT d'accéder à l'app
+    // L'app se charge en arrière-plan pendant ce temps
     initApp();
+    showSplash('app');
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
@@ -2336,48 +2338,93 @@ window.changePassword = async function() {
   }
 };
 // ══════════ SPLASH SCREEN ══════════
-(function() {
-  const DURATION = 15; // secondes minimum de lecture
-  let elapsed = 0;
-  const progress = document.getElementById('splashProgress');
-  const countdown = document.getElementById('splashCountdown');
-  const btn = document.getElementById('splashBtn');
+const SPLASH_DURATION = 30;
+let splashInterval = null;
+let splashTarget = 'login'; // 'login' ou 'app'
 
-  const interval = setInterval(() => {
+function showSplash(target) {
+  splashTarget = target || 'login';
+  const splash = document.getElementById('splashScreen');
+  if (!splash) return;
+
+  // Réinitialiser
+  const progress  = document.getElementById('splashProgress');
+  const countdown = document.getElementById('splashCountdown');
+  const btn       = document.getElementById('splashBtn');
+  if (progress)  { progress.style.width = '0%'; progress.style.transition = 'none'; }
+  if (countdown) countdown.textContent = `Patientez encore ${SPLASH_DURATION} secondes...`;
+  if (btn) {
+    btn.disabled = true;
+    btn.style.background   = 'rgba(255,215,0,.1)';
+    btn.style.borderColor  = 'rgba(255,215,0,.2)';
+    btn.style.color        = 'rgba(255,215,0,.35)';
+    btn.style.cursor       = 'not-allowed';
+    btn.style.boxShadow    = 'none';
+  }
+
+  // Afficher
+  splash.style.display   = 'flex';
+  splash.style.opacity   = '0';
+  splash.style.transition = 'opacity .5s ease';
+  setTimeout(() => { splash.style.opacity = '1'; }, 30);
+
+  // Masquer tout le reste
+  const login = document.getElementById('loginScreen');
+  const app   = document.getElementById('app');
+  if (login) login.style.display = 'none';
+  if (app)   app.classList.remove('show');
+
+  // Timer
+  if (splashInterval) clearInterval(splashInterval);
+  let elapsed = 0;
+  setTimeout(() => { if (progress) progress.style.transition = 'width .1s linear'; }, 60);
+
+  splashInterval = setInterval(() => {
     elapsed++;
-    const pct = Math.min((elapsed / DURATION) * 100, 100);
+    const pct = Math.min((elapsed / SPLASH_DURATION) * 100, 100);
     if (progress) progress.style.width = pct + '%';
 
-    const remaining = DURATION - elapsed;
+    const remaining = SPLASH_DURATION - elapsed;
     if (remaining > 0) {
       if (countdown) countdown.textContent = `Patientez encore ${remaining} seconde${remaining > 1 ? 's' : ''}...`;
     } else {
-      clearInterval(interval);
-      if (countdown) countdown.textContent = 'Vous pouvez continuer ✓';
+      clearInterval(splashInterval);
+      if (countdown) countdown.textContent = '✓ Vous pouvez continuer';
       if (btn) {
         btn.disabled = false;
-        btn.style.background = 'rgba(255,215,0,.25)';
-        btn.style.borderColor = 'rgba(255,215,0,.7)';
-        btn.style.color = '#ffd700';
-        btn.style.cursor = 'pointer';
-        btn.style.boxShadow = '0 0 16px rgba(255,215,0,.2)';
+        btn.style.background  = 'rgba(255,215,0,.25)';
+        btn.style.borderColor = 'rgba(255,215,0,.8)';
+        btn.style.color       = '#ffd700';
+        btn.style.cursor      = 'pointer';
+        btn.style.boxShadow   = '0 0 20px rgba(255,215,0,.25)';
+        // Faire pulser le bouton pour attirer l'attention
+        btn.style.animation   = 'splashPulse 1.5s ease-in-out infinite';
       }
     }
   }, 1000);
-})();
+}
 
 window.closeSplash = function() {
+  if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
   const splash = document.getElementById('splashScreen');
-  const login  = document.getElementById('loginScreen');
-  if (splash) {
-    splash.style.transition = 'opacity .6s ease';
-    splash.style.opacity = '0';
-    setTimeout(() => {
-      splash.style.display = 'none';
-      if (login) login.style.display = 'flex';
-    }, 600);
-  }
+  if (!splash) return;
+  splash.style.transition = 'opacity .7s ease';
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    if (splashTarget === 'app') {
+      // Après connexion → montrer l'app
+      document.getElementById('app')?.classList.add('show');
+    } else {
+      // Avant connexion → montrer le login
+      const login = document.getElementById('loginScreen');
+      if (login) { login.style.display = 'flex'; }
+    }
+  }, 700);
 };
+
+// Afficher le splash au chargement de la page (avant connexion)
+showSplash('login');
 window.toggleUserMenu = function(e) {
   if (e) e.stopPropagation();
   document.getElementById('userDropdown')?.classList.toggle('open');
