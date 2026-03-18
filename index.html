@@ -1106,77 +1106,48 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <!-- PAGE ÉQUIPE -->
     <div class="page" id="page-equipe">
       <div class="page-header">
-        <div><h2>👥 Équipe</h2><p>Profils de tous les membres de l'équipe</p></div>
+        <div><h2>👥 Équipe</h2><p>Profils de tous les membres</p></div>
       </div>
-      <div id="equipeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+      <div id="equipeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
     </div>
 
-    <!-- MODAL PROFIL UTILISATEUR -->
-    <div id="userProfileModal" style="
-      display:none;position:fixed;inset:0;z-index:2000;
-      background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
-      align-items:center;justify-content:center;padding:20px;
-    " onclick="closeUserProfile(event)">
-      <div style="
-        background:#fff;border-radius:20px;width:100%;max-width:480px;
-        max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);
-        animation:fadeUp .3s ease;
-      " onclick="event.stopPropagation()">
-
-        <!-- Header coloré -->
-        <div id="upModalHeader" style="height:100px;border-radius:20px 20px 0 0;position:relative;background:var(--soufflage)">
-          <button onclick="closeUserProfile()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.25);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center">×</button>
+    <!-- MODAL PROFIL -->
+    <div id="userProfileModal" onclick="if(event.target===this){document.getElementById('userProfileModal').style.display='none';document.body.style.overflow=''}" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:fadeUp .3s ease" onclick="event.stopPropagation()">
+        <div id="upHeader" style="height:90px;border-radius:20px 20px 0 0;position:relative">
+          <button onclick="document.getElementById('userProfileModal').style.display='none';document.body.style.overflow=''" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.3);border:none;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer;color:#fff;line-height:1">×</button>
         </div>
-
-        <!-- Avatar (chevauchement) -->
-        <div style="display:flex;justify-content:center;margin-top:-50px;margin-bottom:8px">
-          <div id="upAvatar" style="width:100px;height:100px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0"></div>
+        <div style="display:flex;justify-content:center;margin-top:-48px;margin-bottom:6px">
+          <div id="upAvatar" style="width:96px;height:96px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0"></div>
         </div>
-
-        <!-- Infos principales -->
-        <div style="text-align:center;padding:0 24px 16px">
-          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px">
-            <div id="upName" style="font-family:var(--font-display);font-size:24px;font-weight:800"></div>
-            <div id="upOnlineDot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></div>
+        <div style="text-align:center;padding:0 20px 14px">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+            <div id="upName" style="font-family:var(--font-display);font-size:22px;font-weight:800"></div>
+            <div id="upDot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></div>
           </div>
-          <div id="upRole" style="font-size:14px;font-weight:600;margin-bottom:4px"></div>
-          <div id="upStatus" style="font-size:12px"></div>
+          <div id="upRole" style="font-size:13px;font-weight:600;margin-top:3px"></div>
+          <div id="upStatusTxt" style="font-size:12px;margin-top:2px"></div>
         </div>
-
-        <!-- Coordonnées -->
-        <div style="margin:0 20px 16px">
-          <div style="background:#f8f9fb;border-radius:12px;overflow:hidden">
-            <div id="upEmail" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #eee">
-              <span style="font-size:18px">📧</span>
-              <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#aaa;margin-bottom:2px">Email</div><div id="upEmailVal" style="font-size:14px;color:#333"></div></div>
-            </div>
-            <div id="upPhoneRow" style="display:flex;align-items:center;gap:12px;padding:13px 16px">
-              <span style="font-size:18px">📱</span>
-              <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#aaa;margin-bottom:2px">Téléphone</div><div id="upPhoneVal" style="font-size:14px;color:#333"></div></div>
-            </div>
+        <div style="margin:0 16px 14px;background:#f8f9fb;border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #eee">
+            <span style="font-size:16px">📧</span>
+            <div><div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px">Email</div><div id="upEmail" style="font-size:13px;color:#333"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px">
+            <span style="font-size:16px">📱</span>
+            <div><div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px">Téléphone</div><div id="upPhone" style="font-size:13px;color:#333"></div></div>
           </div>
         </div>
-
-        <!-- Stats production -->
-        <div style="margin:0 20px 16px">
-          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:10px">📊 Statistiques de production</div>
-          <div id="upStats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"></div>
+        <div style="margin:0 16px 14px">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:8px">📊 Production</div>
+          <div id="upStats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"></div>
         </div>
-
-        <!-- Rapports récents -->
-        <div style="margin:0 20px 20px">
-          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:10px">📋 Rapports récents</div>
-          <div id="upReports"></div>
+        <div style="margin:0 16px 14px">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:8px">📋 Derniers rapports</div>
+          <div id="upRapports"></div>
         </div>
-
-        <!-- Bouton envoyer message -->
-        <div style="padding:0 20px 24px">
-          <button id="upMsgBtn" style="
-            width:100%;padding:14px;background:var(--soufflage);color:#fff;
-            border:none;border-radius:12px;font-family:var(--font-display);
-            font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;
-            display:flex;align-items:center;justify-content:center;gap:8px;
-          ">💬 Envoyer un message privé</button>
+        <div style="padding:0 16px 20px">
+          <button id="upMsgBtn" onclick="" style="width:100%;padding:13px;border:none;border-radius:12px;font-family:var(--font-display);font-size:15px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px">💬 Envoyer un message privé</button>
         </div>
       </div>
     </div>
@@ -2819,171 +2790,119 @@ window.changePassword = async function() {
 window.renderEquipePage = async function() {
   const grid = document.getElementById('equipeGrid');
   if (!grid) return;
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div>Chargement...</div>';
-
-  const snap = await get(ref(db, 'userProfiles'));
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Chargement...</div>';
+  const snap = await get(ref(db,'userProfiles'));
   const profiles = snap.val() || {};
   const entries = Object.entries(profiles);
-
-  if (entries.length === 0) {
-    grid.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun profil enregistré</p></div>';
-    return;
-  }
-
-  grid.innerHTML = entries.map(([uid, p]) => {
-    const color = (MACHINE_MAP[p.role]||{}).color || '#888';
-    const isOnline = Object.values(presence).some(x => x.name === p.name && x.online);
-    const userReports = Object.values(allReports).filter(r => r.operatorName === p.name);
-    const totalProd = userReports.reduce((s,r) => s+(r.fields?.prod||0), 0);
-    const nbRapports = userReports.length;
-    const lastRep = userReports.sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-
-    const avatarEl = p.photoURL
-      ? `<img src="${p.photoURL}" style="width:70px;height:70px;border-radius:50%;object-fit:cover">`
-      : `<div style="width:70px;height:70px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff">${(p.name||'?').charAt(0)}</div>`;
-
-    return `<div onclick="openUserProfile('${uid}')" style="
-      background:#fff;border:1px solid var(--border);border-radius:16px;
-      padding:20px;cursor:pointer;transition:all .2s;
-      box-shadow:0 2px 8px rgba(0,0,0,.06);
-      border-top:4px solid ${color};
-    " onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'"
-       onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
-
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-        <div style="position:relative;flex-shrink:0">
-          ${avatarEl}
-          <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
-        </div>
+  if (!entries.length) { grid.innerHTML='<div class="empty"><div class="eico">👥</div><p>Aucun profil</p></div>'; return; }
+  grid.innerHTML = entries.map(([uid,p]) => {
+    const color = (MACHINE_MAP[p.role]||{}).color||'#888';
+    const isOnline = Object.values(presence).some(x=>x.name===p.name&&x.online);
+    const reps = Object.values(allReports).filter(r=>r.operatorName===p.name);
+    const prod = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+    const avEl = p.photoURL
+      ? `<img src="${p.photoURL}" style="width:64px;height:64px;border-radius:50%;object-fit:cover">`
+      : `<div style="width:64px;height:64px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff">${(p.name||'?').charAt(0)}</div>`;
+    return `<div onclick="openUserProfile('${uid}')" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.06);border-top:4px solid ${color}" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="position:relative;flex-shrink:0">${avEl}<div style="position:absolute;bottom:2px;right:2px;width:13px;height:13px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div></div>
         <div style="flex:1;min-width:0">
-          <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||'—')}</div>
-          <div style="font-size:12px;font-weight:600;color:${color};margin-top:2px">${esc(p.role||'—')}</div>
-          <div style="font-size:11px;color:${isOnline?'#22c55e':'var(--muted)'};margin-top:2px">${isOnline?'● En ligne maintenant':'● Hors ligne'}</div>
+          <div style="font-family:var(--font-display);font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||'—')}</div>
+          <div style="font-size:12px;font-weight:600;color:${color};margin-top:1px">${esc(p.role||'—')}</div>
+          <div style="font-size:11px;color:${isOnline?'#22c55e':'var(--muted)'};margin-top:1px">${isOnline?'● En ligne':'● Hors ligne'}</div>
         </div>
       </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <div style="background:var(--surface);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:${color}">${num(totalProd)||'—'}</div>
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Production</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:${color}">${prod>0?num(prod):'—'}</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Production</div>
         </div>
-        <div style="background:var(--surface);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text)">${nbRapports}</div>
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Rapports</div>
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:800">${reps.length}</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Rapports</div>
         </div>
       </div>
-
-      <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
-        ${p.phone ? `<span>📱 ${esc(p.phone)}</span>` : ''}
-        ${lastRep ? `<span style="margin-left:auto">Dernier: ${timeAgo(lastRep.ts)}</span>` : ''}
-      </div>
+      ${p.phone?`<div style="font-size:12px;color:var(--muted);margin-top:10px">📱 ${esc(p.phone)}</div>`:''}
     </div>`;
   }).join('');
 };
 
-// ── Ouvrir modal profil ──
 window.openUserProfile = async function(uid) {
-  const snap = await get(ref(db, `userProfiles/${uid}`));
-  const p = snap.val();
-  if (!p) return;
+  const snap = await get(ref(db,`userProfiles/${uid}`));
+  const p = snap.val(); if (!p) return;
+  const color = (MACHINE_MAP[p.role]||{}).color||'#888';
+  const isOnline = Object.values(presence).some(x=>x.name===p.name&&x.online);
+  const reps = Object.values(allReports).filter(r=>r.operatorName===p.name).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const prod = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+  const jours = [...new Set(reps.map(r=>r.date))].length;
+  const pannes = reps.filter(r=>r.status==='panne').length;
 
-  const color = (MACHINE_MAP[p.role]||{}).color || '#888';
-  const isOnline = Object.values(presence).some(x => x.name === p.name && x.online);
-  const userReports = Object.values(allReports).filter(r => r.operatorName === p.name).sort((a,b)=>(b.ts||0)-(a.ts||0));
-  const totalProd = userReports.reduce((s,r) => s+(r.fields?.prod||0), 0);
-  const nbJours = [...new Set(userReports.map(r=>r.date))].length;
-  const nbPannes = userReports.filter(r=>r.status==='panne').length;
-
-  // Header color
-  document.getElementById('upModalHeader').style.background = `linear-gradient(135deg, ${color}, ${color}99)`;
-
-  // Avatar
+  document.getElementById('upHeader').style.background = `linear-gradient(135deg,${color},${color}88)`;
   const av = document.getElementById('upAvatar');
   av.style.background = color;
-  if (p.photoURL) { av.innerHTML = `<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover">`; }
-  else { av.textContent = (p.name||'?').charAt(0).toUpperCase(); }
+  av.innerHTML = p.photoURL ? `<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover">` : (p.name||'?').charAt(0).toUpperCase();
 
-  // Infos
-  document.getElementById('upName').textContent = p.name || '—';
+  document.getElementById('upName').textContent = p.name||'—';
   document.getElementById('upName').style.color = color;
-  document.getElementById('upRole').textContent = p.role || '—';
+  document.getElementById('upRole').textContent = p.role||'—';
   document.getElementById('upRole').style.color = color;
-  const dot = document.getElementById('upOnlineDot');
-  dot.style.background = isOnline ? '#22c55e' : '#ccc';
-  if (isOnline) dot.style.boxShadow = '0 0 0 3px rgba(34,197,94,.2)';
-  document.getElementById('upStatus').innerHTML = isOnline
-    ? '<span style="color:#22c55e;font-weight:600">● En ligne maintenant</span>'
-    : '<span style="color:#aaa">● Hors ligne</span>';
+  const dot = document.getElementById('upDot');
+  dot.style.background = isOnline?'#22c55e':'#ccc';
+  document.getElementById('upStatusTxt').innerHTML = isOnline?'<span style="color:#22c55e;font-weight:600">● En ligne</span>':'<span style="color:#aaa">● Hors ligne</span>';
+  document.getElementById('upEmail').textContent = p.email||'—';
+  document.getElementById('upPhone').textContent = p.phone||'Non renseigné';
 
-  // Coordonnées
-  document.getElementById('upEmailVal').textContent = p.email || '—';
-  document.getElementById('upPhoneVal').textContent = p.phone || 'Non renseigné';
-
-  // Stats
   document.getElementById('upStats').innerHTML = `
-    <div style="background:${color}15;border-radius:10px;padding:12px;text-align:center;border:1px solid ${color}30">
-      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:${color}">${num(totalProd)||'0'}</div>
-      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Production</div>
+    <div style="background:${color}15;border-radius:9px;padding:10px;text-align:center;border:1px solid ${color}30">
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:${color}">${prod>0?num(prod):'0'}</div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Production</div>
     </div>
-    <div style="background:#f0f9f4;border-radius:10px;padding:12px;text-align:center;border:1px solid #d1fae5">
-      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#16a34a">${nbJours}</div>
-      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Jours actifs</div>
+    <div style="background:#f0fdf4;border-radius:9px;padding:10px;text-align:center;border:1px solid #bbf7d0">
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#16a34a">${jours}</div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Jours actifs</div>
     </div>
-    <div style="background:#fff7ed;border-radius:10px;padding:12px;text-align:center;border:1px solid #fed7aa">
-      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#ea580c">${nbPannes}</div>
-      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Pannes</div>
+    <div style="background:#fff7ed;border-radius:9px;padding:10px;text-align:center;border:1px solid #fed7aa">
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:#ea580c">${pannes}</div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Pannes</div>
     </div>`;
 
-  // Rapports récents
-  const recent = userReports.slice(0, 5);
-  const rEl = document.getElementById('upReports');
-  if (recent.length === 0) {
-    rEl.innerHTML = '<div style="text-align:center;color:#aaa;padding:16px;font-size:13px">Aucun rapport</div>';
-  } else {
-    rEl.innerHTML = `<div style="background:#f8f9fb;border-radius:12px;overflow:hidden">` +
-      recent.map((r,i) => {
-        const m = MACHINES.find(x=>x.id===r.machine);
-        const sc = {ok:'#16a34a',warn:'#d97706',panne:'#dc2626',arret:'#6b7280'}[r.status]||'#888';
-        const st = {ok:'✅',warn:'⚠️',panne:'🔴',arret:'⏸️'}[r.status]||'';
-        return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;${i<recent.length-1?'border-bottom:1px solid #eee':''}">
-          <div style="font-size:20px">${m?.icon||'📋'}</div>
+  const recent = reps.slice(0,5);
+  document.getElementById('upRapports').innerHTML = recent.length===0
+    ? '<div style="text-align:center;color:#aaa;padding:14px;font-size:13px;background:#f8f9fb;border-radius:10px">Aucun rapport</div>'
+    : `<div style="background:#f8f9fb;border-radius:10px;overflow:hidden">${recent.map((r,i)=>{
+        const m=MACHINES.find(x=>x.id===r.machine);
+        const st={ok:'✅',warn:'⚠️',panne:'🔴',arret:'⏸️'}[r.status]||'';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 13px;${i<recent.length-1?'border-bottom:1px solid #eee':''}">
+          <div style="font-size:18px">${m?.icon||'📋'}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:600;color:#333">${r.machine} — ${r.shift}</div>
-            <div style="font-size:11px;color:#aaa">${formatDate(r.date)} · ${timeAgo(r.ts)}</div>
+            <div style="font-size:13px;font-weight:600">${r.machine} — ${r.shift}</div>
+            <div style="font-size:11px;color:#aaa">${formatDate(r.date)}</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:${m?.color||'#888'}">${num(r.fields?.prod)}</div>
-            <div style="font-size:12px">${st}</div>
+            <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:${m?.color||'#888'}">${num(r.fields?.prod)}</div>
+            <div style="font-size:11px">${st}</div>
           </div>
         </div>`;
-      }).join('') + '</div>';
-  }
+      }).join('')}</div>`;
 
-  // Bouton message privé
-  const msgBtn = document.getElementById('upMsgBtn');
-  msgBtn.style.background = color;
-  msgBtn.onclick = () => {
-    closeUserProfile();
+  const btn = document.getElementById('upMsgBtn');
+  btn.style.background = color;
+  btn.style.display = uid===currentUser?.uid ? 'none' : 'flex';
+  btn.onclick = () => {
+    document.getElementById('userProfileModal').style.display='none';
+    document.body.style.overflow='';
     navigate('chat');
-    setTimeout(() => {
-      const userConf = Object.entries(photosCache).find(([k,v]) => v.name === p.name);
-      if (userConf) openConversation(userConf[0], p.name, color, p.photoURL||'');
-    }, 300);
+    setTimeout(()=>{
+      const entry = Object.entries(photosCache).find(([k,v])=>v.name===p.name);
+      if (entry) openConversation(entry[0], p.name, color, p.photoURL||'');
+    }, 350);
   };
-  // Cacher bouton si c'est soi-même
-  msgBtn.style.display = uid === currentUser?.uid ? 'none' : 'flex';
 
-  // Afficher le modal
-  const modal = document.getElementById('userProfileModal');
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  document.getElementById('userProfileModal').style.display='flex';
+  document.body.style.overflow='hidden';
 };
 
-window.closeUserProfile = function(e) {
-  if (e && e.target && e.target !== document.getElementById('userProfileModal')) return;
-  document.getElementById('userProfileModal').style.display = 'none';
-  document.body.style.overflow = '';
-};
+// ══════════ SPLASH SCREEN ══════════
 const SPLASH_DURATION = 30;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
@@ -3092,15 +3011,15 @@ function initMobileUI() {
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
 
-  // Chat visible seulement pour Admin/Superviseur
+  // Chat visible pour TOUS les utilisateurs
   const chatSide  = document.getElementById('chatSidebarItem');
   const chatMMenu = document.getElementById('chatMobileMenuItem');
   const chatNav   = document.getElementById('chatNavIcon');
   const chatMBtn  = document.getElementById('chatMobileBtn');
-  if (chatSide)  chatSide.style.display  = isAdminRole ? 'flex' : 'none';
-  if (chatMMenu) chatMMenu.style.display = isAdminRole ? 'flex' : 'none';
-  if (chatNav)   chatNav.style.display   = isAdminRole ? 'flex' : 'none';
-  if (chatMBtn)  chatMBtn.style.display  = (isMobile && isAdminRole) ? 'flex' : 'none';
+  if (chatSide)  chatSide.style.display  = 'flex';
+  if (chatMMenu) chatMMenu.style.display = 'flex';
+  if (chatNav)   chatNav.style.display   = 'flex';
+  if (chatMBtn)  chatMBtn.style.display  = isMobile ? 'flex' : 'none';
 
   // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
