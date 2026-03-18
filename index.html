@@ -2793,7 +2793,14 @@ window.renderEquipePage = async function() {
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Chargement...</div>';
   const snap = await get(ref(db,'userProfiles'));
   const profiles = snap.val() || {};
-  const entries = Object.entries(profiles);
+  const isCurrentAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+  let entries = Object.entries(profiles);
+
+  // Les opérateurs ne voient pas Admin/Superviseur
+  if (!isCurrentAdmin) {
+    entries = entries.filter(([uid,p]) => p.role !== 'Admin' && p.role !== 'Superviseur');
+  }
+
   if (!entries.length) { grid.innerHTML='<div class="empty"><div class="eico">👥</div><p>Aucun profil</p></div>'; return; }
   grid.innerHTML = entries.map(([uid,p]) => {
     const color = (MACHINE_MAP[p.role]||{}).color||'#888';
@@ -2830,6 +2837,13 @@ window.renderEquipePage = async function() {
 window.openUserProfile = async function(uid) {
   const snap = await get(ref(db,`userProfiles/${uid}`));
   const p = snap.val(); if (!p) return;
+
+  const isCurrentAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+  const isTargetAdmin  = p.role==='Admin'||p.role==='Superviseur';
+
+  // Un opérateur ne peut pas voir le profil d'un Admin/Superviseur
+  if (!isCurrentAdmin && isTargetAdmin) return;
+
   const color = (MACHINE_MAP[p.role]||{}).color||'#888';
   const isOnline = Object.values(presence).some(x=>x.name===p.name&&x.online);
   const reps = Object.values(allReports).filter(r=>r.operatorName===p.name).sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -2849,8 +2863,20 @@ window.openUserProfile = async function(uid) {
   const dot = document.getElementById('upDot');
   dot.style.background = isOnline?'#22c55e':'#ccc';
   document.getElementById('upStatusTxt').innerHTML = isOnline?'<span style="color:#22c55e;font-weight:600">● En ligne</span>':'<span style="color:#aaa">● Hors ligne</span>';
-  document.getElementById('upEmail').textContent = p.email||'—';
-  document.getElementById('upPhone').textContent = p.phone||'Non renseigné';
+
+  // Email et téléphone : visibles seulement par Admin/Superviseur OU pour son propre profil
+  const showPrivateInfo = isCurrentAdmin || uid === currentUser?.uid;
+  const coordSection = document.querySelector('#userProfileModal [id="upEmail"]')?.closest('div[style*="f8f9fb"]') ||
+    document.getElementById('upEmail')?.closest('div');
+
+  document.getElementById('upEmail').textContent  = showPrivateInfo ? (p.email||'—') : '🔒 Confidentiel';
+  document.getElementById('upPhone').textContent  = showPrivateInfo ? (p.phone||'Non renseigné') : '🔒 Confidentiel';
+
+  // Stats et rapports : visibles pour tout le monde (sauf si Admin/Superviseur cible)
+  const statsEl   = document.getElementById('upStats');
+  const rapportsEl = document.getElementById('upRapports');
+  const statSection  = statsEl?.closest('div[style*="margin"]') || statsEl?.parentElement;
+  const rapSection   = rapportsEl?.closest('div[style*="margin"]') || rapportsEl?.parentElement;
 
   document.getElementById('upStats').innerHTML = `
     <div style="background:${color}15;border-radius:9px;padding:10px;text-align:center;border:1px solid ${color}30">
