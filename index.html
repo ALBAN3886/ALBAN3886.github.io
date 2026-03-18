@@ -733,6 +733,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="sidebar-divider"></div>
       <div class="sidebar-label">Mon Compte</div>
       <div class="sidebar-item" onclick="navigate('profil');closeMobileMenu()"><span class="si-icon">👤</span> Mon Profil</div>
+      <div class="sidebar-item" onclick="navigate('equipe');closeMobileMenu()"><span class="si-icon">👥</span> Équipe</div>
       <div class="sidebar-item" id="adminMobileMenuBtn" onclick="navigate('admin');closeMobileMenu()" style="display:none"><span class="si-icon" style="color:#f59e0b">⚙️</span> <span style="color:#f59e0b">Administration</span></div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-item" onclick="logout()" style="color:var(--danger)"><span class="si-icon">⏻</span> Déconnexion</div>
@@ -810,6 +811,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Mon Compte</div>
     <div class="sidebar-item" onclick="navigate('profil')"><span class="si-icon">👤</span> Mon Profil</div>
+    <div class="sidebar-item" onclick="navigate('equipe')"><span class="si-icon">👥</span> Équipe</div>
     <div class="sidebar-item" id="adminSidebarItem" onclick="navigate('admin')" style="display:none"><span class="si-icon" style="color:#f59e0b">⚙️</span> <span style="color:#f59e0b">Administration</span></div>
   </div>
 
@@ -1097,6 +1099,84 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <button class="btn btn-primary" onclick="changePassword()">🔒 Changer le mot de passe</button>
           <div class="save-ok" id="pwdSaveOk">✓ Mot de passe modifié !</div>
           <div id="pwdErr" style="color:var(--danger);font-size:12px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE ÉQUIPE -->
+    <div class="page" id="page-equipe">
+      <div class="page-header">
+        <div><h2>👥 Équipe</h2><p>Profils de tous les membres de l'équipe</p></div>
+      </div>
+      <div id="equipeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- MODAL PROFIL UTILISATEUR -->
+    <div id="userProfileModal" style="
+      display:none;position:fixed;inset:0;z-index:2000;
+      background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+      align-items:center;justify-content:center;padding:20px;
+    " onclick="closeUserProfile(event)">
+      <div style="
+        background:#fff;border-radius:20px;width:100%;max-width:480px;
+        max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);
+        animation:fadeUp .3s ease;
+      " onclick="event.stopPropagation()">
+
+        <!-- Header coloré -->
+        <div id="upModalHeader" style="height:100px;border-radius:20px 20px 0 0;position:relative;background:var(--soufflage)">
+          <button onclick="closeUserProfile()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,.25);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center">×</button>
+        </div>
+
+        <!-- Avatar (chevauchement) -->
+        <div style="display:flex;justify-content:center;margin-top:-50px;margin-bottom:8px">
+          <div id="upAvatar" style="width:100px;height:100px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0"></div>
+        </div>
+
+        <!-- Infos principales -->
+        <div style="text-align:center;padding:0 24px 16px">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px">
+            <div id="upName" style="font-family:var(--font-display);font-size:24px;font-weight:800"></div>
+            <div id="upOnlineDot" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></div>
+          </div>
+          <div id="upRole" style="font-size:14px;font-weight:600;margin-bottom:4px"></div>
+          <div id="upStatus" style="font-size:12px"></div>
+        </div>
+
+        <!-- Coordonnées -->
+        <div style="margin:0 20px 16px">
+          <div style="background:#f8f9fb;border-radius:12px;overflow:hidden">
+            <div id="upEmail" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #eee">
+              <span style="font-size:18px">📧</span>
+              <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#aaa;margin-bottom:2px">Email</div><div id="upEmailVal" style="font-size:14px;color:#333"></div></div>
+            </div>
+            <div id="upPhoneRow" style="display:flex;align-items:center;gap:12px;padding:13px 16px">
+              <span style="font-size:18px">📱</span>
+              <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#aaa;margin-bottom:2px">Téléphone</div><div id="upPhoneVal" style="font-size:14px;color:#333"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats production -->
+        <div style="margin:0 20px 16px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:10px">📊 Statistiques de production</div>
+          <div id="upStats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"></div>
+        </div>
+
+        <!-- Rapports récents -->
+        <div style="margin:0 20px 20px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#aaa;font-weight:700;margin-bottom:10px">📋 Rapports récents</div>
+          <div id="upReports"></div>
+        </div>
+
+        <!-- Bouton envoyer message -->
+        <div style="padding:0 20px 24px">
+          <button id="upMsgBtn" style="
+            width:100%;padding:14px;background:var(--soufflage);color:#fff;
+            border:none;border-radius:12px;font-family:var(--font-display);
+            font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;
+            display:flex;align-items:center;justify-content:center;gap:8px;
+          ">💬 Envoyer un message privé</button>
         </div>
       </div>
     </div>
@@ -1819,7 +1899,7 @@ function renderPresence() {
 }
 
 // ══════════ NAVIGATION ══════════
-const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', admin:'Administration', emballage:'Suivi Emballage', b19:'Suivi B19', total:'Total B19 + Emballage' };
+const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', equipe:'Équipe', admin:'Administration', emballage:'Suivi Emballage', b19:'Suivi B19', total:'Total B19 + Emballage' };
 
 window.navigate = function(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1837,6 +1917,7 @@ window.navigate = function(page) {
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page==='historique') renderHistory();
   if (page==='profil') renderProfile();
+  if (page==='equipe') renderEquipePage();
   if (page==='admin')  renderAdminPage();
   if (page==='emballage') renderEmballagePage();
   if (page==='b19')       renderB19Page();
@@ -2734,7 +2815,175 @@ window.changePassword = async function() {
     else errEl.textContent = 'Erreur : ' + e.message;
   }
 };
-// ══════════ SPLASH SCREEN ══════════
+// ══════════ PAGE ÉQUIPE ══════════
+window.renderEquipePage = async function() {
+  const grid = document.getElementById('equipeGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">⏳</div>Chargement...</div>';
+
+  const snap = await get(ref(db, 'userProfiles'));
+  const profiles = snap.val() || {};
+  const entries = Object.entries(profiles);
+
+  if (entries.length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun profil enregistré</p></div>';
+    return;
+  }
+
+  grid.innerHTML = entries.map(([uid, p]) => {
+    const color = (MACHINE_MAP[p.role]||{}).color || '#888';
+    const isOnline = Object.values(presence).some(x => x.name === p.name && x.online);
+    const userReports = Object.values(allReports).filter(r => r.operatorName === p.name);
+    const totalProd = userReports.reduce((s,r) => s+(r.fields?.prod||0), 0);
+    const nbRapports = userReports.length;
+    const lastRep = userReports.sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+
+    const avatarEl = p.photoURL
+      ? `<img src="${p.photoURL}" style="width:70px;height:70px;border-radius:50%;object-fit:cover">`
+      : `<div style="width:70px;height:70px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff">${(p.name||'?').charAt(0)}</div>`;
+
+    return `<div onclick="openUserProfile('${uid}')" style="
+      background:#fff;border:1px solid var(--border);border-radius:16px;
+      padding:20px;cursor:pointer;transition:all .2s;
+      box-shadow:0 2px 8px rgba(0,0,0,.06);
+      border-top:4px solid ${color};
+    " onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'"
+       onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
+
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="position:relative;flex-shrink:0">
+          ${avatarEl}
+          <div style="position:absolute;bottom:2px;right:2px;width:14px;height:14px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||'—')}</div>
+          <div style="font-size:12px;font-weight:600;color:${color};margin-top:2px">${esc(p.role||'—')}</div>
+          <div style="font-size:11px;color:${isOnline?'#22c55e':'var(--muted)'};margin-top:2px">${isOnline?'● En ligne maintenant':'● Hors ligne'}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--surface);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:${color}">${num(totalProd)||'—'}</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Production</div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text)">${nbRapports}</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px">Rapports</div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+        ${p.phone ? `<span>📱 ${esc(p.phone)}</span>` : ''}
+        ${lastRep ? `<span style="margin-left:auto">Dernier: ${timeAgo(lastRep.ts)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// ── Ouvrir modal profil ──
+window.openUserProfile = async function(uid) {
+  const snap = await get(ref(db, `userProfiles/${uid}`));
+  const p = snap.val();
+  if (!p) return;
+
+  const color = (MACHINE_MAP[p.role]||{}).color || '#888';
+  const isOnline = Object.values(presence).some(x => x.name === p.name && x.online);
+  const userReports = Object.values(allReports).filter(r => r.operatorName === p.name).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const totalProd = userReports.reduce((s,r) => s+(r.fields?.prod||0), 0);
+  const nbJours = [...new Set(userReports.map(r=>r.date))].length;
+  const nbPannes = userReports.filter(r=>r.status==='panne').length;
+
+  // Header color
+  document.getElementById('upModalHeader').style.background = `linear-gradient(135deg, ${color}, ${color}99)`;
+
+  // Avatar
+  const av = document.getElementById('upAvatar');
+  av.style.background = color;
+  if (p.photoURL) { av.innerHTML = `<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover">`; }
+  else { av.textContent = (p.name||'?').charAt(0).toUpperCase(); }
+
+  // Infos
+  document.getElementById('upName').textContent = p.name || '—';
+  document.getElementById('upName').style.color = color;
+  document.getElementById('upRole').textContent = p.role || '—';
+  document.getElementById('upRole').style.color = color;
+  const dot = document.getElementById('upOnlineDot');
+  dot.style.background = isOnline ? '#22c55e' : '#ccc';
+  if (isOnline) dot.style.boxShadow = '0 0 0 3px rgba(34,197,94,.2)';
+  document.getElementById('upStatus').innerHTML = isOnline
+    ? '<span style="color:#22c55e;font-weight:600">● En ligne maintenant</span>'
+    : '<span style="color:#aaa">● Hors ligne</span>';
+
+  // Coordonnées
+  document.getElementById('upEmailVal').textContent = p.email || '—';
+  document.getElementById('upPhoneVal').textContent = p.phone || 'Non renseigné';
+
+  // Stats
+  document.getElementById('upStats').innerHTML = `
+    <div style="background:${color}15;border-radius:10px;padding:12px;text-align:center;border:1px solid ${color}30">
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:${color}">${num(totalProd)||'0'}</div>
+      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Production</div>
+    </div>
+    <div style="background:#f0f9f4;border-radius:10px;padding:12px;text-align:center;border:1px solid #d1fae5">
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#16a34a">${nbJours}</div>
+      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Jours actifs</div>
+    </div>
+    <div style="background:#fff7ed;border-radius:10px;padding:12px;text-align:center;border:1px solid #fed7aa">
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#ea580c">${nbPannes}</div>
+      <div style="font-size:10px;color:#888;margin-top:3px;text-transform:uppercase;letter-spacing:.08em">Pannes</div>
+    </div>`;
+
+  // Rapports récents
+  const recent = userReports.slice(0, 5);
+  const rEl = document.getElementById('upReports');
+  if (recent.length === 0) {
+    rEl.innerHTML = '<div style="text-align:center;color:#aaa;padding:16px;font-size:13px">Aucun rapport</div>';
+  } else {
+    rEl.innerHTML = `<div style="background:#f8f9fb;border-radius:12px;overflow:hidden">` +
+      recent.map((r,i) => {
+        const m = MACHINES.find(x=>x.id===r.machine);
+        const sc = {ok:'#16a34a',warn:'#d97706',panne:'#dc2626',arret:'#6b7280'}[r.status]||'#888';
+        const st = {ok:'✅',warn:'⚠️',panne:'🔴',arret:'⏸️'}[r.status]||'';
+        return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;${i<recent.length-1?'border-bottom:1px solid #eee':''}">
+          <div style="font-size:20px">${m?.icon||'📋'}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:#333">${r.machine} — ${r.shift}</div>
+            <div style="font-size:11px;color:#aaa">${formatDate(r.date)} · ${timeAgo(r.ts)}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:${m?.color||'#888'}">${num(r.fields?.prod)}</div>
+            <div style="font-size:12px">${st}</div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+  }
+
+  // Bouton message privé
+  const msgBtn = document.getElementById('upMsgBtn');
+  msgBtn.style.background = color;
+  msgBtn.onclick = () => {
+    closeUserProfile();
+    navigate('chat');
+    setTimeout(() => {
+      const userConf = Object.entries(photosCache).find(([k,v]) => v.name === p.name);
+      if (userConf) openConversation(userConf[0], p.name, color, p.photoURL||'');
+    }, 300);
+  };
+  // Cacher bouton si c'est soi-même
+  msgBtn.style.display = uid === currentUser?.uid ? 'none' : 'flex';
+
+  // Afficher le modal
+  const modal = document.getElementById('userProfileModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeUserProfile = function(e) {
+  if (e && e.target && e.target !== document.getElementById('userProfileModal')) return;
+  document.getElementById('userProfileModal').style.display = 'none';
+  document.body.style.overflow = '';
+};
 const SPLASH_DURATION = 30;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
@@ -2843,15 +3092,15 @@ function initMobileUI() {
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
 
-  // Chat visible pour TOUS les utilisateurs
+  // Chat visible seulement pour Admin/Superviseur
   const chatSide  = document.getElementById('chatSidebarItem');
   const chatMMenu = document.getElementById('chatMobileMenuItem');
   const chatNav   = document.getElementById('chatNavIcon');
   const chatMBtn  = document.getElementById('chatMobileBtn');
-  if (chatSide)  chatSide.style.display  = 'flex';
-  if (chatMMenu) chatMMenu.style.display = 'flex';
-  if (chatNav)   chatNav.style.display   = 'flex';
-  if (chatMBtn)  chatMBtn.style.display  = isMobile ? 'flex' : 'none';
+  if (chatSide)  chatSide.style.display  = isAdminRole ? 'flex' : 'none';
+  if (chatMMenu) chatMMenu.style.display = isAdminRole ? 'flex' : 'none';
+  if (chatNav)   chatNav.style.display   = isAdminRole ? 'flex' : 'none';
+  if (chatMBtn)  chatMBtn.style.display  = (isMobile && isAdminRole) ? 'flex' : 'none';
 
   // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
