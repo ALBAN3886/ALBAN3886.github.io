@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Eau Vitale">
+<meta name="theme-color" content="#0099CC">
+<meta name="description" content="Application de gestion de ligne de production — AP Industrie Eau Vitale">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Technicien Eau Vitale</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -462,6 +470,31 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 <body>
 
 <!-- LOGIN -->
+<!-- BANNIÈRE INSTALLATION PWA -->
+<div id="pwaInstallBanner" style="
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:99999;
+  background:#fff; border-top:2px solid #0099CC;
+  padding:14px 20px; align-items:center; gap:14px;
+  box-shadow:0 -4px 20px rgba(0,0,0,.12);
+  animation:fadeUp .4s ease;
+">
+  <img src="icon-192.png" style="width:48px;height:48px;border-radius:12px;flex-shrink:0">
+  <div style="flex:1;min-width:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#1a2030">Installer l'application</div>
+    <div style="font-size:12px;color:#7a8599;margin-top:2px">Technicien Eau Vitale — accès rapide depuis l'écran d'accueil</div>
+  </div>
+  <button id="pwaInstallBtn" style="
+    background:#0099CC; color:#fff; border:none; border-radius:8px;
+    padding:10px 18px; font-family:'Barlow Condensed',sans-serif;
+    font-size:14px; font-weight:700; cursor:pointer; flex-shrink:0;
+    white-space:nowrap;
+  ">📲 Installer</button>
+  <button id="pwaInstallDismiss" style="
+    background:none; border:none; color:#9aa3b5;
+    font-size:22px; cursor:pointer; padding:4px; flex-shrink:0; line-height:1;
+  ">×</button>
+</div>
+
 <!-- SPLASH MESSAGE -->
 <div id="splashScreen" style="
   position:fixed; inset:0; z-index:9999;
@@ -671,7 +704,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="sidebar-item" onclick="navigate('stats');closeMobileMenu()"><span class="si-icon">📊</span> Statistiques</div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-label">Communication</div>
-      <div class="sidebar-item" onclick="navigate('chat');closeMobileMenu()"><span class="si-icon">💬</span> Messagerie</div>
+      <div class="sidebar-item" id="chatMobileMenuItem" onclick="navigate('chat');closeMobileMenu()"><span class="si-icon">💬</span> Messagerie</div>
       <div class="sidebar-item" onclick="navigate('alertes');closeMobileMenu()"><span class="si-icon">🔔</span> Alertes</div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-label">Machines</div>
@@ -748,7 +781,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="sidebar-item" onclick="navigate('stats')"><span class="si-icon">📊</span> Statistiques</div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Communication</div>
-    <div class="sidebar-item" onclick="navigate('chat')"><span class="si-icon">💬</span> Messagerie <span class="si-badge" id="chatBadge" style="display:none">0</span></div>
+    <div class="sidebar-item" id="chatSidebarItem" onclick="navigate('chat')"><span class="si-icon">💬</span> Messagerie <span class="si-badge" id="chatBadge" style="display:none">0</span></div>
     <div class="sidebar-item" onclick="navigate('alertes')"><span class="si-icon">🔔</span> Alertes <span class="si-badge" id="alertBadge" style="display:none">0</span></div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Machines</div>
@@ -894,10 +927,26 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     </div>
 
     <!-- CHAT -->
+    <!-- MESSAGERIE — Admin seulement -->
     <div class="page" id="page-chat">
+      <!-- Header chat -->
+      <div style="
+        background:#fff; border-bottom:1px solid var(--border);
+        padding:14px 20px; display:flex; align-items:center; gap:12px;
+        flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.06);
+      ">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--soufflage);display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+        <div style="flex:1">
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text)">Messagerie Équipe</div>
+          <div style="font-size:12px;color:var(--muted)" id="chatOnlineCount">Chargement...</div>
+        </div>
+        <button onclick="clearSystemMessages()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer" title="Nettoyer les messages système">🧹 Nettoyer</button>
+      </div>
+      <!-- Messages -->
       <div class="chat-messages" id="chatMessages"></div>
+      <!-- Zone de saisie -->
       <div class="chat-input-area">
-        <input class="chat-input" id="chatInput" placeholder="Écrire un message à l'équipe..." onkeydown="if(event.key==='Enter')sendChat()">
+        <input class="chat-input" id="chatInput" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendChat();event.preventDefault()}">
         <button class="chat-send" onclick="sendChat()">➤</button>
       </div>
     </div>
@@ -1467,7 +1516,7 @@ window.doForgot = async function() {
 window.logout = async function() {
   if (!currentUser) return;
   try { await update(ref(db, `presence/${currentUser.uid}`), { online: false, ts: serverTimestamp() }); } catch(e){}
-  try { await push(ref(db,'chat'), { system:true, text:`${currentUConf?.name||'Utilisateur'} s'est déconnecté 🔴`, ts: serverTimestamp() }); } catch(e){}
+  // Message déconnexion supprimé pour ne pas polluer le chat
   removeListeners();
   await signOut(auth);
   currentUser = null; currentUConf = null;
@@ -1577,8 +1626,8 @@ function initApp() {
     role: currentUConf.role, machine: currentUConf.machine || '', ts: serverTimestamp()
   });
 
-  // Chat system msg
-  push(ref(db,'chat'), { system:true, text:`${currentUConf.name} vient de se connecter 🟢`, ts: serverTimestamp() });
+  // Chat system msg connexion — supprimé pour ne pas polluer le chat
+  // push(ref(db,'chat'), { system:true, text:`${currentUConf.name} vient de se connecter 🟢`, ts: serverTimestamp() });
 
   // Listeners
   setupListeners();
@@ -1944,7 +1993,7 @@ window.saveReport = async function() {
     });
   }
 
-  await push(ref(db,'chat'), { ts:serverTimestamp(), system:true, text:`${currentUConf.name} a enregistré son rapport (${machine} — ${shift})` });
+  // Message rapport supprimé pour ne pas polluer le chat
 
   panneSwitchOn = false;
   document.getElementById('panneSwitch').classList.remove('on');
@@ -2127,31 +2176,78 @@ window.sendChat = async function() {
 function renderChat() {
   const cont = document.getElementById('chatMessages');
   if (!cont) return;
-  const msgs = Object.values(allChat).sort((a,b)=>(a.ts||0)-(b.ts||0));
+
+  // Compteur en ligne
+  const onlineCount = Object.values(presence).filter(p=>p.online).length;
+  const onlineEl = document.getElementById('chatOnlineCount');
+  if (onlineEl) onlineEl.textContent = `${onlineCount} membre${onlineCount>1?'s':''} en ligne`;
+
+  // Filtrer : UNIQUEMENT les vrais messages (supprimer connexions/déconnexions/rapports)
+  const msgs = Object.values(allChat)
+    .filter(m => !m.system)
+    .sort((a,b)=>(a.ts||0)-(b.ts||0));
+
+  if (msgs.length === 0) {
+    cont.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);padding:40px">
+      <div style="font-size:52px">💬</div>
+      <div style="font-size:16px;font-weight:700;color:var(--text)">Aucun message</div>
+      <div style="font-size:13px;text-align:center">Commencez la conversation avec votre équipe !</div>
+    </div>`;
+    return;
+  }
+
+  let lastDate = '';
   cont.innerHTML = msgs.map(msg => {
-    if (msg.system) return `<div class="chat-system">${esc(msg.text)}</div>`;
-    if (msg.alert)  return `<div class="chat-alert-msg">🚨 ${esc(msg.text)}</div>`;
+    if (msg.alert) return `<div class="chat-alert-msg">🚨 ${esc(msg.text)}</div>`;
+
+    // Séparateur date
+    let dateSep = '';
+    if (msg.ts) {
+      const d = new Date(msg.ts);
+      const today = new Date(); today.setHours(0,0,0,0);
+      const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+      const msgDay = new Date(msg.ts); msgDay.setHours(0,0,0,0);
+      let label = '';
+      if (msgDay.getTime() === today.getTime()) label = "Aujourd'hui";
+      else if (msgDay.getTime() === yesterday.getTime()) label = 'Hier';
+      else label = d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+      if (label !== lastDate) {
+        lastDate = label;
+        dateSep = `<div style="text-align:center;margin:16px 0 10px;"><span style="background:#e2e8f0;border-radius:12px;padding:4px 16px;font-size:11px;color:#64748b;font-weight:600">${label}</span></div>`;
+      }
+    }
+
     const own = msg.userId === currentUser?.uid;
-    // Photo : depuis le message lui-même OU depuis le cache
     const cached = photosCache[msg.userId];
-    const photo  = msg.photoURL || cached?.photoURL || null;
+    const photo   = msg.photoURL || cached?.photoURL || null;
     const bgColor = msg.color || cached?.color || '#888';
     const initial = (msg.name||'?').charAt(0).toUpperCase();
-    const avatarEl = photo
-      ? `<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)"><img src="${photo}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${initial}';this.parentElement.style.background='${bgColor}';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.style.color='#fff';this.parentElement.style.fontWeight='700'"></div>`
-      : `<div style="width:36px;height:36px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.12)">${initial}</div>`;
+    const timeStr = msg.ts ? new Date(msg.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
 
-    return `<div class="chat-msg ${own?'own':''}">
-      ${avatarEl}
-      <div style="max-width:70%">
-        ${!own ? `<div style="font-size:11px;font-weight:600;color:${bgColor};margin-bottom:3px;padding-left:2px">${esc(msg.name)}</div>` : ''}
-        <div class="chat-bubble">${esc(msg.text)}</div>
-        <span class="chat-meta">${own?'Vous':esc(msg.name)} · ${timeAgo(msg.ts)}</span>
+    const avatarEl = photo
+      ? `<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.15)"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div style="width:36px;height:36px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.15)">${initial}</div>`;
+
+    return dateSep + `<div class="chat-msg ${own?'own':''}" style="align-items:flex-end;gap:8px;margin-bottom:6px">
+      ${!own ? avatarEl : ''}
+      <div style="max-width:72%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
+        ${!own ? `<div style="font-size:11px;font-weight:700;color:${bgColor};margin-bottom:3px">${esc(msg.name)}</div>` : ''}
+        <div class="chat-bubble" style="border-radius:${own?'18px 4px 18px 18px':'4px 18px 18px 18px'};padding:10px 14px;font-size:15px;line-height:1.5;word-break:break-word">${esc(msg.text)}</div>
+        <span style="font-size:10px;color:var(--muted);margin-top:3px">${timeStr}</span>
       </div>
+      ${own ? avatarEl : ''}
     </div>`;
   }).join('');
   scrollChat();
 }
+
+// Nettoyer les anciens messages système de Firebase
+window.clearSystemMessages = async function() {
+  if (!confirm('Supprimer tous les messages système (connexions, déconnexions, rapports) ?\nSeuls les vrais messages seront gardés.')) return;
+  const toDelete = Object.entries(allChat).filter(([k,v]) => v.system);
+  if (toDelete.length === 0) { alert('Aucun message système à supprimer.'); return; }
+  await Promise.all(toDelete.map(([k]) => remove(ref(db, `chat/${k}`))));
+};
 
 function scrollChat() {
   const cont = document.getElementById('chatMessages');
@@ -2449,6 +2545,18 @@ function initMobileUI() {
   if (chatMobileBtn) chatMobileBtn.style.display  = isMobile ? 'flex' : 'none';
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+
+  // Chat visible seulement pour Admin/Superviseur
+  const chatSide  = document.getElementById('chatSidebarItem');
+  const chatMMenu = document.getElementById('chatMobileMenuItem');
+  const chatNav   = document.getElementById('chatNavIcon');
+  const chatMBtn  = document.getElementById('chatMobileBtn');
+  if (chatSide)  chatSide.style.display  = isAdminRole ? 'flex' : 'none';
+  if (chatMMenu) chatMMenu.style.display = isAdminRole ? 'flex' : 'none';
+  if (chatNav)   chatNav.style.display   = isAdminRole ? 'flex' : 'none';
+  if (chatMBtn)  chatMBtn.style.display  = (isMobile && isAdminRole) ? 'flex' : 'none';
+
+  // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
   const adminNav   = document.getElementById('adminNavIcon');
   const adminSide  = document.getElementById('adminSidebarItem');
@@ -2973,5 +3081,59 @@ window.exportTotalCSV = function() {
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+<!-- PWA : Enregistrement Service Worker + bouton d'installation -->
+<script>
+// Enregistrement Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('Service Worker enregistré', reg.scope);
+    }).catch(err => {
+      console.log('SW erreur:', err);
+    });
+  });
+}
+
+// Bouton d'installation PWA
+let deferredPrompt = null;
+const installBanner = document.getElementById('pwaInstallBanner');
+const installBtn    = document.getElementById('pwaInstallBtn');
+const installDismiss= document.getElementById('pwaInstallDismiss');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Afficher la bannière seulement si pas déjà installée
+  if (installBanner && !localStorage.getItem('pwa-dismissed')) {
+    setTimeout(() => { installBanner.style.display = 'flex'; }, 3000);
+  }
+});
+
+if (installBtn) {
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    installBanner.style.display = 'none';
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (outcome === 'accepted') {
+      console.log('App installée !');
+    }
+  });
+}
+
+if (installDismiss) {
+  installDismiss.addEventListener('click', () => {
+    installBanner.style.display = 'none';
+    localStorage.setItem('pwa-dismissed', '1');
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  if (installBanner) installBanner.style.display = 'none';
+  deferredPrompt = null;
+});
+</script>
 </body>
 </html>
