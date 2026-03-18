@@ -2837,11 +2837,13 @@ document.addEventListener('click', function(e) {
 function initMobileUI() {
   const isMobile = window.innerWidth <= 900;
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const chatMobileBtn = document.getElementById('chatMobileBtn');
   if (mobileMenuBtn) mobileMenuBtn.style.display = isMobile ? 'flex' : 'none';
+  if (chatMobileBtn) chatMobileBtn.style.display  = isMobile ? 'flex' : 'none';
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
 
-  // Chat visible pour TOUS les utilisateurs (opérateurs + admin)
+  // Chat visible pour TOUS les utilisateurs
   const chatSide  = document.getElementById('chatSidebarItem');
   const chatMMenu = document.getElementById('chatMobileMenuItem');
   const chatNav   = document.getElementById('chatNavIcon');
@@ -2851,7 +2853,7 @@ function initMobileUI() {
   if (chatNav)   chatNav.style.display   = 'flex';
   if (chatMBtn)  chatMBtn.style.display  = isMobile ? 'flex' : 'none';
 
-  // Admin menu — uniquement Admin/Superviseur
+  // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
   const adminNav   = document.getElementById('adminNavIcon');
   const adminSide  = document.getElementById('adminSidebarItem');
