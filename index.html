@@ -1756,11 +1756,17 @@ function setupListeners() {
     renderAlerts();
   });
   listeners.push({ ref:aRef, fn:aL });
+
+  // Group Chat
+  listenGroupChat();
 }
 
 function removeListeners() {
   listeners.forEach(l => off(l.ref));
   listeners = [];
+  if (groupListener) { groupListener = null; }
+  groupMessages = {};
+  activeConvType = null;
 }
 
 // ══════════ PRESENCE ══════════
@@ -2212,6 +2218,30 @@ function getConvId(uid1, uid2) { return [uid1, uid2].sort().join('_'); }
 function renderChat() { renderContacts(); }
 function scrollChat() {}
 
+// ══ GROUPE CHAT ══
+let groupMessages = {};
+let groupListener = null;
+let unreadGroup = 0;
+let activeConvType = null; // 'group' | 'private'
+
+function listenGroupChat() {
+  if (groupListener) return;
+  const gRef = ref(db, 'groupChat');
+  let firstLoad = true;
+  groupListener = onValue(gRef, snap => {
+    const prev = Object.keys(groupMessages).length;
+    groupMessages = snap.val() || {};
+    const curr = Object.keys(groupMessages).length;
+    if (!firstLoad && curr > prev && activeConvType !== 'group') {
+      unreadGroup += curr - prev;
+      updateBadges();
+    }
+    firstLoad = false;
+    if (activeConvType === 'group') renderGroupConversation();
+    renderContacts();
+  });
+}
+
 function renderContacts() {
   const wrap = document.getElementById('contactsList');
   if (!wrap) return;
@@ -2221,46 +2251,162 @@ function renderContacts() {
 
   const users = dynamicUsers.filter(u => u.email !== currentUser?.email);
   const search = (document.getElementById('contactSearch')?.value||'').toLowerCase();
-  const filtered = search ? users.filter(u=>(u.name||'').toLowerCase().includes(search)) : users;
 
-  if (filtered.length === 0) {
-    wrap.innerHTML = `<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">Aucun contact trouvé</div>`;
+  // ── GROUPE ÉQUIPE ──
+  const groupMsgs = Object.values(groupMessages).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const lastGroup = groupMsgs[0];
+  const isGroupActive = activeConvType === 'group';
+  const groupUnreadBadge = unreadGroup > 0
+    ? `<div style="background:var(--soufflage);color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${unreadGroup}</div>` : '';
+
+  const groupItem = `
+    <div style="padding:6px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;background:var(--surface)">💬 Groupe</div>
+    <div onclick="openGroupConversation()" style="
+      display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
+      border-bottom:1px solid var(--border);transition:background .15s;
+      background:${isGroupActive?'rgba(0,153,204,.08)':'#fff'};
+      border-left:3px solid ${isGroupActive?'var(--soufflage)':'transparent'};
+    ">
+      <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--soufflage),#0066aa);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏭</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">Équipe Production</div>
+        <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${lastGroup ? esc(lastGroup.senderName)+': '+esc(lastGroup.text||'').substring(0,30) : 'Canal équipe — tout le monde'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <div style="font-size:10px;color:var(--muted)">${lastGroup&&lastGroup.ts?timeAgo(lastGroup.ts):''}</div>
+        ${groupUnreadBadge}
+      </div>
+    </div>
+    <div style="padding:6px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700;background:var(--surface)">🔒 Privé</div>
+  `;
+
+  // ── CONTACTS PRIVÉS ──
+  const filtered = search ? users.filter(u=>(u.name||'').toLowerCase().includes(search)) : users;
+  const contactItems = filtered.length === 0
+    ? `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Aucun contact</div>`
+    : filtered.map(u => {
+        const uid = Object.keys(photosCache).find(k => photosCache[k]?.name === u.name) || '';
+        const photo = photosCache[uid]?.photoURL || null;
+        const isOnline = Object.values(presence).some(p=>p.name===u.name&&p.online);
+        const unread = unreadPrivate[uid] || 0;
+        const isActive = uid === activeConvUserId && activeConvType === 'private';
+        // Last private message
+        const convId = getConvId(currentUser.uid, uid);
+        const privMsgs = Object.values(privateMessages[convId]||{}).sort((a,b)=>(b.ts||0)-(a.ts||0));
+        const lastPriv = privMsgs[0];
+        const avatarEl = photo
+          ? `<img src="${photo}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+          : `<div style="width:46px;height:46px;border-radius:50%;background:${u.color||'#888'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0">${(u.name||'?').charAt(0)}</div>`;
+
+        return `<div onclick="openConversation('${uid}','${u.name}','${u.color||'#888'}','${photo||''}')" style="
+          display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
+          border-bottom:1px solid var(--border);transition:background .15s;
+          background:${isActive?'rgba(0,153,204,.08)':'#fff'};
+          border-left:3px solid ${isActive?'var(--soufflage)':'transparent'};
+        ">
+          <div style="position:relative;flex-shrink:0">
+            ${avatarEl}
+            <div style="position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div>
+            <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${lastPriv ? esc(lastPriv.text||'').substring(0,35) : (isOnline?'● En ligne':'● Hors ligne')}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+            <div style="font-size:10px;color:var(--muted)">${lastPriv&&lastPriv.ts?timeAgo(lastPriv.ts):''}</div>
+            ${unread > 0 ? `<div style="background:var(--soufflage);color:#fff;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${unread}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+
+  wrap.innerHTML = groupItem + contactItems;
+}
+
+// Ouvrir le groupe
+window.openGroupConversation = function() {
+  activeConvType = 'group';
+  activeConvUserId = null;
+  unreadGroup = 0;
+  updateBadges();
+
+  const convName   = document.getElementById('convName');
+  const convStatus = document.getElementById('convStatus');
+  const convAvatar = document.getElementById('convAvatar');
+  if (convName) convName.textContent = '🏭 Équipe Production';
+  if (convStatus) {
+    const cnt = Object.values(presence).filter(p=>p.online).length;
+    convStatus.innerHTML = `<span style="color:#22c55e">● ${cnt} membre${cnt>1?'s':''} en ligne</span>`;
+  }
+  if (convAvatar) {
+    convAvatar.innerHTML = '🏭';
+    convAvatar.style.cssText = 'width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,var(--soufflage),#0066aa);';
+  }
+
+  const noConv = document.getElementById('chatNoConv');
+  const convActive = document.getElementById('chatConvActive');
+  if (noConv) noConv.style.display = 'none';
+  if (convActive) convActive.style.display = 'flex';
+
+  // Changer le placeholder
+  const inp = document.getElementById('convInput');
+  if (inp) inp.placeholder = 'Écrire à toute l\'équipe...';
+
+  document.getElementById('chatConvPanel')?.classList.add('mobile-open');
+  renderGroupConversation();
+  renderContacts();
+};
+
+function renderGroupConversation() {
+  const cont = document.getElementById('convMessages');
+  if (!cont || activeConvType !== 'group') return;
+  const msgs = Object.values(groupMessages).sort((a,b)=>(a.ts||0)-(b.ts||0));
+
+  if (msgs.length === 0) {
+    cont.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);padding:30px;text-align:center">
+      <div style="font-size:44px">🏭</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text)">Canal Équipe Production</div>
+      <div style="font-size:13px;line-height:1.6">Tous les membres de l'équipe peuvent lire et écrire ici.<br>Comme un groupe WhatsApp.</div>
+    </div>`;
     return;
   }
 
-  wrap.innerHTML = filtered.map(u => {
-    const uid = Object.keys(photosCache).find(k => photosCache[k]?.name === u.name) || '';
-    const photo = photosCache[uid]?.photoURL || null;
-    const isOnline = Object.values(presence).some(p=>p.name===u.name&&p.online);
-    const unread = unreadPrivate[uid] || 0;
-    const isActive = uid === activeConvUserId;
+  let lastDate = '';
+  cont.innerHTML = msgs.map(msg => {
+    let dateSep = '';
+    if (msg.ts) {
+      const td = new Date(); td.setHours(0,0,0,0);
+      const yd = new Date(td); yd.setDate(yd.getDate()-1);
+      const md = new Date(msg.ts); md.setHours(0,0,0,0);
+      let label = md.getTime()===td.getTime() ? "Aujourd'hui" : md.getTime()===yd.getTime() ? 'Hier'
+        : new Date(msg.ts).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+      if (label !== lastDate) { lastDate = label; dateSep = `<div style="text-align:center;margin:14px 0 10px"><span style="background:#e2e8f0;border-radius:12px;padding:4px 14px;font-size:11px;color:#64748b;font-weight:600">${label}</span></div>`; }
+    }
+    const own = msg.senderId === currentUser.uid;
+    const photo = own ? (currentUConf?.photoURL||null) : (photosCache[msg.senderId]?.photoURL||null);
+    const bgColor = own ? (currentUConf?.color||'#888') : (photosCache[msg.senderId]?.color||'#888');
+    const initial = (msg.senderName||'?').charAt(0).toUpperCase();
+    const timeStr = msg.ts ? new Date(msg.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
     const avatarEl = photo
-      ? `<img src="${photo}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;flex-shrink:0">`
-      : `<div style="width:46px;height:46px;border-radius:50%;background:${u.color||'#888'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0">${(u.name||'?').charAt(0)}</div>`;
+      ? `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
+      : `<div style="width:32px;height:32px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
 
-    return `<div onclick="openConversation('${uid}','${u.name}','${u.color||'#888'}','${photo||''}')" style="
-      display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
-      border-bottom:1px solid var(--border);transition:background .15s;
-      background:${isActive?'rgba(0,153,204,.08)':'#fff'};
-      border-left:3px solid ${isActive?'var(--soufflage)':'transparent'};
-    ">
-      <div style="position:relative;flex-shrink:0">
-        ${avatarEl}
-        <div style="position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid #fff"></div>
+    return dateSep + `<div style="display:flex;align-items:flex-end;gap:8px;${own?'flex-direction:row-reverse;':''}margin-bottom:4px">
+      ${avatarEl}
+      <div style="max-width:72%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
+        ${!own?`<div style="font-size:11px;color:${bgColor};font-weight:700;margin-bottom:2px;padding:0 4px">${esc(msg.senderName)}</div>`:''}
+        <div style="padding:10px 14px;font-size:15px;line-height:1.5;word-break:break-word;border-radius:${own?'18px 4px 18px 18px':'4px 18px 18px 18px'};background:${own?'var(--soufflage)':'#fff'};color:${own?'#fff':'var(--text)'};box-shadow:0 1px 4px rgba(0,0,0,.08)">${esc(msg.text)}</div>
+        <span style="font-size:10px;color:var(--muted);margin-top:3px">${timeStr}</span>
       </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.name}</div>
-        <div style="font-size:12px;color:${isOnline?'#22c55e':'var(--muted)'}">${isOnline?'● En ligne':'● Hors ligne'}</div>
-      </div>
-      ${unread > 0 ? `<div style="background:var(--soufflage);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${unread}</div>` : ''}
     </div>`;
   }).join('');
+  setTimeout(() => { cont.scrollTop = cont.scrollHeight; }, 50);
 }
 
 window.filterContacts = function() { renderContacts(); };
 
 window.openConversation = function(uid, name, color, photo) {
   if (!uid) return;
+  activeConvType = 'private';
   activeConvUserId = uid;
 
   // Header
@@ -2297,6 +2443,9 @@ window.openConversation = function(uid, name, color, photo) {
     renderConversation(convId, uid);
   });
   privateListeners[convId] = () => off(msgRef);
+  // Placeholder privé
+  const inp3 = document.getElementById('convInput');
+  if (inp3) inp3.placeholder = 'Écrire un message privé...';
   setTimeout(() => document.getElementById('convInput')?.focus(), 200);
 };
 
@@ -2358,8 +2507,24 @@ function renderConversation(convId, otherUid) {
 window.sendPrivateMsg = async function() {
   const inp = document.getElementById('convInput');
   const txt = inp?.value.trim();
-  if (!txt || !activeConvUserId) return;
+  if (!txt) return;
   inp.value = '';
+
+  if (activeConvType === 'group') {
+    // Envoyer dans le canal groupe
+    await push(ref(db, 'groupChat'), {
+      ts: serverTimestamp(),
+      senderId: currentUser.uid,
+      senderName: currentUConf.name,
+      senderColor: currentUConf.color,
+      photoURL: currentUConf.photoURL || null,
+      text: txt,
+    });
+    return;
+  }
+
+  // Sinon message privé
+  if (!activeConvUserId) return;
   const convId = getConvId(currentUser.uid, activeConvUserId);
   await push(ref(db, `privateMessages/${convId}`), {
     ts: serverTimestamp(),
@@ -2672,15 +2837,15 @@ function initMobileUI() {
 
   const isAdminRole = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
 
-  // Chat visible seulement pour Admin/Superviseur
+  // Chat visible pour TOUS les utilisateurs
   const chatSide  = document.getElementById('chatSidebarItem');
   const chatMMenu = document.getElementById('chatMobileMenuItem');
   const chatNav   = document.getElementById('chatNavIcon');
   const chatMBtn  = document.getElementById('chatMobileBtn');
-  if (chatSide)  chatSide.style.display  = isAdminRole ? 'flex' : 'none';
-  if (chatMMenu) chatMMenu.style.display = isAdminRole ? 'flex' : 'none';
-  if (chatNav)   chatNav.style.display   = isAdminRole ? 'flex' : 'none';
-  if (chatMBtn)  chatMBtn.style.display  = (isMobile && isAdminRole) ? 'flex' : 'none';
+  if (chatSide)  chatSide.style.display  = 'flex';
+  if (chatMMenu) chatMMenu.style.display = 'flex';
+  if (chatNav)   chatNav.style.display   = 'flex';
+  if (chatMBtn)  chatMBtn.style.display  = isMobile ? 'flex' : 'none';
 
   // Admin menu
   const adminDd    = document.getElementById('adminDropdownBtn');
