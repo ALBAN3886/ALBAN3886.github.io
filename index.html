@@ -1217,6 +1217,72 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
     </div>
 
+    <!-- MODAL MODIFIER RAPPORT -->
+    <div id="editReportModal" onclick="if(event.target===this)closeEditModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.4);animation:fadeUp .3s ease" onclick="event.stopPropagation()">
+
+        <!-- Header -->
+        <div style="background:var(--soufflage);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:800;color:#fff">✏️ Modifier le rapport</div>
+            <div id="editModalSubtitle" style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px"></div>
+          </div>
+          <button onclick="closeEditModal()" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+        </div>
+
+        <div style="padding:20px">
+          <input type="hidden" id="editReportId">
+
+          <!-- Date + Poste + Statut -->
+          <div class="form-row" style="margin-bottom:14px">
+            <div class="form-group">
+              <div class="form-label">Date</div>
+              <input type="date" class="form-input" id="edit-date">
+            </div>
+            <div class="form-group">
+              <div class="form-label">Poste</div>
+              <select class="form-select" id="edit-shift">
+                <option value="Matin">🌅 Matin</option>
+                <option value="Après-midi">☀️ Après-midi</option>
+                <option value="Nuit">🌙 Nuit</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="form-label">Statut</div>
+              <select class="form-select" id="edit-status">
+                <option value="ok">✅ En fonctionnement</option>
+                <option value="warn">⚠️ Ralentissement</option>
+                <option value="panne">🔴 En panne</option>
+                <option value="arret">⏸️ Arrêt</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Champs dynamiques de la machine -->
+          <div id="editDynamicFields" style="margin-bottom:14px"></div>
+
+          <!-- Déchets — toujours visible -->
+          <div class="form-group" style="margin-bottom:14px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px">
+            <div class="form-label" style="color:#f87171">🗑️ Déchets (kg)</div>
+            <input type="number" class="form-input" id="edit-dechets" placeholder="0" min="0" step="0.1" style="border-color:rgba(248,113,113,.3)">
+            <div style="font-size:11px;color:var(--muted);margin-top:6px">Poids total des déchets produits en kg</div>
+          </div>
+
+          <!-- Note -->
+          <div class="form-group" style="margin-bottom:20px">
+            <div class="form-label">Note / Commentaire</div>
+            <textarea class="form-textarea" id="edit-note" placeholder="Observations..." style="min-height:70px"></textarea>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="editSaveBtn" onclick="saveEditReport()">💾 Enregistrer les modifications</button>
+            <button class="btn btn-ghost" onclick="closeEditModal()">Annuler</button>
+            <div id="editSaveOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600">✓ Rapport modifié !</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ADMIN RESET -->
     <div class="page" id="page-admin">
       <div class="page-header">
@@ -2284,24 +2350,29 @@ window.renderHistory = function() {
   if (!tbl) return;
   if (filtered.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div>'; return; }
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
-  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Poste</th><th>Opérateur</th><th>Production</th><th>Consommables</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Poste</th><th>Opérateur</th><th>Production</th><th>🗑️ Déchets</th><th>Consommables</th><th>Statut</th><th>Note</th><th></th></tr></thead>
   <tbody>${filtered.map(r=>{
     const m=MACHINES.find(x=>x.id===r.machine);
     const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
     const st={ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||'';
-    const cons = m ? m.fields.filter(f=>f.key!=='prod'&&f.key!=='rejets').map(f=>`${f.label.split(' ')[0]}: <b>${num(r.fields?.[f.key])}</b>`).join(' | ') : '';
+    const cons = m ? m.fields.filter(f=>f.key!=='prod'&&f.key!=='rejets'&&f.key!=='dechets').map(f=>`${f.label.split(' ').pop()}: <b>${num(r.fields?.[f.key])}</b>`).join(' | ') : '';
     const uc = dynamicUsers.find(u=>u.name===r.operatorName);
-    const canDelete = isAdmin || r.userId === currentUser?.uid;
+    const canEdit = isAdmin || r.userId === currentUser?.uid;
+    const dechets = r.fields?.dechets;
     return `<tr>
       <td>${formatDate(r.date)}</td>
       <td><span style="color:${m?.color};font-weight:700">${m?.icon} ${r.machine}</span></td>
       <td>${r.shift}</td>
       <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td class="td-num" style="color:${m?.color}">${num(r.fields?.prod)}</td>
+      <td style="font-weight:600;color:#f87171">${dechets !== undefined && dechets !== '' ? num(dechets)+' kg' : '<span style="color:var(--muted)">—</span>'}</td>
       <td style="font-size:12px;color:var(--muted2)">${cons}</td>
       <td><span class="status-badge ${sc}" style="font-size:10px">${st}</span></td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)" title="${esc(r.note)}">${r.note||'—'}</td>
-      <td>${canDelete ? `<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;transition:all .2s" title="Supprimer ce rapport">🗑️</button>` : ''}</td>
+      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)" title="${esc(r.note)}">${r.note||'—'}</td>
+      <td style="display:flex;gap:5px;align-items:center">
+        ${canEdit ? `<button onclick="editReport('${r.id}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Modifier">✏️</button>` : ''}
+        ${canEdit ? `<button onclick="deleteReport('${r.id}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>` : ''}
+      </td>
     </tr>`;
   }).join('')}</tbody></table>`;
 };
@@ -2315,6 +2386,96 @@ window.deleteReport = async function(id) {
   } catch(e) {
     alert('Erreur lors de la suppression.');
   }
+};
+
+// ── Modifier un rapport ──
+window.editReport = function(id) {
+  const r = allReports[id];
+  if (!r) return;
+  const m = MACHINES.find(x => x.id === r.machine);
+
+  document.getElementById('editReportId').value = id;
+  document.getElementById('editModalSubtitle').textContent = `${m?.icon||''} ${r.machine} — ${r.operatorName}`;
+  document.getElementById('edit-date').value   = r.date || '';
+  document.getElementById('edit-shift').value  = r.shift || 'Matin';
+  document.getElementById('edit-status').value = r.status || 'ok';
+  document.getElementById('edit-note').value   = r.note || '';
+  document.getElementById('edit-dechets').value = r.fields?.dechets !== undefined ? r.fields.dechets : '';
+
+  // Champs dynamiques de la machine
+  const dynFields = document.getElementById('editDynamicFields');
+  if (m) {
+    const otherFields = m.fields.filter(f => f.key !== 'dechets');
+    dynFields.innerHTML = `<div class="form-row">${otherFields.map(f => `
+      <div class="form-group">
+        <div class="form-label">${f.label} (${f.unit})</div>
+        <input type="number" class="form-input" id="edit-field-${f.key}" value="${r.fields?.[f.key] !== undefined ? r.fields[f.key] : ''}" placeholder="0" min="0" step="0.1">
+      </div>`).join('')}</div>`;
+  } else {
+    dynFields.innerHTML = '';
+  }
+
+  // Couleur header selon machine
+  const modal = document.getElementById('editReportModal');
+  const header = modal.querySelector('div[style*="background:var(--soufflage)"]');
+  if (header && m) header.style.background = m.color;
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeEditModal = function() {
+  document.getElementById('editReportModal').style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+window.saveEditReport = async function() {
+  const id  = document.getElementById('editReportId').value;
+  const r   = allReports[id];
+  if (!id || !r) return;
+  const m   = MACHINES.find(x => x.id === r.machine);
+
+  const btn = document.getElementById('editSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Sauvegarde...';
+
+  // Reconstruire les fields
+  const fields = { ...(r.fields || {}) };
+
+  // Champs dynamiques de la machine
+  if (m) {
+    m.fields.filter(f => f.key !== 'dechets').forEach(f => {
+      const el = document.getElementById('edit-field-' + f.key);
+      if (el) fields[f.key] = parseFloat(el.value) || 0;
+    });
+  }
+
+  // Déchets
+  const dechetsVal = document.getElementById('edit-dechets').value;
+  fields.dechets = dechetsVal !== '' ? parseFloat(dechetsVal) || 0 : 0;
+
+  const updated = {
+    ...r,
+    date:   document.getElementById('edit-date').value   || r.date,
+    shift:  document.getElementById('edit-shift').value  || r.shift,
+    status: document.getElementById('edit-status').value || r.status,
+    note:   document.getElementById('edit-note').value.trim(),
+    fields,
+    editedAt: Date.now(),
+    editedBy: currentUConf?.name || '',
+  };
+
+  try {
+    await set(ref(db, `reports/${id}`), updated);
+    const ok = document.getElementById('editSaveOk');
+    ok.style.display = 'block';
+    setTimeout(() => {
+      ok.style.display = 'none';
+      closeEditModal();
+    }, 1500);
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = '💾 Enregistrer les modifications';
 };
 
 // ══════════ STATS ══════════
