@@ -1164,20 +1164,40 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
             -webkit-overflow-scrolling:touch;min-height:0;
           "></div>
 
-          <!-- Zone de saisie -->
-          <div style="background:#f0f2f5;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0;border-top:1px solid #ddd">
-            <div style="flex:1;background:#fff;border-radius:24px;padding:10px 16px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.08)">
-              <input id="convInput" placeholder="Tapez un message" onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendPrivateMsg();event.preventDefault()}" style="
-                flex:1;border:none;outline:none;font-size:15px;color:var(--text);background:transparent;min-width:0;
-              ">
+          <!-- Zone de saisie avec image + audio -->
+          <div style="background:#f0f2f5;padding:10px 12px;flex-shrink:0;border-top:1px solid #ddd">
+
+            <!-- Prévisualisation image avant envoi -->
+            <div id="imgPreviewBar" style="display:none;padding:0 0 8px 0">
+              <div style="position:relative;display:inline-block">
+                <img id="imgPreviewEl" style="height:80px;max-width:200px;border-radius:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.2)">
+                <button onclick="cancelImgSend()" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#dc2626;border:none;border-radius:50%;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+              </div>
             </div>
-            <button onclick="sendPrivateMsg()" style="
-              width:48px;height:48px;min-width:48px;
-              background:var(--soufflage);border:none;border-radius:50%;
-              cursor:pointer;font-size:20px;color:#fff;
-              display:flex;align-items:center;justify-content:center;
-              flex-shrink:0;box-shadow:0 2px 8px rgba(0,153,204,.4);
-            ">➤</button>
+
+            <!-- Barre enregistrement audio -->
+            <div id="audioRecordBar" style="display:none;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:20px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.1)">
+              <div style="width:10px;height:10px;background:#dc2626;border-radius:50%;animation:pulse 1s infinite;flex-shrink:0"></div>
+              <div style="flex:1;font-size:13px;color:#333;font-weight:500" id="audioTimer">⏺ Enregistrement... 0:00</div>
+              <button onclick="cancelAudio()" style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:600">✕</button>
+              <button onclick="stopAndSendAudio()" style="background:#0099cc;border:none;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:700">Envoyer ▶</button>
+            </div>
+
+            <!-- Ligne principale -->
+            <div style="display:flex;gap:8px;align-items:center">
+              <!-- Bouton image -->
+              <label title="Envoyer une image" style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.12);font-size:18px;flex-shrink:0">
+                📷<input type="file" id="chatImgInput" accept="image/*" style="display:none" onchange="handleChatImg(event)">
+              </label>
+              <!-- Bouton micro -->
+              <button id="micBtn" onclick="toggleRecording()" title="Message vocal" style="width:40px;height:40px;background:#fff;border-radius:50%;border:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.12);font-size:18px;flex-shrink:0">🎤</button>
+              <!-- Champ texte -->
+              <div style="flex:1;background:#fff;border-radius:24px;padding:10px 16px;display:flex;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+                <input id="convInput" placeholder="Tapez un message" onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendPrivateMsg();event.preventDefault()}" style="flex:1;border:none;outline:none;font-size:15px;color:var(--text);background:transparent;min-width:0;">
+              </div>
+              <!-- Envoyer -->
+              <button onclick="sendPrivateMsg()" style="width:48px;height:48px;min-width:48px;background:var(--soufflage);border:none;border-radius:50%;cursor:pointer;font-size:20px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(0,153,204,.4)">➤</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2944,17 +2964,31 @@ function buildMessagesHTML(msgs, otherUid) {
       ? `<div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0"><img src="${photo}" style="width:100%;height:100%;object-fit:cover"></div>`
       : `<div style="width:30px;height:30px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">${initial}</div>`;
 
+    // Contenu selon le type
+    let bubbleInner = '';
+    if (msg.msgType === 'image' && msg.imageData) {
+      bubbleInner = `<img src="${msg.imageData}" style="max-width:220px;max-height:220px;border-radius:10px;display:block;cursor:pointer;object-fit:cover" onclick="window.open('${msg.imageData}','_blank')">`;
+      if (msg.text) bubbleInner += `<div style="font-size:13px;margin-top:5px;color:#333">${esc(msg.text)}</div>`;
+    } else if (msg.msgType === 'audio' && msg.audioData) {
+      const aid = 'a'+(msg.senderId||'')+(msg.ts||Date.now());
+      bubbleInner = `<div style="display:flex;align-items:center;gap:8px;min-width:160px">
+        <button onclick="playAudio('${aid}')" style="width:34px;height:34px;background:${own?'rgba(0,0,0,.15)':'#0099cc'};border:none;border-radius:50%;cursor:pointer;font-size:14px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">▶</button>
+        <div style="flex:1">
+          <div style="height:3px;background:rgba(0,0,0,.12);border-radius:2px;margin-bottom:4px"><div style="width:0%;height:100%;background:${own?'rgba(0,0,0,.35)':'#0099cc'};border-radius:2px;transition:width .1s" id="p_${aid}"></div></div>
+          <div style="font-size:11px;color:${own?'rgba(0,0,0,.5)':'#666'}" id="d_${aid}">🎤 ${msg.audioDuration||'0:00'}</div>
+        </div>
+        <audio id="${aid}" src="${msg.audioData}" style="display:none"></audio>
+      </div>`;
+    } else {
+      bubbleInner = `<div style="font-size:15px;line-height:1.5;word-break:break-word">${esc(msg.text||'')}</div>`;
+    }
+
+    const pad = msg.msgType==='image' ? '4px' : '8px 12px';
     return dateSep + `<div style="display:flex;align-items:flex-end;gap:6px;${own?'flex-direction:row-reverse;':''}margin-bottom:3px">
       ${!own ? avatarEl : ''}
       <div style="max-width:75%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
         ${!own&&activeConvType==='group'?`<div style="font-size:11px;color:${bgColor};font-weight:700;margin-bottom:2px;padding:0 6px">${esc(msg.senderName)}</div>`:''}
-        <div style="
-          padding:8px 12px;font-size:15px;line-height:1.5;word-break:break-word;
-          border-radius:${own?'16px 2px 16px 16px':'2px 16px 16px 16px'};
-          background:${own?'#dcf8c6':'#fff'};
-          color:#111;
-          box-shadow:0 1px 2px rgba(0,0,0,.12);
-        ">${esc(msg.text)}</div>
+        <div style="padding:${pad};border-radius:${own?'16px 2px 16px 16px':'2px 16px 16px 16px'};background:${own?'#dcf8c6':'#fff'};color:#111;box-shadow:0 1px 2px rgba(0,0,0,.12);overflow:hidden">${bubbleInner}</div>
         <span style="font-size:10px;color:#999;margin-top:2px;padding:0 4px">${timeStr}${own?' ✓✓':''}</span>
       </div>
       ${own ? avatarEl : ''}
@@ -2962,35 +2996,129 @@ function buildMessagesHTML(msgs, otherUid) {
   }).join('');
 }
 
-// ── Envoyer un message ──
-window.sendPrivateMsg = async function() {
+// ── Variables media ──
+let chatImgPending = null;
+let mediaRecorder  = null;
+let audioChunks    = [];
+let audioTimerInt  = null;
+let audioSeconds   = 0;
+
+// ── Envoyer (texte / image / audio) ──
+window.sendPrivateMsg = async function(overrides = {}) {
   const inp = document.getElementById('convInput');
   const txt = inp?.value.trim();
-  if (!txt) return;
-  inp.value = '';
+  if (!txt && !chatImgPending && !overrides.audioData) return;
+  if (inp) inp.value = '';
+
+  const msg = {
+    ts: serverTimestamp(),
+    senderId: currentUser.uid,
+    senderName: currentUConf.name,
+    senderColor: currentUConf.color,
+    photoURL: currentUConf.photoURL || null,
+    text: txt || '',
+    msgType: overrides.audioData ? 'audio' : (chatImgPending ? 'image' : 'text'),
+    imageData: chatImgPending || null,
+    audioData: overrides.audioData || null,
+    audioDuration: overrides.audioDuration || null,
+  };
+
+  chatImgPending = null;
+  const bar = document.getElementById('imgPreviewBar');
+  if (bar) bar.style.display = 'none';
 
   if (activeConvType === 'group') {
-    await push(ref(db, 'groupChat'), {
-      ts: serverTimestamp(),
-      senderId: currentUser.uid,
-      senderName: currentUConf.name,
-      senderColor: currentUConf.color,
-      photoURL: currentUConf.photoURL || null,
-      text: txt,
-    });
+    await push(ref(db,'groupChat'), msg);
     return;
   }
   if (!activeConvUserId) return;
   const convId = getConvId(currentUser.uid, activeConvUserId);
-  await push(ref(db, `privateMessages/${convId}`), {
-    ts: serverTimestamp(),
-    senderId: currentUser.uid,
-    senderName: currentUConf.name,
-    receiverId: activeConvUserId,
-    text: txt,
-    photoURL: currentUConf.photoURL || null,
-  });
+  await push(ref(db,`privateMessages/${convId}`), { ...msg, receiverId: activeConvUserId });
 };
+
+// ── Image ──
+window.handleChatImg = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 10*1024*1024) { alert('Image trop lourde (max 10 Mo)'); return; }
+  try {
+    chatImgPending = await compressImage(file, 800, 800, 0.75);
+    document.getElementById('imgPreviewEl').src = chatImgPending;
+    document.getElementById('imgPreviewBar').style.display = 'block';
+    document.getElementById('chatImgInput').value = '';
+  } catch(e) { alert('Erreur image'); }
+};
+
+window.cancelImgSend = function() {
+  chatImgPending = null;
+  document.getElementById('imgPreviewBar').style.display = 'none';
+  document.getElementById('chatImgInput').value = '';
+};
+
+// ── Audio ──
+window.toggleRecording = async function() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = []; audioSeconds = 0;
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      clearInterval(audioTimerInt);
+      document.getElementById('audioRecordBar').style.display = 'none';
+      document.getElementById('micBtn').style.background = '#fff';
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      if (blob.size > 4*1024*1024) { alert('Message vocal trop long'); return; }
+      const reader = new FileReader();
+      reader.onload = async e => {
+        await sendPrivateMsg({ audioData: e.target.result, audioDuration: fmtDur(audioSeconds) });
+      };
+      reader.readAsDataURL(blob);
+    };
+    mediaRecorder.start();
+    document.getElementById('audioRecordBar').style.display = 'flex';
+    document.getElementById('micBtn').style.background = '#dc2626';
+    audioTimerInt = setInterval(() => {
+      audioSeconds++;
+      const m = Math.floor(audioSeconds/60), s = String(audioSeconds%60).padStart(2,'0');
+      document.getElementById('audioTimer').textContent = `⏺ Enregistrement... ${m}:${s}`;
+      if (audioSeconds >= 120) mediaRecorder.stop();
+    }, 1000);
+  } catch(e) { alert('Microphone non disponible — vérifiez les permissions.'); }
+};
+
+window.cancelAudio = function() {
+  if (mediaRecorder && mediaRecorder.state==='recording') {
+    mediaRecorder.onstop = () => {};
+    mediaRecorder.stop();
+  }
+  clearInterval(audioTimerInt);
+  document.getElementById('audioRecordBar').style.display = 'none';
+  document.getElementById('micBtn').style.background = '#fff';
+};
+
+window.stopAndSendAudio = function() {
+  if (mediaRecorder && mediaRecorder.state==='recording') mediaRecorder.stop();
+};
+
+window.playAudio = function(aid) {
+  const aud = document.getElementById(aid);
+  if (!aud) return;
+  if (!aud.paused) { aud.pause(); return; }
+  document.querySelectorAll('audio').forEach(a => { if(a!==aud) a.pause(); });
+  aud.play();
+  aud.ontimeupdate = () => {
+    if (!aud.duration) return;
+    const p = document.getElementById('p_'+aid);
+    const d = document.getElementById('d_'+aid);
+    if (p) p.style.width = (aud.currentTime/aud.duration*100)+'%';
+    if (d) d.textContent = '🎤 '+fmtDur(Math.floor(aud.currentTime));
+  };
+  aud.onended = () => { const p=document.getElementById('p_'+aid); if(p) p.style.width='0%'; };
+};
+
+function fmtDur(sec) { return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
 
 window.sendChat = async function() {};
 
