@@ -1,209 +1,146 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eau Vitale - Version Moderne</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<style>
-body{margin:0;font-family:Barlow;background:#f4f6f9;color:#1a2030}
-
-/* MENU */
-.sidebar{
-width:240px;
-height:100vh;
-position:fixed;
-background:#fff;
-border-right:1px solid #e2e6ed;
-padding:20px 0;
-}
-
-.sidebar h3{
-padding:10px 20px;
-font-size:12px;
-color:#7a8599;
-text-transform:uppercase;
-}
-
-.sidebar div{
-padding:12px 20px;
-cursor:pointer;
-}
-
-.sidebar div:hover{
-background:#f0f2f5;
-}
-
-/* MAIN */
-.main{
-margin-left:240px;
-padding:20px;
-}
-
-/* CHAT */
-.chat-box{
-max-width:600px;
-margin:auto;
-background:#fff;
-border-radius:12px;
-display:flex;
-flex-direction:column;
-height:80vh;
-border:1px solid #ddd;
-}
-
-.chat-messages{
-flex:1;
-overflow:auto;
-padding:15px;
-}
-
-.chat-msg{
-margin-bottom:10px;
-}
-
-.chat-bubble{
-background:#0099cc;
-color:#fff;
-padding:10px 14px;
-border-radius:12px;
-display:inline-block;
-}
-
-.chat-input-area{
-display:flex;
-padding:10px;
-border-top:1px solid #ddd;
-gap:8px;
-}
-
-.chat-input{
-flex:1;
-padding:10px;
-border-radius:20px;
-border:1px solid #ccc;
-}
-
-.chat-send{
-background:#0099cc;
-color:#fff;
-border:none;
-border-radius:50%;
-width:40px;
-height:40px;
-cursor:pointer;
-}
-
-.chat-btn{
-width:40px;
-height:40px;
-border-radius:50%;
-border:none;
-cursor:pointer;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="sidebar">
-<h3>Navigation</h3>
-<div>🏭 Tableau de bord</div>
-<div>📝 Rapport</div>
-<div>📋 Historique</div>
-<div>📊 Statistiques</div>
-
-<h3>Communication</h3>
-<div>💬 Messagerie</div>
-<div>🔔 Alertes</div>
-
-<h3>Production</h3>
-<div>🫧 Soufflage</div>
-<div>🧴 Remplissage</div>
-<div>🏷️ Étiquette</div>
-<div>📦 Emballage</div>
-<div>⚙️ B19</div>
-
-<h3>Compte</h3>
-<div>👤 Profil</div>
-<div>👥 Équipe</div>
-</div>
-
-<div class="main">
-
-<h2>💬 Messagerie moderne</h2>
-
-<div class="chat-box">
-
-<div class="chat-messages" id="messages"></div>
-
-<div class="chat-input-area">
-
-<input type="file" id="fileInput" style="display:none" onchange="sendFile(event)">
-<button onclick="fileInput.click()" class="chat-btn">📎</button>
-
-<button onclick="toggleRecording()" id="recordBtn" class="chat-btn">🎤</button>
-
-<input type="text" id="input" class="chat-input" placeholder="Message...">
-
-<button class="chat-send" onclick="sendMessage()">➤</button>
-
-</div>
-
-</div>
-
-</div>
-
+<!-- ===================== AJOUT CHAT PRO (FICHIER + AUDIO) ===================== -->
 <script>
-function addMessage(html){
-const div=document.createElement('div');
-div.className='chat-msg';
-div.innerHTML='<div class="chat-bubble">'+html+'</div>';
-document.getElementById('messages').appendChild(div);
-}
 
-function sendMessage(){
-const input=document.getElementById('input');
-if(!input.value) return;
-addMessage(input.value);
-input.value='';
-}
+// ===== FICHIER =====
+window.sendFile = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-function sendFile(e){
-const file=e.target.files[0];
-if(!file) return;
-const url=URL.createObjectURL(file);
-addMessage('<a href="'+url+'" download>'+file.name+'</a>');
-}
+  const reader = new FileReader();
 
-let mediaRecorder;
-let chunks=[];
+  reader.onload = async function(e) {
+    const fileData = e.target.result;
 
-async function toggleRecording(){
-if(!mediaRecorder || mediaRecorder.state==='inactive'){
-const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-mediaRecorder=new MediaRecorder(stream);
-mediaRecorder.start();
-chunks=[];
+    if (activeConvType === 'group') {
+      await push(ref(db, 'groupChat'), {
+        ts: serverTimestamp(),
+        senderId: currentUser.uid,
+        senderName: currentUConf.name,
+        file: fileData,
+        fileName: file.name
+      });
+    } else {
+      const convId = getConvId(currentUser.uid, activeConvUserId);
+      await push(ref(db, `privateMessages/${convId}`), {
+        ts: serverTimestamp(),
+        senderId: currentUser.uid,
+        receiverId: activeConvUserId,
+        file: fileData,
+        fileName: file.name
+      });
+    }
+  };
 
-mediaRecorder.ondataavailable=e=>chunks.push(e.data);
-
-mediaRecorder.onstop=()=>{
-const blob=new Blob(chunks,{type:'audio/webm'});
-const url=URL.createObjectURL(blob);
-addMessage('<audio controls src="'+url+'"></audio>');
+  reader.readAsDataURL(file);
 };
 
-document.getElementById('recordBtn').innerText='⏹️';
-}else{
-mediaRecorder.stop();
-document.getElementById('recordBtn').innerText='🎤';
-}
-}
+
+// ===== AUDIO =====
+let mediaRecorder;
+let audioChunks = [];
+
+window.toggleRecording = async function() {
+
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => {
+      audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunks, { type: "audio/webm" });
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const audioData = e.target.result;
+
+        if (activeConvType === 'group') {
+          await push(ref(db, 'groupChat'), {
+            ts: serverTimestamp(),
+            senderId: currentUser.uid,
+            senderName: currentUConf.name,
+            audio: audioData
+          });
+        } else {
+          const convId = getConvId(currentUser.uid, activeConvUserId);
+          await push(ref(db, `privateMessages/${convId}`), {
+            ts: serverTimestamp(),
+            senderId: currentUser.uid,
+            receiverId: activeConvUserId,
+            audio: audioData
+          });
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    };
+
+    document.getElementById("recordBtn").innerText = "⏹️";
+
+  } else {
+    mediaRecorder.stop();
+    document.getElementById("recordBtn").innerText = "🎤";
+  }
+};
+
+
+// ===== PATCH AFFICHAGE =====
+const oldBuild = buildMessagesHTML;
+
+buildMessagesHTML = function(msgs, otherUid) {
+  return msgs.map(msg => {
+
+    let content = '';
+
+    if (msg.text) {
+      content = esc(msg.text);
+    } else if (msg.file) {
+      content = `<a href="${msg.file}" download="${msg.fileName}">📎 ${msg.fileName}</a>`;
+    } else if (msg.audio) {
+      content = `<audio controls src="${msg.audio}"></audio>`;
+    }
+
+    msg.text = content;
+
+    return oldBuild([msg], otherUid);
+
+  }).join('');
+};
+
 </script>
 
-</body>
-</html>
+<!-- ===== BOUTONS CHAT ===== -->
+<script>
+setTimeout(() => {
+  const input = document.getElementById('convInput');
+  if (!input) return;
+
+  const parent = input.parentElement;
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.style.display = 'none';
+  fileInput.onchange = sendFile;
+
+  const fileBtn = document.createElement('button');
+  fileBtn.innerText = '📎';
+  fileBtn.onclick = () => fileInput.click();
+
+  const audioBtn = document.createElement('button');
+  audioBtn.innerText = '🎤';
+  audioBtn.id = 'recordBtn';
+  audioBtn.onclick = toggleRecording;
+
+  parent.insertBefore(fileInput, input);
+  parent.insertBefore(fileBtn, input);
+  parent.insertBefore(audioBtn, input);
+
+}, 2000);
+</script>
