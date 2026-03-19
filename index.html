@@ -828,8 +828,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
       </div>
-
-      <!-- ANNONCE ADMIN — visible par tous, géré par admin -->
+      <!-- BANNIÈRE ANNONCE ADMIN -->
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
       <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-box s1"><div class="slabel">🫧 Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub" id="gs1date">—</div></div>
@@ -1162,52 +1161,53 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
 
       <!-- 📢 PUBLIER UNE ANNONCE -->
-      <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.04);margin-bottom:16px">
+      <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.03);margin-bottom:16px">
         <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message sera affiché en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong> dès la publication.</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera immédiatement en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.</p>
 
-        <!-- Type d'annonce -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-          <button onclick="selectAnnounceType('info')"   id="atype-info"   style="padding:8px 16px;border-radius:20px;border:2px solid var(--soufflage);background:var(--soufflage);color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">ℹ️ Info</button>
-          <button onclick="selectAnnounceType('urgent')" id="atype-urgent" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">🚨 Urgent</button>
-          <button onclick="selectAnnounceType('rapport')"id="atype-rapport"style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">📋 Rapport</button>
-          <button onclick="selectAnnounceType('succes')" id="atype-succes" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">✅ Succès</button>
+        <!-- Type -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="announceTypeBtns">
+          <button onclick="selectAnnounceType('info')"    id="atype-info"    class="atype-btn active-type" style="padding:8px 16px;border-radius:20px;border:2px solid var(--soufflage);background:var(--soufflage);color:#fff;font-weight:700;font-size:13px;cursor:pointer">ℹ️ Info</button>
+          <button onclick="selectAnnounceType('urgent')"  id="atype-urgent"  class="atype-btn" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">🚨 Urgent</button>
+          <button onclick="selectAnnounceType('rapport')" id="atype-rapport" class="atype-btn" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">📋 Rapport</button>
+          <button onclick="selectAnnounceType('succes')"  id="atype-succes"  class="atype-btn" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">✅ Succès</button>
         </div>
 
-        <!-- Titre -->
-        <div class="form-group" style="margin-bottom:12px">
-          <div class="form-label">Titre de l'annonce</div>
-          <input type="text" class="form-input" id="announceTitle" placeholder="Ex : Objectif du jour, Réunion importante...">
+        <div class="form-row" style="margin-bottom:12px">
+          <div class="form-group">
+            <div class="form-label">Titre de l'annonce</div>
+            <input type="text" class="form-input" id="announceTitle" placeholder="Ex : Objectif du jour, Réunion à 14h...">
+          </div>
         </div>
-
-        <!-- Message -->
         <div class="form-group" style="margin-bottom:12px">
           <div class="form-label">Message</div>
           <textarea class="form-textarea" id="announceMsg" placeholder="Écrivez votre message ici..." style="min-height:90px"></textarea>
         </div>
 
-        <!-- Image/document optionnel -->
+        <!-- Image avec compression auto -->
         <div class="form-group" style="margin-bottom:16px">
-          <div class="form-label">Image (optionnel)</div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <label style="padding:9px 16px;background:var(--surface);border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s" onmouseover="this.style.borderColor='var(--soufflage)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div class="form-label">Image (optionnel — compressée automatiquement)</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <label style="padding:9px 16px;background:var(--surface);border:1.5px dashed var(--border2);border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted)">
               📎 Choisir une image
-              <input type="file" id="announceImg" accept="image/*" style="display:none" onchange="previewAnnounceImg(event)">
+              <input type="file" id="announceImgInput" accept="image/*" style="display:none" onchange="handleAnnounceImg(event)">
             </label>
-            <span id="announceImgName" style="font-size:12px;color:var(--muted)">Aucune image</span>
-            <button onclick="clearAnnounceImg()" id="clearImgBtn" style="display:none;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">✕ Retirer</button>
+            <span id="announceImgInfo" style="font-size:12px;color:var(--muted)">Aucune image · max 800×600px · qualité 80%</span>
+            <button onclick="clearAnnounceImg()" id="clearImgBtn" style="display:none;background:none;border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:5px 10px;color:var(--danger);cursor:pointer;font-size:12px">✕ Retirer</button>
           </div>
           <div id="announceImgPreview" style="margin-top:10px;display:none">
-            <img id="announceImgEl" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--border)">
+            <img id="announceImgEl" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--border)">
           </div>
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="publishAnnouncement()">📢 Publier maintenant</button>
-          <button class="btn btn-ghost btn-sm" onclick="clearAnnouncement()" style="border-color:rgba(239,68,68,.3);color:var(--danger)">🗑️ Supprimer l'annonce actuelle</button>
-          <div id="announceOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600">✓ Annonce publiée !</div>
+          <button class="btn btn-primary" onclick="publishAnnouncement()">📢 Publier</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteAnnouncement()" style="border-color:rgba(239,68,68,.3);color:var(--danger)">🗑️ Supprimer l'annonce</button>
+          <div id="announceOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600;align-items:center;gap:6px">✓ Annonce publiée !</div>
         </div>
       </div>
+
+      <!-- UTILISATEURS ENREGISTRÉS -->
       <div class="card">
         <div class="card-title">👥 Comptes utilisateurs enregistrés</div>
         <div id="adminUserList"><div class="empty"><div class="eico">👥</div><p>Chargement...</p></div></div>
@@ -1880,8 +1880,8 @@ function setupListeners() {
   });
   listeners.push({ ref:aRef, fn:aL });
 
-  // Annonce admin — temps réel sur le dashboard
-  const annRef = ref(db, 'announcement');
+  // Annonce admin — temps réel
+  const annRef = ref(db,'announcement');
   const annL = onValue(annRef, snap => { renderAnnounceBanner(snap.val()); });
   listeners.push({ ref:annRef, fn:annL });
 
@@ -2752,28 +2752,64 @@ function renderProfile() {
 }
 
 // Photo
-window.handlePhotoChange = function(event) {
+// ══════════ COMPRESSION IMAGE ══════════
+// Compresse toute image avant sauvegarde Firebase
+// maxW/maxH = dimensions max en pixels, quality = 0 à 1
+function compressImage(file, maxW, maxH, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        // Calculer les nouvelles dimensions en gardant le ratio
+        let w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          const ratio = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', quality);
+        // Afficher la réduction obtenue
+        const origKb  = Math.round(file.size / 1024);
+        const newKb   = Math.round((compressed.length * 3) / 4 / 1024);
+        console.log(`Image compressée : ${origKb} Ko → ${newKb} Ko (-${Math.round((1-newKb/origKb)*100)}%)`);
+        resolve(compressed);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+window.handlePhotoChange = async function(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 2 * 1024 * 1024) { alert('Photo trop lourde (max 2 Mo).'); return; }
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const dataURL = e.target.result;
+  if (file.size > 5 * 1024 * 1024) { alert('Photo trop lourde (max 5 Mo).'); return; }
+
+  try {
+    // Photo de profil : max 200x200px, qualité 75% → ~10-20 Ko
+    const dataURL = await compressImage(file, 200, 200, 0.75);
+
     await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), dataURL);
     currentUConf.photoURL = dataURL;
-    // Mettre à jour le cache local
     if (!photosCache[currentUser.uid]) photosCache[currentUser.uid] = {};
     photosCache[currentUser.uid].photoURL = dataURL;
-    // Mettre à jour avatar topbar
+
     const topAv = document.getElementById('myAvatarTop');
     if (topAv) topAv.innerHTML = `<img src="${dataURL}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
-    // Mettre à jour big avatar profil
     const bigAv = document.getElementById('profileAvatarBig');
     if (bigAv) { bigAv.innerHTML = `<img src="${dataURL}" alt="photo">`; bigAv.style.background='transparent'; }
-    // Re-render chat pour afficher nouvelle photo
     renderChat();
-  };
-  reader.readAsDataURL(file);
+  } catch(e) {
+    alert('Erreur lors du traitement de la photo.');
+    console.error(e);
+  }
 };
 
 // Save profile info
@@ -2958,102 +2994,97 @@ window.openUserProfile = async function(uid) {
 
 // ══════════ ANNONCES ADMIN ══════════
 let currentAnnounceType = 'info';
+let announceImgData = null;
+
+const ANNOUNCE_COLORS = {
+  info:    { bg:'linear-gradient(135deg,#0099cc,#0077aa)', icon:'ℹ️' },
+  urgent:  { bg:'linear-gradient(135deg,#dc2626,#b91c1c)', icon:'🚨' },
+  rapport: { bg:'linear-gradient(135deg,#cc8800,#a86e00)', icon:'📋' },
+  succes:  { bg:'linear-gradient(135deg,#16a34a,#15803d)', icon:'✅' },
+};
 
 window.selectAnnounceType = function(type) {
   currentAnnounceType = type;
+  const cols = { info:'var(--soufflage)', urgent:'var(--danger)', rapport:'var(--etiquette)', succes:'var(--ok)' };
   ['info','urgent','rapport','succes'].forEach(t => {
     const btn = document.getElementById('atype-'+t);
     if (!btn) return;
-    const colors = { info:'var(--soufflage)', urgent:'var(--danger)', rapport:'var(--etiquette)', succes:'var(--ok)' };
-    if (t === type) {
-      btn.style.background = colors[t]; btn.style.borderColor = colors[t]; btn.style.color = '#fff';
-    } else {
-      btn.style.background = 'none'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--muted)';
-    }
+    if (t === type) { btn.style.background=cols[t]; btn.style.borderColor=cols[t]; btn.style.color='#fff'; }
+    else { btn.style.background='none'; btn.style.borderColor='var(--border)'; btn.style.color='var(--muted)'; }
   });
 };
 
-window.previewAnnounceImg = function(event) {
+window.handleAnnounceImg = async function(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 3 * 1024 * 1024) { alert('Image trop lourde (max 3 Mo)'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('announceImgEl').src = e.target.result;
+  if (file.size > 10 * 1024 * 1024) { alert('Image trop lourde (max 10 Mo)'); return; }
+  try {
+    // Annonce : max 800×600px, qualité 80% → ~40-80 Ko
+    announceImgData = await compressImage(file, 800, 600, 0.80);
+    document.getElementById('announceImgEl').src = announceImgData;
     document.getElementById('announceImgPreview').style.display = 'block';
-    document.getElementById('announceImgName').textContent = file.name;
     document.getElementById('clearImgBtn').style.display = 'inline-block';
-  };
-  reader.readAsDataURL(file);
+    const kb = Math.round((announceImgData.length * 3) / 4 / 1024);
+    document.getElementById('announceImgInfo').textContent = `✅ Image compressée — ${kb} Ko`;
+    document.getElementById('announceImgInfo').style.color = 'var(--ok)';
+  } catch(e) { alert('Erreur lors de la compression.'); }
 };
 
 window.clearAnnounceImg = function() {
-  document.getElementById('announceImg').value = '';
+  announceImgData = null;
+  document.getElementById('announceImgInput').value = '';
   document.getElementById('announceImgPreview').style.display = 'none';
-  document.getElementById('announceImgName').textContent = 'Aucune image';
   document.getElementById('clearImgBtn').style.display = 'none';
+  document.getElementById('announceImgInfo').textContent = 'Aucune image · max 800×600px · qualité 80%';
+  document.getElementById('announceImgInfo').style.color = 'var(--muted)';
 };
 
 window.publishAnnouncement = async function() {
   const title = document.getElementById('announceTitle').value.trim();
   const msg   = document.getElementById('announceMsg').value.trim();
-  if (!title || !msg) { alert('Entrez un titre et un message.'); return; }
-
-  const imgEl = document.getElementById('announceImgEl');
-  const imgData = imgEl && document.getElementById('announceImgPreview').style.display !== 'none' ? imgEl.src : null;
-
-  const data = {
-    type: currentAnnounceType,
-    title,
-    msg,
-    img: imgData || null,
-    author: currentUConf?.name || 'Admin',
-    ts: Date.now(),
-    active: true,
-  };
-
-  await set(ref(db, 'announcement'), data);
-
-  const ok = document.getElementById('announceOk');
-  ok.style.display = 'flex'; ok.style.alignItems = 'center'; ok.style.gap = '6px';
-  setTimeout(() => { ok.style.display = 'none'; }, 3000);
+  if (!title && !msg) { alert('Entrez un titre ou un message.'); return; }
+  const btn = document.querySelector('[onclick="publishAnnouncement()"]');
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Publication...'; }
+  try {
+    await set(ref(db,'announcement'), {
+      type: currentAnnounceType,
+      title, msg,
+      img: announceImgData || null,
+      author: currentUConf?.name || 'Admin',
+      ts: Date.now(),
+      active: true,
+    });
+    const ok = document.getElementById('announceOk');
+    ok.style.display='flex'; setTimeout(()=>{ ok.style.display='none'; }, 3000);
+  } catch(e) { alert('Erreur : '+e.message); }
+  if (btn) { btn.disabled=false; btn.textContent='📢 Publier'; }
 };
 
-window.clearAnnouncement = async function() {
+window.deleteAnnouncement = async function() {
   if (!confirm('Supprimer l\'annonce actuelle ?')) return;
-  await remove(ref(db, 'announcement'));
+  await remove(ref(db,'announcement'));
 };
 
-// Rendu de la bannière d'annonce sur le dashboard
 function renderAnnounceBanner(data) {
   const banner = document.getElementById('announceBanner');
   if (!banner) return;
-  if (!data || !data.active) { banner.style.display = 'none'; return; }
-
-  const styles = {
-    info:    { bg:'linear-gradient(135deg,#0099cc,#0077aa)', icon:'ℹ️', border:'rgba(0,153,204,.3)' },
-    urgent:  { bg:'linear-gradient(135deg,#dc2626,#b91c1c)', icon:'🚨', border:'rgba(220,38,38,.3)' },
-    rapport: { bg:'linear-gradient(135deg,#cc8800,#aa6600)', icon:'📋', border:'rgba(204,136,0,.3)' },
-    succes:  { bg:'linear-gradient(135deg,#16a34a,#15803d)', icon:'✅', border:'rgba(22,163,74,.3)' },
-  };
-  const s = styles[data.type] || styles.info;
-  const timeStr = data.ts ? timeAgo(data.ts) : '';
+  if (!data || !data.active) { banner.style.display='none'; return; }
+  const s = ANNOUNCE_COLORS[data.type] || ANNOUNCE_COLORS.info;
   const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
-
-  banner.style.display = 'block';
+  banner.style.display='block';
   banner.innerHTML = `
-    <div style="background:${s.bg};padding:18px 20px;color:#fff">
-      <div style="display:flex;align-items:flex-start;gap:14px">
-        <div style="font-size:28px;flex-shrink:0;margin-top:2px">${s.icon}</div>
+    <div style="background:${s.bg};padding:16px 18px;color:#fff">
+      <div style="display:flex;align-items:flex-start;gap:13px">
+        <div style="font-size:26px;flex-shrink:0;margin-top:2px">${s.icon}</div>
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
-            <div style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:.02em">${esc(data.title)}</div>
-            <div style="font-size:11px;opacity:.75;white-space:nowrap">📌 ${esc(data.author)} · ${timeStr}</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px">
+            <div style="font-family:var(--font-display);font-size:17px;font-weight:800">${esc(data.title||'')}</div>
+            <div style="font-size:11px;opacity:.75">📌 ${esc(data.author||'')} · ${timeAgo(data.ts)}</div>
           </div>
-          <div style="font-size:14px;line-height:1.6;opacity:.95;white-space:pre-wrap">${esc(data.msg)}</div>
-          ${data.img ? `<div style="margin-top:14px"><img src="${data.img}" style="max-width:100%;max-height:280px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.25)"></div>` : ''}
+          ${data.msg?`<div style="font-size:14px;line-height:1.6;opacity:.95;white-space:pre-wrap;margin-bottom:${data.img?'12px':'0'}">${esc(data.msg)}</div>`:''}
+          ${data.img?`<img src="${data.img}" style="max-width:100%;max-height:260px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.25)">`:''}
         </div>
-        ${isAdmin ? `<button onclick="clearAnnouncement()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:6px 10px;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s" title="Supprimer l'annonce" onmouseover="this.style.background='rgba(255,255,255,.35)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">✕</button>` : ''}
+        ${isAdmin?`<button onclick="deleteAnnouncement()" title="Supprimer" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:5px 10px;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0">✕</button>`:''}
       </div>
     </div>`;
 }
