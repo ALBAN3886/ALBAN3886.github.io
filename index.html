@@ -828,6 +828,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
       </div>
+
+      <!-- ANNONCE ADMIN — visible par tous, géré par admin -->
+      <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
       <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-box s1"><div class="slabel">🫧 Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub" id="gs1date">—</div></div>
         <div class="stat-box s2"><div class="slabel">🧴 Remplissage</div><div class="sval" id="gs2">—</div><div class="ssub" id="gs2date">—</div></div>
@@ -1158,7 +1161,53 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div><h2>⚙️ Administration</h2><p>Gestion et réinitialisation des données</p></div>
       </div>
 
-      <!-- UTILISATEURS ENREGISTRÉS -->
+      <!-- 📢 PUBLIER UNE ANNONCE -->
+      <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.04);margin-bottom:16px">
+        <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message sera affiché en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong> dès la publication.</p>
+
+        <!-- Type d'annonce -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <button onclick="selectAnnounceType('info')"   id="atype-info"   style="padding:8px 16px;border-radius:20px;border:2px solid var(--soufflage);background:var(--soufflage);color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">ℹ️ Info</button>
+          <button onclick="selectAnnounceType('urgent')" id="atype-urgent" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">🚨 Urgent</button>
+          <button onclick="selectAnnounceType('rapport')"id="atype-rapport"style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">📋 Rapport</button>
+          <button onclick="selectAnnounceType('succes')" id="atype-succes" style="padding:8px 16px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">✅ Succès</button>
+        </div>
+
+        <!-- Titre -->
+        <div class="form-group" style="margin-bottom:12px">
+          <div class="form-label">Titre de l'annonce</div>
+          <input type="text" class="form-input" id="announceTitle" placeholder="Ex : Objectif du jour, Réunion importante...">
+        </div>
+
+        <!-- Message -->
+        <div class="form-group" style="margin-bottom:12px">
+          <div class="form-label">Message</div>
+          <textarea class="form-textarea" id="announceMsg" placeholder="Écrivez votre message ici..." style="min-height:90px"></textarea>
+        </div>
+
+        <!-- Image/document optionnel -->
+        <div class="form-group" style="margin-bottom:16px">
+          <div class="form-label">Image (optionnel)</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="padding:9px 16px;background:var(--surface);border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s" onmouseover="this.style.borderColor='var(--soufflage)'" onmouseout="this.style.borderColor='var(--border)'">
+              📎 Choisir une image
+              <input type="file" id="announceImg" accept="image/*" style="display:none" onchange="previewAnnounceImg(event)">
+            </label>
+            <span id="announceImgName" style="font-size:12px;color:var(--muted)">Aucune image</span>
+            <button onclick="clearAnnounceImg()" id="clearImgBtn" style="display:none;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px">✕ Retirer</button>
+          </div>
+          <div id="announceImgPreview" style="margin-top:10px;display:none">
+            <img id="announceImgEl" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--border)">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="publishAnnouncement()">📢 Publier maintenant</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAnnouncement()" style="border-color:rgba(239,68,68,.3);color:var(--danger)">🗑️ Supprimer l'annonce actuelle</button>
+          <div id="announceOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600">✓ Annonce publiée !</div>
+        </div>
+      </div>
       <div class="card">
         <div class="card-title">👥 Comptes utilisateurs enregistrés</div>
         <div id="adminUserList"><div class="empty"><div class="eico">👥</div><p>Chargement...</p></div></div>
@@ -1830,6 +1879,11 @@ function setupListeners() {
     renderAlerts();
   });
   listeners.push({ ref:aRef, fn:aL });
+
+  // Annonce admin — temps réel sur le dashboard
+  const annRef = ref(db, 'announcement');
+  const annL = onValue(annRef, snap => { renderAnnounceBanner(snap.val()); });
+  listeners.push({ ref:annRef, fn:annL });
 
   // Démarrer groupe dès la connexion
   listenGroupChat();
@@ -2793,14 +2847,7 @@ window.renderEquipePage = async function() {
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Chargement...</div>';
   const snap = await get(ref(db,'userProfiles'));
   const profiles = snap.val() || {};
-  const isCurrentAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
-  let entries = Object.entries(profiles);
-
-  // Les opérateurs ne voient pas Admin/Superviseur
-  if (!isCurrentAdmin) {
-    entries = entries.filter(([uid,p]) => p.role !== 'Admin' && p.role !== 'Superviseur');
-  }
-
+  const entries = Object.entries(profiles);
   if (!entries.length) { grid.innerHTML='<div class="empty"><div class="eico">👥</div><p>Aucun profil</p></div>'; return; }
   grid.innerHTML = entries.map(([uid,p]) => {
     const color = (MACHINE_MAP[p.role]||{}).color||'#888';
@@ -2837,13 +2884,6 @@ window.renderEquipePage = async function() {
 window.openUserProfile = async function(uid) {
   const snap = await get(ref(db,`userProfiles/${uid}`));
   const p = snap.val(); if (!p) return;
-
-  const isCurrentAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
-  const isTargetAdmin  = p.role==='Admin'||p.role==='Superviseur';
-
-  // Un opérateur ne peut pas voir le profil d'un Admin/Superviseur
-  if (!isCurrentAdmin && isTargetAdmin) return;
-
   const color = (MACHINE_MAP[p.role]||{}).color||'#888';
   const isOnline = Object.values(presence).some(x=>x.name===p.name&&x.online);
   const reps = Object.values(allReports).filter(r=>r.operatorName===p.name).sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -2863,20 +2903,8 @@ window.openUserProfile = async function(uid) {
   const dot = document.getElementById('upDot');
   dot.style.background = isOnline?'#22c55e':'#ccc';
   document.getElementById('upStatusTxt').innerHTML = isOnline?'<span style="color:#22c55e;font-weight:600">● En ligne</span>':'<span style="color:#aaa">● Hors ligne</span>';
-
-  // Email et téléphone : visibles seulement par Admin/Superviseur OU pour son propre profil
-  const showPrivateInfo = isCurrentAdmin || uid === currentUser?.uid;
-  const coordSection = document.querySelector('#userProfileModal [id="upEmail"]')?.closest('div[style*="f8f9fb"]') ||
-    document.getElementById('upEmail')?.closest('div');
-
-  document.getElementById('upEmail').textContent  = showPrivateInfo ? (p.email||'—') : '🔒 Confidentiel';
-  document.getElementById('upPhone').textContent  = showPrivateInfo ? (p.phone||'Non renseigné') : '🔒 Confidentiel';
-
-  // Stats et rapports : visibles pour tout le monde (sauf si Admin/Superviseur cible)
-  const statsEl   = document.getElementById('upStats');
-  const rapportsEl = document.getElementById('upRapports');
-  const statSection  = statsEl?.closest('div[style*="margin"]') || statsEl?.parentElement;
-  const rapSection   = rapportsEl?.closest('div[style*="margin"]') || rapportsEl?.parentElement;
+  document.getElementById('upEmail').textContent = p.email||'—';
+  document.getElementById('upPhone').textContent = p.phone||'Non renseigné';
 
   document.getElementById('upStats').innerHTML = `
     <div style="background:${color}15;border-radius:9px;padding:10px;text-align:center;border:1px solid ${color}30">
@@ -2927,6 +2955,108 @@ window.openUserProfile = async function(uid) {
   document.getElementById('userProfileModal').style.display='flex';
   document.body.style.overflow='hidden';
 };
+
+// ══════════ ANNONCES ADMIN ══════════
+let currentAnnounceType = 'info';
+
+window.selectAnnounceType = function(type) {
+  currentAnnounceType = type;
+  ['info','urgent','rapport','succes'].forEach(t => {
+    const btn = document.getElementById('atype-'+t);
+    if (!btn) return;
+    const colors = { info:'var(--soufflage)', urgent:'var(--danger)', rapport:'var(--etiquette)', succes:'var(--ok)' };
+    if (t === type) {
+      btn.style.background = colors[t]; btn.style.borderColor = colors[t]; btn.style.color = '#fff';
+    } else {
+      btn.style.background = 'none'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--muted)';
+    }
+  });
+};
+
+window.previewAnnounceImg = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) { alert('Image trop lourde (max 3 Mo)'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('announceImgEl').src = e.target.result;
+    document.getElementById('announceImgPreview').style.display = 'block';
+    document.getElementById('announceImgName').textContent = file.name;
+    document.getElementById('clearImgBtn').style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+};
+
+window.clearAnnounceImg = function() {
+  document.getElementById('announceImg').value = '';
+  document.getElementById('announceImgPreview').style.display = 'none';
+  document.getElementById('announceImgName').textContent = 'Aucune image';
+  document.getElementById('clearImgBtn').style.display = 'none';
+};
+
+window.publishAnnouncement = async function() {
+  const title = document.getElementById('announceTitle').value.trim();
+  const msg   = document.getElementById('announceMsg').value.trim();
+  if (!title || !msg) { alert('Entrez un titre et un message.'); return; }
+
+  const imgEl = document.getElementById('announceImgEl');
+  const imgData = imgEl && document.getElementById('announceImgPreview').style.display !== 'none' ? imgEl.src : null;
+
+  const data = {
+    type: currentAnnounceType,
+    title,
+    msg,
+    img: imgData || null,
+    author: currentUConf?.name || 'Admin',
+    ts: Date.now(),
+    active: true,
+  };
+
+  await set(ref(db, 'announcement'), data);
+
+  const ok = document.getElementById('announceOk');
+  ok.style.display = 'flex'; ok.style.alignItems = 'center'; ok.style.gap = '6px';
+  setTimeout(() => { ok.style.display = 'none'; }, 3000);
+};
+
+window.clearAnnouncement = async function() {
+  if (!confirm('Supprimer l\'annonce actuelle ?')) return;
+  await remove(ref(db, 'announcement'));
+};
+
+// Rendu de la bannière d'annonce sur le dashboard
+function renderAnnounceBanner(data) {
+  const banner = document.getElementById('announceBanner');
+  if (!banner) return;
+  if (!data || !data.active) { banner.style.display = 'none'; return; }
+
+  const styles = {
+    info:    { bg:'linear-gradient(135deg,#0099cc,#0077aa)', icon:'ℹ️', border:'rgba(0,153,204,.3)' },
+    urgent:  { bg:'linear-gradient(135deg,#dc2626,#b91c1c)', icon:'🚨', border:'rgba(220,38,38,.3)' },
+    rapport: { bg:'linear-gradient(135deg,#cc8800,#aa6600)', icon:'📋', border:'rgba(204,136,0,.3)' },
+    succes:  { bg:'linear-gradient(135deg,#16a34a,#15803d)', icon:'✅', border:'rgba(22,163,74,.3)' },
+  };
+  const s = styles[data.type] || styles.info;
+  const timeStr = data.ts ? timeAgo(data.ts) : '';
+  const isAdmin = currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur';
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div style="background:${s.bg};padding:18px 20px;color:#fff">
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="font-size:28px;flex-shrink:0;margin-top:2px">${s.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:.02em">${esc(data.title)}</div>
+            <div style="font-size:11px;opacity:.75;white-space:nowrap">📌 ${esc(data.author)} · ${timeStr}</div>
+          </div>
+          <div style="font-size:14px;line-height:1.6;opacity:.95;white-space:pre-wrap">${esc(data.msg)}</div>
+          ${data.img ? `<div style="margin-top:14px"><img src="${data.img}" style="max-width:100%;max-height:280px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.25)"></div>` : ''}
+        </div>
+        ${isAdmin ? `<button onclick="clearAnnouncement()" style="background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:6px 10px;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s" title="Supprimer l'annonce" onmouseover="this.style.background='rgba(255,255,255,.35)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">✕</button>` : ''}
+      </div>
+    </div>`;
+}
 
 // ══════════ SPLASH SCREEN ══════════
 const SPLASH_DURATION = 30;
