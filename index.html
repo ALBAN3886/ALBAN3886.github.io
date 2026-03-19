@@ -877,10 +877,20 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
         <!-- = Total -->
         <div style="width:1px;height:50px;background:rgba(255,255,255,.1);flex-shrink:0;margin-right:16px"></div>
-        <div style="flex-shrink:0;text-align:right">
+        <div style="flex-shrink:0;text-align:right;margin-right:16px">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#a5b4fc;font-weight:700;margin-bottom:4px">🔢 TOTAL</div>
           <div id="totalCombineDash" style="font-family:var(--font-display);font-size:32px;font-weight:900;color:#a5b4fc;line-height:1">—</div>
           <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">combiné</div>
+        </div>
+
+        <!-- Séparateur -->
+        <div style="width:1px;height:50px;background:rgba(255,255,255,.1);flex-shrink:0;margin-right:16px"></div>
+
+        <!-- Déchets total -->
+        <div style="flex-shrink:0;text-align:right">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#f87171;font-weight:700;margin-bottom:4px">🗑️ DÉCHETS</div>
+          <div id="totalDechetsDash" style="font-family:var(--font-display);font-size:28px;font-weight:900;color:#f87171;line-height:1">—</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">kg total</div>
         </div>
       </div>
       <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
@@ -1528,15 +1538,15 @@ function getUserConf(email) {
 
 const MACHINES = [
   { id:'Soufflage',   icon:'🫧', color:'#00d4ff', cssClass:'mc-soufflage',
-    fields:[{key:'prod',label:'Bouteilles soufflées',unit:'unités'},{key:'rejets',label:'Rejets / déchets',unit:'unités'},{key:'tempChauffe',label:'Temp. chauffe',unit:'°C'}] },
+    fields:[{key:'prod',label:'Bouteilles soufflées',unit:'unités'},{key:'rejets',label:'Rejets / déchets',unit:'unités'},{key:'tempChauffe',label:'Temp. chauffe',unit:'°C'},{key:'dechets',label:'🗑️ Déchets',unit:'kg'}] },
   { id:'Remplissage', icon:'🧴', color:'#00ff94', cssClass:'mc-remplissage',
-    fields:[{key:'prod',label:'Bouteilles remplies',unit:'unités'},{key:'bouchons',label:'Bouchons utilisés',unit:'pcs'},{key:'bouchonsRest',label:'Bouchons restants',unit:'pcs'}] },
+    fields:[{key:'prod',label:'Bouteilles remplies',unit:'unités'},{key:'bouchons',label:'Bouchons utilisés',unit:'pcs'},{key:'bouchonsRest',label:'Bouchons restants',unit:'pcs'},{key:'dechets',label:'🗑️ Déchets',unit:'kg'}] },
   { id:'Étiquette',   icon:'🏷️', color:'#ffb800', cssClass:'mc-etiquette',
-    fields:[{key:'prod',label:'Bouteilles étiquetées',unit:'unités'},{key:'etiquettes',label:'Étiquettes utilisées',unit:'pcs'},{key:'etiqRest',label:'Étiquettes restantes',unit:'pcs'}] },
+    fields:[{key:'prod',label:'Bouteilles étiquetées',unit:'unités'},{key:'etiquettes',label:'Étiquettes utilisées',unit:'pcs'},{key:'etiqRest',label:'Étiquettes restantes',unit:'pcs'},{key:'dechets',label:'🗑️ Déchets',unit:'kg'}] },
   { id:'Emballage',   icon:'📦', color:'#ff6b35', cssClass:'mc-emballage',
-    fields:[{key:'prod',label:'Cartons emballés',unit:'cartons'},{key:'sachets',label:'Sachets utilisés',unit:'pcs'},{key:'sachetsRest',label:'Sachets restants',unit:'pcs'}] },
+    fields:[{key:'prod',label:'Cartons emballés',unit:'cartons'},{key:'sachets',label:'Sachets utilisés',unit:'pcs'},{key:'sachetsRest',label:'Sachets restants',unit:'pcs'},{key:'dechets',label:'🗑️ Déchets',unit:'kg'}] },
   { id:'B19',         icon:'⚙️', color:'#a855f7', cssClass:'mc-b19',
-    fields:[{key:'prod',label:'Production B19',unit:'unités'}] },
+    fields:[{key:'prod',label:'Production B19',unit:'unités'},{key:'dechets',label:'🗑️ Déchets',unit:'kg'}] },
 ];
 
 // ══════════ STATE ══════════
@@ -2062,6 +2072,12 @@ function renderDashboard() {
   document.getElementById('totalEmbDash').textContent     = embMonthTotal > 0 ? num(embMonthTotal) : '0';
   document.getElementById('totalB19Dash').textContent     = b19MonthTotal > 0 ? num(b19MonthTotal) : '0';
   document.getElementById('totalCombineDash').textContent = combined > 0 ? num(combined) : '0';
+
+  // Total déchets toutes machines du mois
+  const dechetsTotal = allRepsAll
+    .filter(r => r.date.startsWith(curMonth))
+    .reduce((s,r) => s + (parseFloat(r.fields?.dechets) || 0), 0);
+  document.getElementById('totalDechetsDash').textContent = dechetsTotal > 0 ? num(dechetsTotal) + ' kg' : '0';
 
   // Label tableau
   const labelEl = document.getElementById('dashReportDateLabel');
