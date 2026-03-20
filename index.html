@@ -612,11 +612,11 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         color:rgba(255,255,255,.4);
         margin-top:8px;
         letter-spacing:.05em;
-      ">Patientez 30 secondes...</div>
+      ">Patientez 10 secondes...</div>
     </div>
 
-    <!-- Bouton Continuer (désactivé au début) -->
-    <button id="splashBtn" onclick="closeSplash()" disabled style="
+    <!-- Bouton Continuer -->
+    <button id="splashBtn" onclick="goToWelcome()" disabled style="
       width:100%; padding:13px;
       background:rgba(255,215,0,.15);
       border:1.5px solid rgba(255,215,0,.3);
@@ -628,6 +628,49 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       cursor:not-allowed;
       transition:all .4s;
     ">CONTINUER →</button>
+  </div>
+</div>
+
+<!-- ÉCRAN BIENVENUE ALBAN ELOH -->
+<div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:9998;background:linear-gradient(135deg,#0a0c14 0%,#0d1220 40%,#060810 100%);align-items:center;justify-content:center;padding:28px">
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,153,204,.12),transparent 70%);top:-80px;right:-80px"></div>
+    <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,200,150,.08),transparent 70%);bottom:-60px;left:-40px"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#0ff;border-radius:50%;opacity:.5;top:20%;left:10%"></div>
+    <div style="position:absolute;width:3px;height:3px;background:#0cf;border-radius:50%;opacity:.4;top:60%;right:15%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#0ff;border-radius:50%;opacity:.3;bottom:30%;left:30%"></div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.05" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="30%" x2="100%" y2="30%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="0" y1="70%" x2="100%" y2="70%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="30%" y1="0" x2="30%" y2="100%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="70%" y1="0" x2="70%" y2="100%" stroke="#0099cc" stroke-width="1"/>
+    </svg>
+  </div>
+  <div style="max-width:520px;width:100%;text-align:center;position:relative;animation:fadeIn .8s ease">
+    <div style="margin-bottom:28px;position:relative;display:inline-block">
+      <div style="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,#0099cc,#005580);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto;box-shadow:0 0 40px rgba(0,153,204,.4),0 0 80px rgba(0,153,204,.15)">🛡️</div>
+      <div style="position:absolute;inset:-4px;border-radius:28px;border:1px solid rgba(0,153,204,.4);animation:pulse 2s infinite"></div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.25em;color:rgba(0,204,255,.7);text-transform:uppercase;margin-bottom:14px">Bienvenue dans</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;letter-spacing:.06em;color:#ffffff;line-height:1.15;margin-bottom:8px;text-shadow:0 0 40px rgba(0,153,204,.5)">LA TECHNOLOGIE DE<br><span style="color:#00ccff;text-shadow:0 0 20px rgba(0,204,255,.8)">ALBAN ELOH</span></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:20px auto;max-width:300px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(0,204,255,.5))"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00ccff;box-shadow:0 0 8px #00ccff"></div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,204,255,.5),transparent)"></div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,4vw,19px);font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:32px">
+      SPÉCIALISTE EN <span style="color:#00ccff;font-weight:800">CYBER SÉCURITÉ</span><br>
+      ET EN <span style="color:#00ccff;font-weight:800">DATA TECHNOLOGY</span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">🔐 Cybersécurité</span>
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📊 Data Technology</span>
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">🌐 Innovation</span>
+    </div>
+    <button onclick="closeWelcome()" style="padding:15px 48px;background:linear-gradient(135deg,#0099cc,#0066aa);border:none;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.1em;color:#fff;cursor:pointer;box-shadow:0 4px 24px rgba(0,153,204,.5);transition:all .3s;text-transform:uppercase" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      ACCÉDER À L'APPLICATION →
+    </button>
+    <div style="margin-top:24px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em;text-transform:uppercase">Alban Technology A.E.T © 2026</div>
   </div>
 </div>
 
@@ -666,7 +709,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
         <option value="Technicien Emballage">📦 Technicien Emballage</option>
         <option value="Technicien B19">⚙️ Technicien B19</option>
-        <option value="Superviseur">⚙️ Superviseur</option>
       </select>
       <div class="login-label">Adresse e-mail</div>
       <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr">
@@ -1066,21 +1108,18 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
           <!-- Zone de saisie avec image + audio -->
           <div style="background:#f0f2f5;padding:10px 12px;flex-shrink:0;border-top:1px solid #ddd">
-            <!-- Prévisualisation image -->
             <div id="imgPreviewBar" style="display:none;padding:0 0 8px 0">
               <div style="position:relative;display:inline-block">
                 <img id="imgPreviewEl" style="height:80px;max-width:200px;border-radius:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.2)">
                 <button onclick="cancelImgSend()" style="position:absolute;top:-6px;right:-6px;width:22px;height:22px;background:#dc2626;border:none;border-radius:50%;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
               </div>
             </div>
-            <!-- Barre enregistrement audio -->
             <div id="audioRecordBar" style="display:none;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:20px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.1)">
               <div style="width:10px;height:10px;background:#dc2626;border-radius:50%;animation:pulse 1s infinite;flex-shrink:0"></div>
               <div style="flex:1;font-size:13px;color:#333;font-weight:500" id="audioTimer">⏺ 0:00</div>
               <button onclick="cancelAudio()" style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#dc2626;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:600">✕</button>
               <button onclick="stopAndSendAudio()" style="background:#0099cc;border:none;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:700">Envoyer ▶</button>
             </div>
-            <!-- Ligne principale -->
             <div style="display:flex;gap:8px;align-items:center">
               <label style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.12);font-size:18px;flex-shrink:0">
                 📷<input type="file" id="chatImgInput" accept="image/*" style="display:none" onchange="handleChatImg(event)">
@@ -1145,8 +1184,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
               <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
               <option value="Technicien Emballage">📦 Technicien Emballage</option>
               <option value="Technicien B19">⚙️ Technicien B19</option>
-              <option value="Superviseur">🔧 Superviseur</option>
-              <option value="Admin">⚙️ Admin</option>
             </select>
           </div>
         </div>
@@ -1574,7 +1611,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as storageRef, uploadString, getDownloadURL }
+import { getStorage, ref as sRef, uploadString, getDownloadURL }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 // ══════════ FIREBASE CONFIG ══════════
@@ -1593,12 +1630,11 @@ const auth    = getAuth(app);
 const db      = getDatabase(app);
 const storage = getStorage(app);
 
-// ══ Upload vers Firebase Storage — retourne l'URL publique ══
-// path ex: 'profiles/uid.jpg' | 'chat/convId_ts.webm' | 'announcements/ts.jpg'
-async function uploadToStorage(base64DataURL, path) {
-  const fileRef = storageRef(storage, path);
-  await uploadString(fileRef, base64DataURL, 'data_url');
-  return await getDownloadURL(fileRef);
+// Upload base64 → Firebase Storage → retourne URL publique
+async function uploadToStorage(path, dataURL) {
+  const storageRef = sRef(storage, path);
+  await uploadString(storageRef, dataURL, 'data_url');
+  return await getDownloadURL(storageRef);
 }
 
 // ══════════ SAFETY TIMEOUT ══════════
@@ -2872,13 +2908,20 @@ function buildMessagesHTML(msgs, otherUid) {
       ${!own ? avatarEl : ''}
       <div style="max-width:75%;display:flex;flex-direction:column;${own?'align-items:flex-end':'align-items:flex-start'}">
         ${!own&&activeConvType==='group'?`<div style="font-size:11px;color:${bgColor};font-weight:700;margin-bottom:2px;padding:0 6px">${esc(msg.senderName)}</div>`:''}
-        <div style="
-          padding:8px 12px;font-size:15px;line-height:1.5;word-break:break-word;
-          border-radius:${own?'16px 2px 16px 16px':'2px 16px 16px 16px'};
-          background:${own?'#dcf8c6':'#fff'};
-          color:#111;
-          box-shadow:0 1px 2px rgba(0,0,0,.12);
-        ">${esc(msg.text)}</div>
+        <div style="padding:${msg.msgType==='image'?'4px':'8px 12px'};font-size:15px;line-height:1.5;word-break:break-word;border-radius:${own?'16px 2px 16px 16px':'2px 16px 16px 16px'};background:${own?'#dcf8c6':'#fff'};color:#111;box-shadow:0 1px 2px rgba(0,0,0,.12);overflow:hidden">${
+          msg.msgType==='image'&&msg.imageData
+            ? `<img src="${msg.imageData}" style="max-width:220px;max-height:220px;border-radius:10px;display:block;cursor:pointer;object-fit:cover" onclick="window.open('${msg.imageData}','_blank')">${msg.text?`<div style="padding:6px 8px;font-size:13px">${esc(msg.text)}</div>`:''}`
+            : msg.msgType==='audio'&&msg.audioData
+              ? `<div style="display:flex;align-items:center;gap:8px;min-width:160px;padding:2px 0">
+                  <button onclick="playAudio('a${msg.senderId}${msg.ts}')" style="width:34px;height:34px;background:${own?'rgba(0,0,0,.15)':'#0099cc'};border:none;border-radius:50%;cursor:pointer;font-size:14px;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">▶</button>
+                  <div style="flex:1">
+                    <div style="height:3px;background:rgba(0,0,0,.1);border-radius:2px;margin-bottom:4px"><div style="width:0%;height:100%;background:${own?'rgba(0,0,0,.3)':'#0099cc'};border-radius:2px;transition:width .1s" id="p_a${msg.senderId}${msg.ts}"></div></div>
+                    <div style="font-size:11px;color:#666" id="d_a${msg.senderId}${msg.ts}">🎤 ${msg.audioDuration||'0:00'}</div>
+                  </div>
+                  <audio id="a${msg.senderId}${msg.ts}" src="${msg.audioData}" style="display:none"></audio>
+                </div>`
+              : `${esc(msg.text||'')}`
+        }</div>
         <span style="font-size:10px;color:#999;margin-top:2px;padding:0 4px">${timeStr}${own?' ✓✓':''}</span>
       </div>
       ${own ? avatarEl : ''}
@@ -2886,40 +2929,33 @@ function buildMessagesHTML(msgs, otherUid) {
   }).join('');
 }
 
-// ── Variables media chat ──
+// ── Variables media ──
 let chatImgPending = null;
 let mediaRecorder  = null;
 let audioChunks    = [];
 let audioTimerInt  = null;
 let audioSeconds   = 0;
 
-// ── Envoyer un message (texte / image / audio) ──
+// ── Envoyer (texte / image Storage / audio Storage) ──
 window.sendPrivateMsg = async function(overrides = {}) {
   const inp = document.getElementById('convInput');
   const txt = inp?.value.trim();
   if (!txt && !chatImgPending && !overrides.audioData) return;
   if (inp) inp.value = '';
 
-  let imageURL = null;
-  let audioURL = null;
+  let imageURL = null, audioURL = null;
 
-  // Upload image vers Storage si présente
   if (chatImgPending) {
-    try {
-      const path = `chat/${currentUser.uid}/${Date.now()}_img.jpg`;
-      imageURL = await uploadToStorage(chatImgPending, path);
-    } catch(e) { console.error('Upload image chat:', e); imageURL = chatImgPending; }
+    try { imageURL = await uploadToStorage(`chat/${currentUser.uid}/${Date.now()}_img.jpg`, chatImgPending); }
+    catch(e) { console.error('Upload image chat:', e); }
     chatImgPending = null;
     const bar = document.getElementById('imgPreviewBar');
     if (bar) bar.style.display = 'none';
   }
 
-  // Upload audio vers Storage si présent
   if (overrides.audioData) {
-    try {
-      const path = `chat/${currentUser.uid}/${Date.now()}_audio.webm`;
-      audioURL = await uploadToStorage(overrides.audioData, path);
-    } catch(e) { console.error('Upload audio chat:', e); audioURL = overrides.audioData; }
+    try { audioURL = await uploadToStorage(`chat/${currentUser.uid}/${Date.now()}_audio.webm`, overrides.audioData); }
+    catch(e) { console.error('Upload audio chat:', e); }
   }
 
   const msgData = {
@@ -2930,8 +2966,8 @@ window.sendPrivateMsg = async function(overrides = {}) {
     photoURL: currentUConf.photoURL || null,
     text: txt || '',
     msgType: overrides.audioData ? 'audio' : (imageURL ? 'image' : 'text'),
-    imageData: imageURL || null,   // URL Storage (pas base64)
-    audioData: audioURL || null,   // URL Storage (pas base64)
+    imageData: imageURL || null,
+    audioData: audioURL || null,
     audioDuration: overrides.audioDuration || null,
   };
 
@@ -2944,7 +2980,7 @@ window.sendPrivateMsg = async function(overrides = {}) {
   await push(ref(db,`privateMessages/${convId}`), { ...msgData, receiverId: activeConvUserId });
 };
 
-// ── Image chat ──
+// ── Image ──
 window.handleChatImg = async function(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -2963,21 +2999,20 @@ window.cancelImgSend = function() {
   document.getElementById('chatImgInput').value = '';
 };
 
-// ── Audio chat ──
+// ── Audio ──
 window.toggleRecording = async function() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); return; }
+  if (mediaRecorder && mediaRecorder.state==='recording') { mediaRecorder.stop(); return; }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream);
     audioChunks = []; audioSeconds = 0;
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.ondataavailable = e => { if (e.data.size>0) audioChunks.push(e.data); };
     mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
+      stream.getTracks().forEach(t=>t.stop());
       clearInterval(audioTimerInt);
       document.getElementById('audioRecordBar').style.display = 'none';
       document.getElementById('micBtn').style.background = '#fff';
-      const blob = new Blob(audioChunks, { type: 'audio/webm' });
-      if (blob.size > 10*1024*1024) { alert('Message vocal trop long'); return; }
+      const blob = new Blob(audioChunks, {type:'audio/webm'});
       const reader = new FileReader();
       reader.onload = async e => {
         await sendPrivateMsg({ audioData: e.target.result, audioDuration: fmtDur(audioSeconds) });
@@ -2989,18 +3024,15 @@ window.toggleRecording = async function() {
     document.getElementById('micBtn').style.background = '#dc2626';
     audioTimerInt = setInterval(() => {
       audioSeconds++;
-      const m = Math.floor(audioSeconds/60), s = String(audioSeconds%60).padStart(2,'0');
-      document.getElementById('audioTimer').textContent = `⏺ Enregistrement... ${m}:${s}`;
-      if (audioSeconds >= 300) mediaRecorder.stop(); // max 5 min
+      const m=Math.floor(audioSeconds/60), s=String(audioSeconds%60).padStart(2,'0');
+      document.getElementById('audioTimer').textContent = `⏺ ${m}:${s}`;
+      if (audioSeconds>=300) mediaRecorder.stop();
     }, 1000);
   } catch(e) { alert('Microphone non disponible.'); }
 };
 
 window.cancelAudio = function() {
-  if (mediaRecorder && mediaRecorder.state==='recording') {
-    mediaRecorder.onstop = () => {};
-    mediaRecorder.stop();
-  }
+  if (mediaRecorder && mediaRecorder.state==='recording') { mediaRecorder.onstop=()=>{}; mediaRecorder.stop(); }
   clearInterval(audioTimerInt);
   document.getElementById('audioRecordBar').style.display = 'none';
   document.getElementById('micBtn').style.background = '#fff';
@@ -3014,14 +3046,13 @@ window.playAudio = function(aid) {
   const aud = document.getElementById(aid);
   if (!aud) return;
   if (!aud.paused) { aud.pause(); return; }
-  document.querySelectorAll('audio').forEach(a => { if(a!==aud) a.pause(); });
+  document.querySelectorAll('audio').forEach(a=>{ if(a!==aud) a.pause(); });
   aud.play();
   aud.ontimeupdate = () => {
     if (!aud.duration) return;
-    const p = document.getElementById('p_'+aid);
-    const d = document.getElementById('d_'+aid);
-    if (p) p.style.width = (aud.currentTime/aud.duration*100)+'%';
-    if (d) d.textContent = '🎤 '+fmtDur(Math.floor(aud.currentTime));
+    const p=document.getElementById('p_'+aid), d=document.getElementById('d_'+aid);
+    if(p) p.style.width=(aud.currentTime/aud.duration*100)+'%';
+    if(d) d.textContent='🎤 '+fmtDur(Math.floor(aud.currentTime));
   };
   aud.onended = () => { const p=document.getElementById('p_'+aid); if(p) p.style.width='0%'; };
 };
@@ -3136,33 +3167,20 @@ window.handlePhotoChange = async function(event) {
   const file = event.target.files[0];
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) { alert('Photo trop lourde (max 5 Mo).'); return; }
-
-  const bigAv  = document.getElementById('profileAvatarBig');
-  const topAv  = document.getElementById('myAvatarTop');
-  if (bigAv) { bigAv.innerHTML = '<div style="font-size:20px;animation:pulse 1s infinite">⏳</div>'; }
-
+  const bigAv = document.getElementById('profileAvatarBig');
+  if (bigAv) bigAv.innerHTML = '<div style="font-size:12px;color:var(--muted)">⏳...</div>';
   try {
-    // 1. Compresser en local (200x200, qualité 75%)
     const compressed = await compressImage(file, 200, 200, 0.75);
-
-    // 2. Upload vers Firebase Storage — ne stocke que l'URL dans DB
-    const path = `profiles/${currentUser.uid}/avatar.jpg`;
-    const photoURL = await uploadToStorage(compressed, path);
-
-    // 3. Sauvegarder URL (pas base64) dans DB
-    await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), photoURL);
-    currentUConf.photoURL = photoURL;
+    const url = await uploadToStorage(`photos/${currentUser.uid}/profile.jpg`, compressed);
+    await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), url);
+    currentUConf.photoURL = url;
     if (!photosCache[currentUser.uid]) photosCache[currentUser.uid] = {};
-    photosCache[currentUser.uid].photoURL = photoURL;
-
-    // 4. Mise à jour UI
-    if (topAv) topAv.innerHTML = `<img src="${photoURL}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
-    if (bigAv) { bigAv.innerHTML = `<img src="${photoURL}" alt="photo">`; bigAv.style.background='transparent'; }
+    photosCache[currentUser.uid].photoURL = url;
+    const topAv = document.getElementById('myAvatarTop');
+    if (topAv) topAv.innerHTML = `<img src="${url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
+    if (bigAv) { bigAv.innerHTML = `<img src="${url}" alt="photo">`; bigAv.style.background='transparent'; }
     renderChat();
-  } catch(e) {
-    alert('Erreur lors de l\'upload de la photo : ' + e.message);
-    if (bigAv) { bigAv.textContent = (currentUConf.name||'?').charAt(0); bigAv.style.background = currentUConf.color; }
-  }
+  } catch(e) { alert('Erreur upload photo : ' + e.message); }
 };
 
 // Save profile info
@@ -3397,13 +3415,12 @@ window.handleAnnounceImg = async function(event) {
   if (!file) return;
   if (file.size > 10*1024*1024) { alert('Image trop lourde (max 10 Mo)'); return; }
   try {
-    // Garder en base64 localement pour la prévisualisation seulement
     announceImgData = await compressImage(file, 800, 600, 0.80);
     document.getElementById('announceImgEl').src = announceImgData;
     document.getElementById('announceImgPreview').style.display = 'block';
     document.getElementById('clearImgBtn').style.display = 'inline-block';
     const kb = Math.round((announceImgData.length*3)/4/1024);
-    document.getElementById('announceImgInfo').textContent = `✅ Prête à envoyer — ${kb} Ko (sera uploadée vers Storage)`;
+    document.getElementById('announceImgInfo').textContent = `✅ Image compressée — ${kb} Ko`;
     document.getElementById('announceImgInfo').style.color = 'var(--ok)';
   } catch(e) { alert('Erreur lors de la compression.'); }
 };
@@ -3424,17 +3441,13 @@ window.publishAnnouncement = async function() {
   const btn = document.querySelector('[onclick="publishAnnouncement()"]');
   if (btn) { btn.disabled=true; btn.textContent='⏳ Publication...'; }
   try {
-    // Upload image vers Storage si présente
     let imgURL = null;
     if (announceImgData) {
-      try {
-        const path = `announcements/${Date.now()}.jpg`;
-        imgURL = await uploadToStorage(announceImgData, path);
-      } catch(e) { console.error('Upload annonce img:', e); imgURL = announceImgData; }
+      imgURL = await uploadToStorage(`announcements/current.jpg`, announceImgData);
     }
     await set(ref(db,'announcement'), {
       type: currentAnnounceType, title, msg,
-      img: imgURL || null,   // URL Storage (pas base64)
+      img: imgURL || null,
       author: currentUConf?.name || 'Admin',
       ts: Date.now(), active: true,
     });
@@ -3475,7 +3488,7 @@ function renderAnnounceBanner(data) {
 }
 
 // ══════════ SPLASH SCREEN ══════════
-const SPLASH_DURATION = 30;
+const SPLASH_DURATION = 10;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
 
@@ -3550,17 +3563,51 @@ window.closeSplash = function() {
   setTimeout(() => {
     splash.style.display = 'none';
     if (splashTarget === 'app') {
-      // Après connexion → montrer l'app
       document.getElementById('app')?.classList.add('show');
     } else {
-      // Avant connexion → montrer le login
       const login = document.getElementById('loginScreen');
       if (login) { login.style.display = 'flex'; }
     }
   }, 700);
 };
 
-// Afficher le splash au chargement de la page (avant connexion)
+window.goToWelcome = function() {
+  if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
+  const splash = document.getElementById('splashScreen');
+  const welcome = document.getElementById('welcomeScreen');
+  if (!splash) return;
+  splash.style.transition = 'opacity .6s ease';
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    if (welcome) {
+      welcome.style.display = 'flex';
+      welcome.style.opacity = '0';
+      welcome.style.transition = 'opacity .8s ease';
+      setTimeout(() => { welcome.style.opacity = '1'; }, 30);
+    } else {
+      closeSplash();
+    }
+  }, 600);
+};
+
+window.closeWelcome = function() {
+  const welcome = document.getElementById('welcomeScreen');
+  if (!welcome) return;
+  welcome.style.transition = 'opacity .6s ease';
+  welcome.style.opacity = '0';
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    if (splashTarget === 'app') {
+      document.getElementById('app')?.classList.add('show');
+    } else {
+      const login = document.getElementById('loginScreen');
+      if (login) { login.style.display = 'flex'; }
+    }
+  }, 600);
+};
+
+// Afficher le splash au chargement (10 secondes)
 showSplash('login');
 window.toggleUserMenu = function(e) {
   if (e) e.stopPropagation();
@@ -3633,10 +3680,10 @@ function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
   if (!isAdmin) { navigate('dashboard'); return; }
 
+  const isSuperOnly = currentUConf?.role === 'Superviseur'; // Superviseur mais pas Admin
   const listEl = document.getElementById('adminUserList');
   if (!listEl) return;
 
-  // Load users from DB
   get(ref(db, 'userProfiles')).then(snap => {
     const profiles = snap.val() || {};
     const users = Object.entries(profiles);
@@ -3644,23 +3691,88 @@ function renderAdminPage() {
       listEl.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun utilisateur enregistré</p></div>';
       return;
     }
+
+    // Rôles disponibles selon qui est connecté
+    // Superviseur → peut seulement changer les rôles techniciens
+    // Admin → peut tout changer
+    const ROLES_ADMIN     = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19','Superviseur','Admin'];
+    const ROLES_SUPERVISEUR = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19'];
+    const availableRoles = isSuperOnly ? ROLES_SUPERVISEUR : ROLES_ADMIN;
+
     listEl.innerHTML = `<div class="table-wrap"><table>
-      <thead><tr><th>Nom</th><th>Poste / Rôle</th><th>E-mail</th><th>Téléphone</th><th></th></tr></thead>
-      <tbody>${users.map(([uid, p]) => `<tr>
-        <td style="font-weight:600">
-          ${p.photoURL ? `<img src="${p.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">` : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${(MACHINE_MAP[p.role]||{}).color||'#888'};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
-          ${esc(p.name||'—')}
-        </td>
-        <td><span style="color:${(MACHINE_MAP[p.role]||{}).color||'var(--muted)'}">${esc(p.role||'—')}</span></td>
-        <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
-        <td style="color:var(--muted);font-size:12px">${esc(p.phone||'—')}</td>
-        <td>
-          <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer ce profil">🗑️</button>
-        </td>
-      </tr>`).join('')}</tbody>
+      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th>${!isSuperOnly?'<th>Changer le rôle</th>':''}<th></th></tr></thead>
+      <tbody>${users.map(([uid, p]) => {
+        const color = (MACHINE_MAP[p.role]||{}).color||'#888';
+        const isAdminUser = p.role==='Admin';
+        const isSuperUser = p.role==='Superviseur';
+        const badgeStyle = isAdminUser
+          ? 'background:rgba(251,191,36,.15);color:#f59e0b;border:1px solid rgba(251,191,36,.3);'
+          : isSuperUser
+            ? 'background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);'
+            : `background:${color}15;color:${color};border:1px solid ${color}30;`;
+
+        // Le Superviseur ne peut pas modifier un Admin ou autre Superviseur
+        const canChangeRole = !isSuperOnly;
+
+        return `<tr>
+          <td style="font-weight:600;white-space:nowrap">
+            ${p.photoURL
+              ? `<img src="${p.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">`
+              : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${color};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
+            ${esc(p.name||'—')}
+          </td>
+          <td>
+            <span style="padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;${badgeStyle}">
+              ${isAdminUser?'⚙️ ':isSuperUser?'🔧 ':''}${esc(p.role||'—')}
+            </span>
+          </td>
+          <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
+          ${canChangeRole ? `<td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <select id="roleSelect_${uid}" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--text);cursor:pointer;outline:none">
+                ${availableRoles.map(r=>`<option value="${r}" ${r===p.role?'selected':''}>${r}</option>`).join('')}
+              </select>
+              <button onclick="changeUserRole('${uid}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Appliquer</button>
+            </div>
+          </td>` : '<td></td>'}
+          <td>
+            <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
     </table></div>`;
   });
 }
+
+window.changeUserRole = async function(uid) {
+  const select = document.getElementById('roleSelect_'+uid);
+  if (!select) return;
+  const newRole = select.value;
+
+  // Double sécurité — seul Admin peut attribuer Admin/Superviseur
+  if ((newRole === 'Admin' || newRole === 'Superviseur') && currentUConf?.role !== 'Admin') {
+    alert('⚠️ Seul l\'Administrateur peut attribuer les rôles Admin ou Superviseur.');
+    return;
+  }
+
+  const newColor   = (MACHINE_MAP[newRole]||{}).color || '#888';
+  const newMachine = (MACHINE_MAP[newRole]||{}).machine || null;
+
+  try {
+    await update(ref(db, `userProfiles/${uid}`), { role: newRole });
+    await update(ref(db, `presence/${uid}`), { role: newRole, color: newColor, machine: newMachine||'' });
+    const btn = select.nextElementSibling;
+    if (btn) {
+      const origTxt = btn.textContent;
+      const origStyle = btn.getAttribute('style');
+      btn.textContent = '✅ Appliqué !';
+      btn.style.background = 'rgba(34,197,94,.15)';
+      btn.style.borderColor = 'rgba(34,197,94,.3)';
+      btn.style.color = 'var(--ok)';
+      setTimeout(() => { renderAdminPage(); }, 1200);
+    }
+  } catch(e) { alert('Erreur : ' + e.message); }
+};
 
 window.deleteUserProfile = async function(uid) {
   if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
