@@ -666,7 +666,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
         <option value="Technicien Emballage">📦 Technicien Emballage</option>
         <option value="Technicien B19">⚙️ Technicien B19</option>
-        <option value="Superviseur">⚙️ Superviseur</option>
       </select>
       <div class="login-label">Adresse e-mail</div>
       <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr">
@@ -1132,8 +1131,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
               <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
               <option value="Technicien Emballage">📦 Technicien Emballage</option>
               <option value="Technicien B19">⚙️ Technicien B19</option>
-              <option value="Superviseur">🔧 Superviseur</option>
-              <option value="Admin">⚙️ Admin</option>
             </select>
           </div>
         </div>
@@ -2102,12 +2099,9 @@ function renderDashboard() {
   const allReps = Object.values(allReports);
   const selReps = allReps.filter(r => r.date === selDate);
 
-  // Si rapport trouvé pour la date → l'utiliser, sinon → prendre le dernier rapport connu
+  // Stats haut — uniquement la date sélectionnée, pas de fallback sur d'autres dates
   function getBest(machine) {
-    const forDate = selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
-    if (forDate) return { r: forDate, isLastKnown: false };
-    const lastKnown = allReps.filter(r=>r.machine===machine&&r.date<selDate).sort((a,b)=>b.date>a.date?1:b.date<a.date?-1:0)[0];
-    return lastKnown ? { r: lastKnown, isLastKnown: true } : { r: null, isLastKnown: false };
+    return selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
   }
 
   const soufR = getBest('Soufflage');
@@ -2116,21 +2110,9 @@ function renderDashboard() {
   const embR  = getBest('Emballage');
   const b19R  = getBest('B19');
 
-  function setGs(id, dateId, obj) {
-    const { r, isLastKnown } = obj;
-    const valEl  = document.getElementById(id);
-    const dateEl = document.getElementById(dateId);
-    if (r) {
-      valEl.textContent  = num(r.fields?.prod);
-      valEl.style.opacity = isLastKnown ? '0.55' : '1';
-      dateEl.textContent = isLastKnown ? '📌 ' + formatDate(r.date) : formatDate(r.date);
-      dateEl.style.color = isLastKnown ? 'var(--warn)' : '';
-    } else {
-      valEl.textContent  = '—';
-      valEl.style.opacity = '1';
-      dateEl.textContent = '—';
-      dateEl.style.color = '';
-    }
+  function setGs(id, dateId, r) {
+    document.getElementById(id).textContent = r ? num(r.fields?.prod) : '—';
+    document.getElementById(dateId).textContent = r ? formatDate(r.date) : '—';
   }
   setGs('gs1','gs1date',soufR);
   setGs('gs2','gs2date',rempR);
@@ -2164,22 +2146,14 @@ function renderDashboard() {
   const labelEl = document.getElementById('dashReportDateLabel');
   if (labelEl) labelEl.textContent = formatDate(selDate);
 
-  // Machine cards — rapport du jour ou dernier rapport connu
+  // Machine cards — rapports de la date sélectionnée
   const mc = document.getElementById('machineCards');
   mc.innerHTML = MACHINES.map(m => {
     const mrs = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    let r = mrs[0];
-    let isLastKnown = false;
-    if (!r) {
-      // Prendre le dernier rapport avant la date sélectionnée
-      const prev = allReps.filter(x=>x.machine===m.id&&x.date<selDate).sort((a,b)=>b.date>a.date?1:b.date<a.date?-1:0)[0];
-      if (prev) { r = prev; isLastKnown = true; }
-    }
+    const r = mrs[0];
     const status = r ? r.status : 'none';
     const sc = {ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[status]||'warn';
-    const st = isLastKnown
-      ? `<span style="font-size:10px">📌 ${formatDate(r.date)}</span>`
-      : {ok:'✅ En fonctionnement',warn:'⚠️ Ralentissement',panne:'🔴 En panne',arret:'⏸️ Arrêt',none:'— Pas de rapport'}[status]||'—';
+    const st = {ok:'✅ En fonctionnement',warn:'⚠️ Ralentissement',panne:'🔴 En panne',arret:'⏸️ Arrêt',none:'— Pas de rapport'}[status]||'—';
     const uc = dynamicUsers.find(u=>u.machine===m.id);
     const presOnline = uc ? Object.values(presence).find(p=>p.name===uc.name&&p.online) : null;
     const hasSecondField = m.fields.length > 1;
@@ -3505,7 +3479,6 @@ function renderAdminPage() {
   const listEl = document.getElementById('adminUserList');
   if (!listEl) return;
 
-  // Load users from DB
   get(ref(db, 'userProfiles')).then(snap => {
     const profiles = snap.val() || {};
     const users = Object.entries(profiles);
@@ -3513,20 +3486,49 @@ function renderAdminPage() {
       listEl.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun utilisateur enregistré</p></div>';
       return;
     }
+
+    const ALL_ROLES = [
+      'Technicien Soufflage','Technicien Remplissage','Technicien Étiquette',
+      'Technicien Emballage','Technicien B19','Superviseur','Admin'
+    ];
+
     listEl.innerHTML = `<div class="table-wrap"><table>
-      <thead><tr><th>Nom</th><th>Poste / Rôle</th><th>E-mail</th><th>Téléphone</th><th></th></tr></thead>
-      <tbody>${users.map(([uid, p]) => `<tr>
-        <td style="font-weight:600">
-          ${p.photoURL ? `<img src="${p.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">` : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${(MACHINE_MAP[p.role]||{}).color||'#888'};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
-          ${esc(p.name||'—')}
-        </td>
-        <td><span style="color:${(MACHINE_MAP[p.role]||{}).color||'var(--muted)'}">${esc(p.role||'—')}</span></td>
-        <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
-        <td style="color:var(--muted);font-size:12px">${esc(p.phone||'—')}</td>
-        <td>
-          <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer ce profil">🗑️</button>
-        </td>
-      </tr>`).join('')}</tbody>
+      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th><th>Changer le rôle</th><th></th></tr></thead>
+      <tbody>${users.map(([uid, p]) => {
+        const color = (MACHINE_MAP[p.role]||{}).color||'#888';
+        const isAdminUser = p.role==='Admin';
+        const isSuperUser = p.role==='Superviseur';
+        const badgeStyle = isAdminUser
+          ? 'background:rgba(251,191,36,.15);color:#f59e0b;border:1px solid rgba(251,191,36,.3);'
+          : isSuperUser
+            ? 'background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);'
+            : `background:${color}15;color:${color};border:1px solid ${color}30;`;
+        return `<tr>
+          <td style="font-weight:600;white-space:nowrap">
+            ${p.photoURL
+              ? `<img src="${p.photoURL}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">`
+              : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${color};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
+            ${esc(p.name||'—')}
+          </td>
+          <td>
+            <span style="padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;${badgeStyle}">
+              ${isAdminUser?'⚙️ ':isSuperUser?'🔧 ':''}${esc(p.role||'—')}
+            </span>
+          </td>
+          <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <select id="roleSelect_${uid}" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--text);cursor:pointer;outline:none">
+                ${ALL_ROLES.map(r=>`<option value="${r}" ${r===p.role?'selected':''}>${r}</option>`).join('')}
+              </select>
+              <button onclick="changeUserRole('${uid}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Appliquer</button>
+            </div>
+          </td>
+          <td>
+            <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
     </table></div>`;
   });
 }
@@ -3535,6 +3537,47 @@ window.deleteUserProfile = async function(uid) {
   if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
   await remove(ref(db, `userProfiles/${uid}`));
   renderAdminPage();
+};
+
+window.changeUserRole = async function(uid) {
+  const select = document.getElementById('roleSelect_'+uid);
+  if (!select) return;
+  const newRole = select.value;
+
+  // Sécurité : seul un Admin peut désigner un autre Admin
+  if ((newRole === 'Admin' || newRole === 'Superviseur') && currentUConf?.role !== 'Admin') {
+    alert('⚠️ Seul un Administrateur peut attribuer les rôles Admin ou Superviseur.');
+    return;
+  }
+
+  const newColor = (MACHINE_MAP[newRole]||{}).color || '#888';
+  const newMachine = (MACHINE_MAP[newRole]||{}).machine || null;
+
+  try {
+    await update(ref(db, `userProfiles/${uid}`), {
+      role: newRole,
+    });
+    // Mettre à jour la présence si l'utilisateur est connecté
+    await update(ref(db, `presence/${uid}`), {
+      role: newRole,
+      color: newColor,
+      machine: newMachine || '',
+    });
+    // Feedback visuel
+    const btn = select.nextElementSibling;
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✅ Appliqué !';
+      btn.style.background = 'rgba(34,197,94,.15)';
+      btn.style.borderColor = 'rgba(34,197,94,.3)';
+      btn.style.color = 'var(--ok)';
+      setTimeout(() => {
+        renderAdminPage();
+      }, 1200);
+    }
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
 };
 
 window.resetSection = async function(section, label) {
