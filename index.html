@@ -342,11 +342,6 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 
 /* STATS */
 .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
-@media(max-width:600px){
-  .stats-row { display:flex; overflow-x:auto; gap:10px; padding-bottom:6px; scrollbar-width:none; }
-  .stats-row::-webkit-scrollbar { display:none; }
-  .stats-row .stat-box { min-width:120px; flex-shrink:0; }
-}
 .stat-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; position:relative; }
 .stat-box::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; border-radius:0 0 10px 10px; }
 .stat-box.s1::after{background:var(--soufflage)} .stat-box.s2::after{background:var(--remplissage)}
@@ -477,11 +472,14 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
   #mobileMenuBtn { display:flex !important; }
   .topbar-date { display:none; }
   .chat-input-area { padding:10px 12px !important; }
-  .page { padding:14px 12px; }
-  .page-header { flex-wrap:wrap; gap:8px; }
-  .page-header .btn-row { flex-wrap:wrap; gap:6px; }
-  .machines-grid { grid-template-columns:1fr 1fr !important; }
-  .card { padding:14px; }
+  /* Dashboard mobile */
+  .page { padding:12px 10px !important; }
+  .page-header { flex-wrap:wrap; gap:6px; }
+  .page-header .btn-row { flex-wrap:wrap; gap:6px; width:100%; }
+  .stats-row { display:flex !important; overflow-x:auto; gap:8px; padding-bottom:4px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .stats-row::-webkit-scrollbar { display:none; }
+  .stats-row .stat-box { min-width:110px !important; flex-shrink:0; }
+  .machines-grid { grid-template-columns:1fr 1fr !important; gap:10px !important; }
 }
 
 @keyframes splashPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,.2)} 50%{box-shadow:0 0 28px rgba(255,215,0,.5)} }
@@ -884,59 +882,40 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
-      <div style="
-        background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
-        border-radius:14px;
-        padding:14px 16px;
-        margin-bottom:16px;
-        border:1px solid rgba(99,102,241,.25);
-        box-shadow:0 4px 16px rgba(0,0,0,.15);
-        position:relative;
-        overflow:hidden;
-      ">
-        <!-- Décoration fond -->
+      <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.08);pointer-events:none"></div>
 
-        <!-- Titre mois -->
+        <!-- En-tête mois -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:4px">
           <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.5)">📊 Total mensuel</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5)">📊 Total mensuel</div>
             <div id="totalMoisLabel" style="font-family:var(--font-display);font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">—</div>
           </div>
           <div id="totalJoursTravailles" style="font-size:11px;color:rgba(255,255,255,.4)">—</div>
         </div>
 
-        <!-- Grille 2×2 responsive -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
-
-          <!-- Emballage -->
-          <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,107,53,.2)">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--emballage);font-weight:700;margin-bottom:6px">📦 Emballage</div>
-            <div id="totalEmbDash" style="font-family:var(--font-display);font-size:clamp(16px,4vw,26px);font-weight:900;color:var(--emballage);line-height:1">—</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px">cartons</div>
+        <!-- Grille 4 cases — s'adapte mobile et desktop -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="background:rgba(255,107,53,.1);border-radius:10px;padding:10px;border:1px solid rgba(255,107,53,.2)">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--emballage);font-weight:700;margin-bottom:5px">📦 Emballage</div>
+            <div id="totalEmbDash" style="font-family:var(--font-display);font-size:clamp(15px,3.5vw,26px);font-weight:900;color:var(--emballage);line-height:1;word-break:break-all">—</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:3px">cartons</div>
           </div>
-
-          <!-- B19 -->
-          <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(168,85,247,.2)">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--b19);font-weight:700;margin-bottom:6px">⚙️ B19</div>
-            <div id="totalB19Dash" style="font-family:var(--font-display);font-size:clamp(16px,4vw,26px);font-weight:900;color:var(--b19);line-height:1">—</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px">production</div>
+          <div style="background:rgba(168,85,247,.1);border-radius:10px;padding:10px;border:1px solid rgba(168,85,247,.2)">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--b19);font-weight:700;margin-bottom:5px">⚙️ B19</div>
+            <div id="totalB19Dash" style="font-family:var(--font-display);font-size:clamp(15px,3.5vw,26px);font-weight:900;color:var(--b19);line-height:1;word-break:break-all">—</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:3px">production</div>
           </div>
-
-          <!-- Total combiné -->
-          <div style="background:rgba(165,180,252,.1);border-radius:10px;padding:10px 12px;border:1px solid rgba(165,180,252,.25)">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#a5b4fc;font-weight:700;margin-bottom:6px">🔢 Total</div>
-            <div id="totalCombineDash" style="font-family:var(--font-display);font-size:clamp(16px,4vw,28px);font-weight:900;color:#a5b4fc;line-height:1">—</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px">combiné</div>
+          <div style="background:rgba(165,180,252,.1);border-radius:10px;padding:10px;border:1px solid rgba(165,180,252,.2)">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#a5b4fc;font-weight:700;margin-bottom:5px">🔢 Total</div>
+            <div id="totalCombineDash" style="font-family:var(--font-display);font-size:clamp(15px,3.5vw,28px);font-weight:900;color:#a5b4fc;line-height:1;word-break:break-all">—</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:3px">combiné</div>
           </div>
-
-          <!-- Déchets -->
-          <div style="background:rgba(248,113,113,.08);border-radius:10px;padding:10px 12px;border:1px solid rgba(248,113,113,.2)">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#f87171;font-weight:700;margin-bottom:6px">🗑️ Déchets</div>
-            <div id="totalDechetsDash" style="font-family:var(--font-display);font-size:clamp(16px,4vw,26px);font-weight:900;color:#f87171;line-height:1">—</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px">kg total</div>
+          <div style="background:rgba(248,113,113,.1);border-radius:10px;padding:10px;border:1px solid rgba(248,113,113,.2)">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#f87171;font-weight:700;margin-bottom:5px">🗑️ Déchets</div>
+            <div id="totalDechetsDash" style="font-family:var(--font-display);font-size:clamp(15px,3.5vw,26px);font-weight:900;color:#f87171;line-height:1;word-break:break-all">—</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:3px">kg total</div>
           </div>
-
         </div>
       </div>
       <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
