@@ -612,11 +612,11 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         color:rgba(255,255,255,.4);
         margin-top:8px;
         letter-spacing:.05em;
-      ">Patientez 30 secondes...</div>
+      ">Patientez 10 secondes...</div>
     </div>
 
-    <!-- Bouton Continuer (désactivé au début) -->
-    <button id="splashBtn" onclick="closeSplash()" disabled style="
+    <!-- Bouton Continuer -->
+    <button id="splashBtn" onclick="goToWelcome()" disabled style="
       width:100%; padding:13px;
       background:rgba(255,215,0,.15);
       border:1.5px solid rgba(255,215,0,.3);
@@ -628,6 +628,49 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       cursor:not-allowed;
       transition:all .4s;
     ">CONTINUER →</button>
+  </div>
+</div>
+
+<!-- ÉCRAN BIENVENUE ALBAN ELOH -->
+<div id="welcomeScreen" style="display:none;position:fixed;inset:0;z-index:9998;background:linear-gradient(135deg,#0a0c14 0%,#0d1220 40%,#060810 100%);align-items:center;justify-content:center;padding:28px">
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,153,204,.12),transparent 70%);top:-80px;right:-80px"></div>
+    <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,200,150,.08),transparent 70%);bottom:-60px;left:-40px"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#0ff;border-radius:50%;opacity:.5;top:20%;left:10%"></div>
+    <div style="position:absolute;width:3px;height:3px;background:#0cf;border-radius:50%;opacity:.4;top:60%;right:15%"></div>
+    <div style="position:absolute;width:2px;height:2px;background:#0ff;border-radius:50%;opacity:.3;bottom:30%;left:30%"></div>
+    <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.05" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="30%" x2="100%" y2="30%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="0" y1="70%" x2="100%" y2="70%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="30%" y1="0" x2="30%" y2="100%" stroke="#0099cc" stroke-width="1"/>
+      <line x1="70%" y1="0" x2="70%" y2="100%" stroke="#0099cc" stroke-width="1"/>
+    </svg>
+  </div>
+  <div style="max-width:520px;width:100%;text-align:center;position:relative;animation:fadeIn .8s ease">
+    <div style="margin-bottom:28px;position:relative;display:inline-block">
+      <div style="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,#0099cc,#005580);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto;box-shadow:0 0 40px rgba(0,153,204,.4),0 0 80px rgba(0,153,204,.15)">🛡️</div>
+      <div style="position:absolute;inset:-4px;border-radius:28px;border:1px solid rgba(0,153,204,.4);animation:pulse 2s infinite"></div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.25em;color:rgba(0,204,255,.7);text-transform:uppercase;margin-bottom:14px">Bienvenue dans</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;letter-spacing:.06em;color:#ffffff;line-height:1.15;margin-bottom:8px;text-shadow:0 0 40px rgba(0,153,204,.5)">LA TECHNOLOGIE DE<br><span style="color:#00ccff;text-shadow:0 0 20px rgba(0,204,255,.8)">ALBAN ELOH</span></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:20px auto;max-width:300px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(0,204,255,.5))"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00ccff;box-shadow:0 0 8px #00ccff"></div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,204,255,.5),transparent)"></div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,4vw,19px);font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:32px">
+      SPÉCIALISTE EN <span style="color:#00ccff;font-weight:800">CYBER SÉCURITÉ</span><br>
+      ET EN <span style="color:#00ccff;font-weight:800">DATA TECHNOLOGY</span>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">🔐 Cybersécurité</span>
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">📊 Data Technology</span>
+      <span style="background:rgba(0,153,204,.15);border:1px solid rgba(0,153,204,.3);color:#0cf;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600">🌐 Innovation</span>
+    </div>
+    <button onclick="closeWelcome()" style="padding:15px 48px;background:linear-gradient(135deg,#0099cc,#0066aa);border:none;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;letter-spacing:.1em;color:#fff;cursor:pointer;box-shadow:0 4px 24px rgba(0,153,204,.5);transition:all .3s;text-transform:uppercase" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      ACCÉDER À L'APPLICATION →
+    </button>
+    <div style="margin-top:24px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em;text-transform:uppercase">Alban Technology A.E.T © 2026</div>
   </div>
 </div>
 
@@ -3318,7 +3361,7 @@ function renderAnnounceBanner(data) {
 }
 
 // ══════════ SPLASH SCREEN ══════════
-const SPLASH_DURATION = 30;
+const SPLASH_DURATION = 10;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
 
@@ -3393,17 +3436,51 @@ window.closeSplash = function() {
   setTimeout(() => {
     splash.style.display = 'none';
     if (splashTarget === 'app') {
-      // Après connexion → montrer l'app
       document.getElementById('app')?.classList.add('show');
     } else {
-      // Avant connexion → montrer le login
       const login = document.getElementById('loginScreen');
       if (login) { login.style.display = 'flex'; }
     }
   }, 700);
 };
 
-// Afficher le splash au chargement de la page (avant connexion)
+window.goToWelcome = function() {
+  if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
+  const splash = document.getElementById('splashScreen');
+  const welcome = document.getElementById('welcomeScreen');
+  if (!splash) return;
+  splash.style.transition = 'opacity .6s ease';
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    if (welcome) {
+      welcome.style.display = 'flex';
+      welcome.style.opacity = '0';
+      welcome.style.transition = 'opacity .8s ease';
+      setTimeout(() => { welcome.style.opacity = '1'; }, 30);
+    } else {
+      closeSplash();
+    }
+  }, 600);
+};
+
+window.closeWelcome = function() {
+  const welcome = document.getElementById('welcomeScreen');
+  if (!welcome) return;
+  welcome.style.transition = 'opacity .6s ease';
+  welcome.style.opacity = '0';
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    if (splashTarget === 'app') {
+      document.getElementById('app')?.classList.add('show');
+    } else {
+      const login = document.getElementById('loginScreen');
+      if (login) { login.style.display = 'flex'; }
+    }
+  }, 600);
+};
+
+// Afficher le splash au chargement (10 secondes)
 showSplash('login');
 window.toggleUserMenu = function(e) {
   if (e) e.stopPropagation();
@@ -3476,6 +3553,7 @@ function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
   if (!isAdmin) { navigate('dashboard'); return; }
 
+  const isSuperOnly = currentUConf?.role === 'Superviseur'; // Superviseur mais pas Admin
   const listEl = document.getElementById('adminUserList');
   if (!listEl) return;
 
@@ -3487,13 +3565,15 @@ function renderAdminPage() {
       return;
     }
 
-    const ALL_ROLES = [
-      'Technicien Soufflage','Technicien Remplissage','Technicien Étiquette',
-      'Technicien Emballage','Technicien B19','Superviseur','Admin'
-    ];
+    // Rôles disponibles selon qui est connecté
+    // Superviseur → peut seulement changer les rôles techniciens
+    // Admin → peut tout changer
+    const ROLES_ADMIN     = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19','Superviseur','Admin'];
+    const ROLES_SUPERVISEUR = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19'];
+    const availableRoles = isSuperOnly ? ROLES_SUPERVISEUR : ROLES_ADMIN;
 
     listEl.innerHTML = `<div class="table-wrap"><table>
-      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th><th>Changer le rôle</th><th></th></tr></thead>
+      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th>${!isSuperOnly?'<th>Changer le rôle</th>':''}<th></th></tr></thead>
       <tbody>${users.map(([uid, p]) => {
         const color = (MACHINE_MAP[p.role]||{}).color||'#888';
         const isAdminUser = p.role==='Admin';
@@ -3503,6 +3583,10 @@ function renderAdminPage() {
           : isSuperUser
             ? 'background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);'
             : `background:${color}15;color:${color};border:1px solid ${color}30;`;
+
+        // Le Superviseur ne peut pas modifier un Admin ou autre Superviseur
+        const canChangeRole = !isSuperOnly;
+
         return `<tr>
           <td style="font-weight:600;white-space:nowrap">
             ${p.photoURL
@@ -3516,14 +3600,14 @@ function renderAdminPage() {
             </span>
           </td>
           <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
-          <td>
+          ${canChangeRole ? `<td>
             <div style="display:flex;align-items:center;gap:8px">
               <select id="roleSelect_${uid}" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--text);cursor:pointer;outline:none">
-                ${ALL_ROLES.map(r=>`<option value="${r}" ${r===p.role?'selected':''}>${r}</option>`).join('')}
+                ${availableRoles.map(r=>`<option value="${r}" ${r===p.role?'selected':''}>${r}</option>`).join('')}
               </select>
               <button onclick="changeUserRole('${uid}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Appliquer</button>
             </div>
-          </td>
+          </td>` : '<td></td>'}
           <td>
             <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>
           </td>
@@ -3533,51 +3617,40 @@ function renderAdminPage() {
   });
 }
 
-window.deleteUserProfile = async function(uid) {
-  if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
-  await remove(ref(db, `userProfiles/${uid}`));
-  renderAdminPage();
-};
-
 window.changeUserRole = async function(uid) {
   const select = document.getElementById('roleSelect_'+uid);
   if (!select) return;
   const newRole = select.value;
 
-  // Sécurité : seul un Admin peut désigner un autre Admin
+  // Double sécurité — seul Admin peut attribuer Admin/Superviseur
   if ((newRole === 'Admin' || newRole === 'Superviseur') && currentUConf?.role !== 'Admin') {
-    alert('⚠️ Seul un Administrateur peut attribuer les rôles Admin ou Superviseur.');
+    alert('⚠️ Seul l\'Administrateur peut attribuer les rôles Admin ou Superviseur.');
     return;
   }
 
-  const newColor = (MACHINE_MAP[newRole]||{}).color || '#888';
+  const newColor   = (MACHINE_MAP[newRole]||{}).color || '#888';
   const newMachine = (MACHINE_MAP[newRole]||{}).machine || null;
 
   try {
-    await update(ref(db, `userProfiles/${uid}`), {
-      role: newRole,
-    });
-    // Mettre à jour la présence si l'utilisateur est connecté
-    await update(ref(db, `presence/${uid}`), {
-      role: newRole,
-      color: newColor,
-      machine: newMachine || '',
-    });
-    // Feedback visuel
+    await update(ref(db, `userProfiles/${uid}`), { role: newRole });
+    await update(ref(db, `presence/${uid}`), { role: newRole, color: newColor, machine: newMachine||'' });
     const btn = select.nextElementSibling;
     if (btn) {
-      const orig = btn.textContent;
+      const origTxt = btn.textContent;
+      const origStyle = btn.getAttribute('style');
       btn.textContent = '✅ Appliqué !';
       btn.style.background = 'rgba(34,197,94,.15)';
       btn.style.borderColor = 'rgba(34,197,94,.3)';
       btn.style.color = 'var(--ok)';
-      setTimeout(() => {
-        renderAdminPage();
-      }, 1200);
+      setTimeout(() => { renderAdminPage(); }, 1200);
     }
-  } catch(e) {
-    alert('Erreur : ' + e.message);
-  }
+  } catch(e) { alert('Erreur : ' + e.message); }
+};
+
+window.deleteUserProfile = async function(uid) {
+  if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
+  await remove(ref(db, `userProfiles/${uid}`));
+  renderAdminPage();
 };
 
 window.resetSection = async function(section, label) {
