@@ -17,123 +17,94 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* ── THÈME 1 : BLANC ÉPURÉ (défaut) ── */
-  --bg:      #f5f7fa;
-  --bg2:     #ffffff;
-  --surface: #eef1f6;
-  --card:    #ffffff;
-  --border:  #dde3ed;
-  --border2: #c5cfe0;
-  --text:    #1e2840;
-  --muted:   #6b7a99;
-  --muted2:  #9aa5be;
-  --soufflage:   #0ea5e9;
-  --remplissage: #10b981;
+  /* ── THÈME SOMBRE (défaut) ── */
+  --bg:      #0f1117;
+  --bg2:     #161b25;
+  --surface: #1e2535;
+  --card:    #1a2030;
+  --border:  rgba(255,255,255,.08);
+  --border2: rgba(255,255,255,.14);
+  --text:    #e8edf5;
+  --muted:   #7a8caa;
+  --muted2:  #5a6b85;
+  --soufflage:   #00b8e6;
+  --remplissage: #00d97e;
   --etiquette:   #f59e0b;
   --emballage:   #f97316;
-  --b19:         #8b5cf6;
+  --b19:         #a855f7;
   --admin:       #7c3aed;
-  --ok:      #10b981;
+  --ok:      #22c55e;
   --warn:    #f59e0b;
   --danger:  #ef4444;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
-  --bg-image: none;
 }
 
-/* ── THÈME 2 : CIEL AZUR ── */
-body.theme-azure {
-  --bg:#e8f4fd; --bg2:#ffffff; --surface:#d6eaf8; --card:rgba(255,255,255,.93);
-  --border:rgba(14,165,233,.2); --border2:rgba(14,165,233,.35);
-  --text:#0c2340; --muted:#4a7fa5; --muted2:#80aec8;
-  --soufflage:#0284c7; --remplissage:#059669; --etiquette:#d97706; --emballage:#ea580c; --b19:#7c3aed;
-  --ok:#059669; --warn:#d97706; --danger:#dc2626;
-  --bg-image:linear-gradient(160deg,#e0f2fe 0%,#bae6fd 40%,#e0f2fe 70%,#f0f9ff 100%);
+/* ── THÈME CLAIR ── */
+body.theme-light {
+  --bg:      #f0f4f8;
+  --bg2:     #ffffff;
+  --surface: #f8f9fb;
+  --card:    #ffffff;
+  --border:  #e2e6ed;
+  --border2: #c8d0dc;
+  --text:    #1a2030;
+  --muted:   #7a8599;
+  --muted2:  #9aa3b5;
+  --soufflage:   #0099cc;
+  --remplissage: #00aa66;
+  --etiquette:   #cc8800;
+  --emballage:   #e05520;
+  --b19:         #8833cc;
+  --ok:      #16a34a;
+  --warn:    #d97706;
+  --danger:  #dc2626;
 }
-/* ── THÈME 3 : PÊCHE ROSÉE ── */
-body.theme-peach {
-  --bg:#fff5f0; --bg2:#ffffff; --surface:#ffe8dc; --card:rgba(255,255,255,.93);
-  --border:rgba(251,113,57,.2); --border2:rgba(251,113,57,.35);
-  --text:#3d1505; --muted:#a05030; --muted2:#c88060;
-  --soufflage:#ef4444; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#8b5cf6;
-  --ok:#10b981; --warn:#f59e0b; --danger:#dc2626;
-  --bg-image:linear-gradient(160deg,#fff5f0 0%,#ffe4d6 35%,#ffd6c8 65%,#fff0e8 100%);
+
+/* ── THÈME OCEAN ── */
+body.theme-ocean {
+  --bg:      #071a2e;
+  --bg2:     #0d2540;
+  --surface: #0f2d4a;
+  --card:    #0d2640;
+  --border:  rgba(0,180,255,.15);
+  --border2: rgba(0,180,255,.25);
+  --text:    #d0eaff;
+  --muted:   #5b8db8;
+  --muted2:  #3d6e99;
+  --soufflage:   #00d4ff;
+  --remplissage: #00e5a0;
+  --etiquette:   #ffd166;
+  --emballage:   #ff8c42;
+  --b19:         #c084fc;
+  --ok:      #00e5a0;
+  --warn:    #ffd166;
+  --danger:  #ff4d6d;
 }
-/* ── THÈME 4 : LAVANDE ── */
-body.theme-lavender {
-  --bg:#f5f0ff; --bg2:#ffffff; --surface:#ede5ff; --card:rgba(255,255,255,.93);
-  --border:rgba(139,92,246,.2); --border2:rgba(139,92,246,.35);
-  --text:#1e0a3c; --muted:#7055a0; --muted2:#a085c8;
-  --soufflage:#7c3aed; --remplissage:#0ea5e9; --etiquette:#d97706; --emballage:#db2777; --b19:#6366f1;
-  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
-  --bg-image:linear-gradient(160deg,#f3e8ff 0%,#e9d5ff 35%,#ddd6fe 65%,#f5f0ff 100%);
-}
-/* ── THÈME 5 : MENTHE FRAÎCHE ── */
-body.theme-mint {
-  --bg:#f0fdf4; --bg2:#ffffff; --surface:#dcfce7; --card:rgba(255,255,255,.93);
-  --border:rgba(16,185,129,.2); --border2:rgba(16,185,129,.35);
-  --text:#052e16; --muted:#3a7d55; --muted2:#6aab85;
-  --soufflage:#0ea5e9; --remplissage:#059669; --etiquette:#ca8a04; --emballage:#ea580c; --b19:#7c3aed;
-  --ok:#059669; --warn:#ca8a04; --danger:#dc2626;
-  --bg-image:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 35%,#bbf7d0 65%,#f0fdf4 100%);
-}
-/* ── THÈME 6 : SOLEIL D'OR ── */
-body.theme-gold {
-  --bg:#fffbeb; --bg2:#ffffff; --surface:#fef3c7; --card:rgba(255,255,255,.93);
-  --border:rgba(245,158,11,.25); --border2:rgba(245,158,11,.4);
-  --text:#292203; --muted:#926f0a; --muted2:#c8a030;
-  --soufflage:#0ea5e9; --remplissage:#10b981; --etiquette:#d97706; --emballage:#ef4444; --b19:#7c3aed;
-  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
-  --bg-image:linear-gradient(160deg,#fffbeb 0%,#fef3c7 35%,#fde68a 65%,#fffbeb 100%);
-}
-/* ── THÈME 7 : CORAIL TROPICAL ── */
-body.theme-coral {
-  --bg:#fff1f2; --bg2:#ffffff; --surface:#ffe4e6; --card:rgba(255,255,255,.93);
-  --border:rgba(244,63,94,.2); --border2:rgba(244,63,94,.35);
-  --text:#3b0a14; --muted:#9f4055; --muted2:#c87080;
-  --soufflage:#f43f5e; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#8b5cf6;
-  --ok:#10b981; --warn:#f59e0b; --danger:#dc2626;
-  --bg-image:linear-gradient(160deg,#fff1f2 0%,#fecdd3 35%,#fda4af 55%,#ffe4e6 100%);
-}
-/* ── THÈME 8 : ARDOISE BLEUE ── */
-body.theme-slate {
-  --bg:#f1f5f9; --bg2:#ffffff; --surface:#e2e8f0; --card:rgba(255,255,255,.94);
-  --border:rgba(100,116,139,.2); --border2:rgba(100,116,139,.35);
-  --text:#0f172a; --muted:#475569; --muted2:#94a3b8;
-  --soufflage:#0ea5e9; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#6366f1;
-  --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
-  --bg-image:linear-gradient(160deg,#f8fafc 0%,#e2e8f0 40%,#cbd5e1 70%,#f1f5f9 100%);
-}
-/* ── THÈME 9 : AURORE ROSE-VIOLET ── */
-body.theme-aurora {
-  --bg:#fdf2f8; --bg2:#ffffff; --surface:#fce7f3; --card:rgba(255,255,255,.93);
-  --border:rgba(219,39,119,.18); --border2:rgba(219,39,119,.3);
-  --text:#3b0a28; --muted:#9d3873; --muted2:#c868a0;
-  --soufflage:#db2777; --remplissage:#0ea5e9; --etiquette:#d97706; --emballage:#f97316; --b19:#7c3aed;
-  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
-  --bg-image:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 25%,#f3e8ff 55%,#ede9fe 80%,#fdf2f8 100%);
-}
-/* ── THÈME 10 : NATURE PRINTANIÈRE ── */
-body.theme-spring {
-  --bg:#f7fef4; --bg2:#ffffff; --surface:#ecfccb; --card:rgba(255,255,255,.93);
-  --border:rgba(132,204,22,.22); --border2:rgba(132,204,22,.38);
-  --text:#1a2e05; --muted:#4d7c0f; --muted2:#84a840;
-  --soufflage:#0ea5e9; --remplissage:#16a34a; --etiquette:#ca8a04; --emballage:#ea580c; --b19:#7c3aed;
-  --ok:#16a34a; --warn:#ca8a04; --danger:#dc2626;
-  --bg-image:linear-gradient(160deg,#f7fef4 0%,#ecfccb 35%,#d9f99d 65%,#f7fef4 100%);
+
+/* ── THÈME FORÊT ── */
+body.theme-forest {
+  --bg:      #0a140d;
+  --bg2:     #111e14;
+  --surface: #162819;
+  --card:    #132016;
+  --border:  rgba(34,197,94,.12);
+  --border2: rgba(34,197,94,.22);
+  --text:    #d4f0dc;
+  --muted:   #5a8c68;
+  --muted2:  #3d6649;
+  --soufflage:   #4ade80;
+  --remplissage: #22d3ee;
+  --etiquette:   #fbbf24;
+  --emballage:   #fb923c;
+  --b19:         #c084fc;
+  --ok:      #4ade80;
+  --warn:    #fbbf24;
+  --danger:  #f87171;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
-body {
-  font-family:var(--font-body);
-  background:var(--bg);
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  color:var(--text);
-  font-size:15px;
-}
+body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
 
 /* ══ FORCER MODE DESKTOP SUR MOBILE ══
    Le viewport meta width=1024 est ignoré par Chrome Android.
@@ -1274,6 +1245,22 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <div id="pwdErr" style="color:var(--danger);font-size:12px"></div>
         </div>
       </div>
+
+      <!-- NOTIFICATIONS PUSH -->
+      <div class="card" style="border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.03)">
+        <div class="card-title" style="color:var(--ok)">🔔 Notifications Push</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+          Recevez des alertes sur votre téléphone même quand l'application est fermée.
+        </p>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+          <div id="pushStatusText" style="font-size:13px;font-weight:600;color:var(--danger)">❌ Notifications non activées sur cet appareil</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">L'administrateur doit d'abord activer les notifications, puis cliquez le bouton ci-dessous.</div>
+        </div>
+        <button id="pushToggleBtn" onclick="userActivatePush()"
+          style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--ok);border-radius:10px;padding:11px 20px;cursor:pointer;font-size:13px;font-weight:700;width:100%;transition:all .2s">
+          🔔 Recevoir les notifications sur ce téléphone
+        </button>
+      </div>
     </div>
 
     <!-- PAGE ÉQUIPE -->
@@ -1398,162 +1385,114 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
 
       <!-- 🎨 THÈME DE L'APPLICATION -->
-      <div class="card" style="border-color:rgba(14,165,233,.25);background:rgba(14,165,233,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--soufflage)">🎨 Thème de l'application</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">10 thèmes modernes — choisissez le fond visuel pour tous les utilisateurs.</p>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+      <div class="card" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04);margin-bottom:16px">
+        <div class="card-title" style="color:var(--b19)">🎨 Thème de l'application</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le thème visuel pour tous les utilisateurs.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
 
-          <div onclick="applyTheme('default')" id="theme-default" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#eef1f6,#f5f7fa);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
+          <!-- Sombre -->
+          <div onclick="applyTheme('dark')" id="theme-dark" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid var(--b19);box-shadow:0 0 0 3px rgba(168,85,247,.2)">
+            <div style="background:linear-gradient(135deg,#0f1117,#161b25);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
               </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+              <div style="height:4px;background:#1e2535;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#1a2030;border-radius:2px;width:70%"></div>
             </div>
-            <div style="background:#f5f7fa;padding:7px 10px;font-size:11px;font-weight:700;color:#0ea5e9;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🤍 Épuré <span id="check-default" style="color:#10b981;display:none">✓</span>
+            <div style="background:#161b25;padding:8px 12px;font-size:12px;font-weight:700;color:#a855f7;display:flex;align-items:center;justify-content:space-between">
+              🌙 Sombre <span id="check-dark" style="color:#22c55e">✓</span>
             </div>
           </div>
 
-          <div onclick="applyTheme('azure')" id="theme-azure" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#bae6fd,#e0f2fe);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0284c7"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#059669"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
+          <!-- Clair -->
+          <div onclick="applyTheme('light')" id="theme-light" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#f0f4f8,#ffffff);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
               </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+              <div style="height:4px;background:#e2e6ed;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#f8f9fb;border-radius:2px;width:70%;border:1px solid #e2e6ed"></div>
             </div>
-            <div style="background:#e0f2fe;padding:7px 10px;font-size:11px;font-weight:700;color:#0284c7;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              💙 Ciel Azur <span id="check-azure" style="color:#059669;display:none">✓</span>
+            <div style="background:#f0f4f8;padding:8px 12px;font-size:12px;font-weight:700;color:#0099cc;display:flex;align-items:center;justify-content:space-between">
+              ☀️ Clair <span id="check-light" style="color:#22c55e;display:none">✓</span>
             </div>
           </div>
 
-          <div onclick="applyTheme('peach')" id="theme-peach" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#ffd6c8,#fff5f0);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#ef4444"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
+          <!-- Océan -->
+          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#071a2e,#0d2540);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffd166"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#00e5a0"></div>
               </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+              <div style="height:4px;background:#0f2d4a;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#0d2640;border-radius:2px;width:70%"></div>
             </div>
-            <div style="background:#fff5f0;padding:7px 10px;font-size:11px;font-weight:700;color:#ea580c;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🍑 Pêche Rosée <span id="check-peach" style="color:#10b981;display:none">✓</span>
+            <div style="background:#071a2e;padding:8px 12px;font-size:12px;font-weight:700;color:#00d4ff;display:flex;align-items:center;justify-content:space-between">
+              🌊 Océan <span id="check-ocean" style="color:#00e5a0;display:none">✓</span>
             </div>
           </div>
 
-          <div onclick="applyTheme('lavender')" id="theme-lavender" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#ddd6fe,#f5f0ff);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#7c3aed"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
+          <!-- Forêt -->
+          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0a140d,#111e14);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#f87171"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#4ade80"></div>
               </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+              <div style="height:4px;background:#162819;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#132016;border-radius:2px;width:70%"></div>
             </div>
-            <div style="background:#f5f0ff;padding:7px 10px;font-size:11px;font-weight:700;color:#7c3aed;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              💜 Lavande <span id="check-lavender" style="color:#10b981;display:none">✓</span>
+            <div style="background:#0a140d;padding:8px 12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;justify-content:space-between">
+              🌿 Forêt <span id="check-forest" style="color:#4ade80;display:none">✓</span>
             </div>
           </div>
 
-          <div onclick="applyTheme('mint')" id="theme-mint" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#bbf7d0,#f0fdf4);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#059669"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#ca8a04"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#f0fdf4;padding:7px 10px;font-size:11px;font-weight:700;color:#059669;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🌿 Menthe <span id="check-mint" style="color:#16a34a;display:none">✓</span>
-            </div>
-          </div>
-
-          <div onclick="applyTheme('gold')" id="theme-gold" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#fde68a,#fffbeb);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#fffbeb;padding:7px 10px;font-size:11px;font-weight:700;color:#d97706;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              ☀️ Soleil d'Or <span id="check-gold" style="color:#10b981;display:none">✓</span>
-            </div>
-          </div>
-
-          <div onclick="applyTheme('coral')" id="theme-coral" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#fda4af,#fff1f2);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#f43f5e"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#fff1f2;padding:7px 10px;font-size:11px;font-weight:700;color:#f43f5e;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🪸 Corail <span id="check-coral" style="color:#10b981;display:none">✓</span>
-            </div>
-          </div>
-
-          <div onclick="applyTheme('slate')" id="theme-slate" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#cbd5e1,#f1f5f9);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#f1f5f9;padding:7px 10px;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🩶 Ardoise <span id="check-slate" style="color:#10b981;display:none">✓</span>
-            </div>
-          </div>
-
-          <div onclick="applyTheme('aurora')" id="theme-aurora" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#e9d5ff,#fdf2f8);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#db2777"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#fdf2f8;padding:7px 10px;font-size:11px;font-weight:700;color:#db2777;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🌸 Aurore <span id="check-aurora" style="color:#10b981;display:none">✓</span>
-            </div>
-          </div>
-
-          <div onclick="applyTheme('spring')" id="theme-spring" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-            <div style="height:52px;background:linear-gradient(135deg,#d9f99d,#f7fef4);position:relative">
-              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
-                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#16a34a"></div>
-                <div style="width:7px;height:7px;border-radius:50%;background:#ca8a04"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
-              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
-            </div>
-            <div style="background:#f7fef4;padding:7px 10px;font-size:11px;font-weight:700;color:#4d7c0f;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
-              🌱 Printemps <span id="check-spring" style="color:#16a34a;display:none">✓</span>
-            </div>
-          </div>
         </div>
       </div>
+
+      <!-- 🔔 NOTIFICATIONS PUSH -->
+      <div class="card" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.03);margin-bottom:16px">
+        <div class="card-title" style="color:var(--ok)">🔔 Notifications Push</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+          Activez les notifications pour envoyer des alertes sur le téléphone de tous les utilisateurs — même quand l'application est fermée.
+        </p>
+
+        <!-- Statut global -->
+        <div id="adminPushStatusCard" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div id="adminPushDot" style="width:10px;height:10px;border-radius:50%;background:var(--danger);flex-shrink:0"></div>
+            <div id="adminPushStatus" style="font-size:13px;font-weight:600;color:var(--danger)">❌ Notifications désactivées</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted)">Quand activées, tous les utilisateurs recevront les alertes sur leur téléphone.</div>
+        </div>
+
+        <!-- Bouton activer/désactiver -->
+        <button id="adminPushBtn" onclick="adminActivatePush()"
+          style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--ok);border-radius:10px;padding:12px 20px;cursor:pointer;font-size:13px;font-weight:700;width:100%;transition:all .2s;margin-bottom:14px">
+          🔔 Activer les notifications pour tous
+        </button>
+
+        <!-- Envoyer une notif manuelle -->
+        <div style="border-top:1px solid var(--border);padding-top:14px">
+          <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:10px">📤 Envoyer une notification maintenant</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input type="text" id="pushTitle" class="form-input" placeholder="Titre (ex: Réunion urgente)" style="font-size:13px">
+            <input type="text" id="pushBody" class="form-input" placeholder="Message (ex: Tous en salle B à 14h)" style="font-size:13px">
+            <button onclick="sendManualPush()" class="btn btn-primary btn-sm" style="width:fit-content">
+              📤 Envoyer à tous
+            </button>
+          </div>
+          <div id="pushSendOk" style="display:none;color:var(--ok);font-size:12px;font-weight:600;margin-top:8px">✅ Notification envoyée !</div>
+        </div>
+      </div>
+
       <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.03);margin-bottom:16px">
         <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera immédiatement en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.</p>
@@ -1825,6 +1764,8 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getMessaging, getToken, onMessage }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 // ══════════ FIREBASE CONFIG ══════════
 const firebaseConfig = {
@@ -1840,6 +1781,8 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
+let messaging = null;
+try { messaging = getMessaging(app); } catch(e) { console.warn('FCM not available:', e); }
 
 // ══════════ SAFETY TIMEOUT ══════════
 setTimeout(() => {
@@ -2134,6 +2077,10 @@ onAuthStateChanged(auth, async user => {
     // L'app se charge en arrière-plan pendant ce temps
     initApp();
     showSplash('app');
+    // Initialiser les notifications push (ne demande la permission que si déjà accordée)
+    if (Notification.permission === 'granted') {
+      setTimeout(() => initPushNotifications(), 2000);
+    }
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
@@ -2582,6 +2529,12 @@ window.saveReport = async function() {
       userId: currentUser.uid, name: currentUConf.name, color: currentUConf.color,
       text: `🚨 ALERTE PANNE — Machine ${machine} — ${note||'Vérifier immédiatement'}`,
     });
+    // 🔔 Notification Push à tous
+    await sendPushToAll(
+      `🚨 PANNE — ${machine}`,
+      `Signalée par ${currentUConf.name}. ${note||'Vérifier immédiatement.'}`,
+      { type: 'panne', machine }
+    );
   }
 
   // Message rapport supprimé pour ne pas polluer le chat
@@ -3548,6 +3501,13 @@ window.publishAnnouncement = async function() {
       author: currentUConf?.name || 'Admin',
       ts: Date.now(), active: true,
     });
+    // 🔔 Notification Push à tous
+    const icons = { info:'ℹ️', urgent:'🚨', rapport:'📋', succes:'✅' };
+    await sendPushToAll(
+      `${icons[currentAnnounceType]||'📢'} ${title || 'Nouvelle annonce'}`,
+      msg || 'Consultez le tableau de bord',
+      '📢'
+    );
     const ok = document.getElementById('announceOk');
     ok.style.display='block';
     setTimeout(()=>{ ok.style.display='none'; }, 3000);
@@ -3584,38 +3544,246 @@ function renderAnnounceBanner(data) {
     </div>`;
 }
 
-// ══════════ GESTION DES THÈMES ══════════
-const THEMES = ['default','azure','peach','lavender','mint','gold','coral','slate','aurora','spring'];
+// ══════════ NOTIFICATIONS PUSH (FCM) ══════════
+const VAPID_KEY = 'BGxLTxYTuXqnYl3CuNkioi2wOj4MYqPdnX-x6qpm6lyHxAOlO8Gvpz5L4OKxGPf_k5NIU3-uJ2OOkJwIedyOITE';
 
-const THEME_ACCENTS = {
-  default:  '#0ea5e9',
-  azure:    '#0284c7',
-  peach:    '#ea580c',
-  lavender: '#7c3aed',
-  mint:     '#059669',
-  gold:     '#d97706',
-  coral:    '#f43f5e',
-  slate:    '#475569',
-  aurora:   '#db2777',
-  spring:   '#4d7c0f',
+let pushEnabled = false;
+let fcmToken    = null;
+
+// ── Enregistrer le token FCM de cet appareil ──
+async function registerFCMToken() {
+  if (!messaging) return null;
+  try {
+    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: swReg
+    });
+    return token || null;
+  } catch(e) {
+    console.warn('FCM token error:', e);
+    return null;
+  }
+}
+
+// ── Activer les notifications sur CET appareil ──
+async function activatePushOnThisDevice() {
+  if (!messaging) {
+    alert('Les notifications ne sont pas supportées sur ce navigateur.');
+    return false;
+  }
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('❌ Vous avez refusé les notifications. Allez dans les paramètres de votre navigateur pour les autoriser.');
+      return false;
+    }
+    const token = await registerFCMToken();
+    if (!token) { console.warn('No FCM token'); return false; }
+    fcmToken = token;
+    pushEnabled = true;
+
+    // Sauvegarder le token lié à cet utilisateur dans Firebase
+    if (currentUser) {
+      await update(ref(db, `fcmTokens/${currentUser.uid}`), {
+        token,
+        name: currentUConf?.name || '',
+        role: currentUConf?.role || '',
+        updatedAt: Date.now()
+      });
+    }
+
+    // Écouter les messages quand l'app est ouverte (foreground)
+    onMessage(messaging, payload => {
+      const title = payload.notification?.title || 'TEV';
+      const body  = payload.notification?.body  || '';
+      showInAppNotification(title, body);
+    });
+
+    return true;
+  } catch(e) {
+    console.warn('Push activation error:', e);
+    return false;
+  }
+}
+
+// ── Notification visuelle dans l'app (quand app ouverte) ──
+function showInAppNotification(title, body) {
+  const el = document.createElement('div');
+  el.style.cssText = `
+    position:fixed;top:70px;right:16px;z-index:99999;
+    background:var(--card);border:1px solid var(--border2);
+    border-radius:14px;padding:14px 16px;max-width:300px;
+    box-shadow:0 8px 30px rgba(0,0,0,.2);
+    display:flex;align-items:flex-start;gap:12px;
+    animation:fadeIn .3s ease;cursor:pointer;
+  `;
+  el.innerHTML = `
+    <div style="font-size:22px;flex-shrink:0">🔔</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px">${title}</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.4">${body}</div>
+    </div>
+    <div onclick="this.parentElement.remove()" style="font-size:18px;color:var(--muted);cursor:pointer;flex-shrink:0;margin-top:-2px">×</div>
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
+}
+
+// ── Envoyer une notification push via Firebase Database ──
+// Le service worker lit /pushQueue et affiche la notif
+async function sendPushToAll(title, body, icon = '🔔') {
+  try {
+    await push(ref(db, 'pushQueue'), {
+      title, body, icon,
+      ts: Date.now(),
+      sentBy: currentUser?.uid || 'system'
+    });
+  } catch(e) { console.warn('Push send error:', e); }
+}
+
+// ── Écouter la file de notifications push ──
+let lastPushTs = Date.now();
+function listenPushQueue() {
+  onValue(ref(db, 'pushQueue'), snap => {
+    const queue = snap.val();
+    if (!queue || !pushEnabled) return;
+    // Afficher les nouvelles notifications in-app
+    Object.values(queue).forEach(n => {
+      if (n.ts > lastPushTs && n.sentBy !== currentUser?.uid) {
+        showInAppNotification(n.title, n.body);
+        lastPushTs = n.ts;
+      }
+    });
+  });
+}
+
+// ── Bouton admin : activer pour tous ──
+window.adminActivatePush = async function() {
+  const btn = document.getElementById('adminPushBtn');
+  const stat = document.getElementById('adminPushStatus');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Activation...'; }
+
+  const ok = await activatePushOnThisDevice();
+  if (ok) {
+    // Sauver dans Firebase que les notifications sont activées globalement
+    await update(ref(db, 'system/push'), { enabled: true, activatedBy: currentUConf?.name, activatedAt: Date.now() });
+    if (stat) { stat.textContent = '✅ Notifications activées ! Les utilisateurs qui ouvrent l\'app recevront les alertes.'; stat.style.color = 'var(--ok)'; }
+    if (btn) { btn.textContent = '🔕 Désactiver les notifications'; btn.disabled = false; btn.style.background = 'rgba(239,68,68,.12)'; btn.style.borderColor = 'rgba(239,68,68,.3)'; btn.style.color = 'var(--danger)'; }
+    // Changer la fonction du bouton
+    btn.onclick = adminDeactivatePush;
+  } else {
+    if (stat) { stat.textContent = '❌ Échec — autorisez les notifications dans votre navigateur.'; stat.style.color = 'var(--danger)'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications'; }
+  }
 };
 
+window.adminDeactivatePush = async function() {
+  await update(ref(db, 'system/push'), { enabled: false });
+  if (currentUser) await remove(ref(db, `fcmTokens/${currentUser.uid}`));
+  pushEnabled = false; fcmToken = null;
+  const btn = document.getElementById('adminPushBtn');
+  const stat = document.getElementById('adminPushStatus');
+  if (btn) { btn.textContent = '🔔 Activer les notifications'; btn.style.background = 'rgba(34,197,94,.12)'; btn.style.borderColor = 'rgba(34,197,94,.3)'; btn.style.color = 'var(--ok)'; btn.onclick = adminActivatePush; }
+  if (stat) { stat.textContent = '❌ Notifications désactivées.'; stat.style.color = 'var(--danger)'; }
+};
+
+// ── Les utilisateurs activent automatiquement quand push est activé par admin ──
+function listenPushActivation() {
+  onValue(ref(db, 'system/push'), async snap => {
+    const data = snap.val();
+    if (!data?.enabled || pushEnabled) return;
+    // Auto-activer si permission déjà accordée
+    if (Notification.permission === 'granted') {
+      await activatePushOnThisDevice();
+      listenPushQueue();
+    }
+  });
+}
+listenPushActivation();
+
+// ── Utilisateur individuel active sur son appareil ──
+window.userActivatePush = async function() {
+  const btn = document.getElementById('pushToggleBtn');
+  const stat = document.getElementById('pushStatusText');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Activation...'; }
+  const ok = await activatePushOnThisDevice();
+  if (ok) {
+    listenPushQueue();
+    if (stat) { stat.textContent = '✅ Notifications activées sur cet appareil !'; stat.style.color = 'var(--ok)'; }
+    if (btn) { btn.textContent = '✅ Notifications activées'; btn.style.background = 'rgba(34,197,94,.08)'; btn.disabled = false; }
+  } else {
+    if (stat) { stat.textContent = '❌ Échec — autorisez les notifications dans votre navigateur.'; stat.style.color = 'var(--danger)'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 Recevoir les notifications sur ce téléphone'; }
+  }
+};
+
+// ── Envoi manuel depuis admin ──
+window.sendManualPush = async function() {
+  const title = document.getElementById('pushTitle')?.value.trim();
+  const body  = document.getElementById('pushBody')?.value.trim();
+  if (!title || !body) { alert('Entrez un titre et un message.'); return; }
+  await sendPushToAll(title, body, '📢');
+  document.getElementById('pushTitle').value = '';
+  document.getElementById('pushBody').value  = '';
+  const ok = document.getElementById('pushSendOk');
+  if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
+};
+
+// ── Écouter le statut push dans Firebase pour mettre à jour l'UI admin ──
+function listenAdminPushStatus() {
+  onValue(ref(db, 'system/push'), snap => {
+    const data = snap.val();
+    const enabled = data?.enabled === true;
+    const btn  = document.getElementById('adminPushBtn');
+    const stat = document.getElementById('adminPushStatus');
+    const dot  = document.getElementById('adminPushDot');
+    if (!btn || !stat) return;
+    if (enabled) {
+      stat.textContent = `✅ Notifications activées${data.activatedBy ? ' par ' + data.activatedBy : ''}`;
+      stat.style.color = 'var(--ok)';
+      dot.style.background = 'var(--ok)';
+      dot.style.boxShadow = '0 0 6px var(--ok)';
+      btn.textContent = '🔕 Désactiver les notifications';
+      btn.style.background = 'rgba(239,68,68,.12)';
+      btn.style.borderColor = 'rgba(239,68,68,.3)';
+      btn.style.color = 'var(--danger)';
+      btn.onclick = adminDeactivatePush;
+    } else {
+      stat.textContent = '❌ Notifications désactivées';
+      stat.style.color = 'var(--danger)';
+      dot.style.background = 'var(--danger)';
+      dot.style.boxShadow = 'none';
+      btn.textContent = '🔔 Activer les notifications pour tous';
+      btn.style.background = 'rgba(34,197,94,.12)';
+      btn.style.borderColor = 'rgba(34,197,94,.3)';
+      btn.style.color = 'var(--ok)';
+      btn.onclick = adminActivatePush;
+    }
+  });
+}
+listenAdminPushStatus();
+
+// ══════════ GESTION DES THÈMES ══════════
+const THEMES = ['dark','light','ocean','forest'];
+
 function applyThemeUI(theme) {
+  // Retirer tous les thèmes
   THEMES.forEach(t => {
     document.body.classList.remove('theme-'+t);
-    const card  = document.getElementById('theme-'+t);
+    const card = document.getElementById('theme-'+t);
     const check = document.getElementById('check-'+t);
-    if (card)  { card.style.border = '2px solid transparent'; card.style.boxShadow = '0 2px 8px rgba(0,0,0,.08)'; }
+    if (card) card.style.border = '2px solid transparent';
     if (check) check.style.display = 'none';
   });
-  // 'default' = :root = pas de classe
-  if (theme !== 'default') document.body.classList.add('theme-'+theme);
-  const activeCard  = document.getElementById('theme-'+theme);
+  // Appliquer le thème sélectionné (dark = défaut = pas de classe)
+  if (theme !== 'dark') document.body.classList.add('theme-'+theme);
+  const activeCard = document.getElementById('theme-'+theme);
   const activeCheck = document.getElementById('check-'+theme);
-  const accent = THEME_ACCENTS[theme] || '#0ea5e9';
   if (activeCard) {
-    activeCard.style.border = `2px solid ${accent}`;
-    activeCard.style.boxShadow = `0 0 0 3px ${accent}33, 0 4px 12px rgba(0,0,0,.12)`;
+    const colors = { dark:'rgba(168,85,247,.8)', light:'rgba(0,153,204,.8)', ocean:'rgba(0,212,255,.8)', forest:'rgba(74,222,128,.8)' };
+    activeCard.style.border = `2px solid ${colors[theme]||'rgba(168,85,247,.8)'}`;
+    activeCard.style.boxShadow = `0 0 0 3px ${colors[theme]||'rgba(168,85,247,.2)'}44`;
   }
   if (activeCheck) activeCheck.style.display = 'inline';
 }
@@ -3623,6 +3791,7 @@ function applyThemeUI(theme) {
 window.applyTheme = async function(theme) {
   applyThemeUI(theme);
   localStorage.setItem('tev_theme', theme);
+  // Sauvegarder dans Firebase pour tous les utilisateurs
   try { await set(ref(db, 'system/theme'), theme); } catch(e) {}
 };
 
@@ -3630,8 +3799,9 @@ window.applyTheme = async function(theme) {
 function loadSavedTheme() {
   const local = localStorage.getItem('tev_theme');
   if (local) applyThemeUI(local);
+  // Écouter les changements en temps réel
   onValue(ref(db, 'system/theme'), snap => {
-    const theme = snap.val() || 'default';
+    const theme = snap.val() || 'dark';
     localStorage.setItem('tev_theme', theme);
     applyThemeUI(theme);
   });
