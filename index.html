@@ -544,6 +544,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 /* PROFIL */
 #profileAvatarBig img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 <div id="app-scaler">
@@ -1245,22 +1246,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <div id="pwdErr" style="color:var(--danger);font-size:12px"></div>
         </div>
       </div>
-
-      <!-- NOTIFICATIONS PUSH -->
-      <div class="card" style="border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.03)">
-        <div class="card-title" style="color:var(--ok)">🔔 Notifications Push</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          Recevez des alertes sur votre téléphone même quand l'application est fermée.
-        </p>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px">
-          <div id="pushStatusText" style="font-size:13px;font-weight:600;color:var(--danger)">❌ Notifications non activées sur cet appareil</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">L'administrateur doit d'abord activer les notifications, puis cliquez le bouton ci-dessous.</div>
-        </div>
-        <button id="pushToggleBtn" onclick="userActivatePush()"
-          style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--ok);border-radius:10px;padding:11px 20px;cursor:pointer;font-size:13px;font-weight:700;width:100%;transition:all .2s">
-          🔔 Recevoir les notifications sur ce téléphone
-        </button>
-      </div>
     </div>
 
     <!-- PAGE ÉQUIPE -->
@@ -1457,39 +1442,48 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         </div>
       </div>
 
-      <!-- 🔔 NOTIFICATIONS PUSH -->
-      <div class="card" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--ok)">🔔 Notifications Push</div>
+      <!-- 📧 NOTIFICATIONS PAR EMAIL -->
+      <div class="card" style="border-color:rgba(14,165,233,.3);background:rgba(14,165,233,.03);margin-bottom:16px">
+        <div class="card-title" style="color:var(--soufflage)">📧 Notifications par Email</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          Activez les notifications pour envoyer des alertes sur le téléphone de tous les utilisateurs — même quand l'application est fermée.
+          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
         </p>
 
-        <!-- Statut global -->
-        <div id="adminPushStatusCard" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <div id="adminPushDot" style="width:10px;height:10px;border-radius:50%;background:var(--danger);flex-shrink:0"></div>
-            <div id="adminPushStatus" style="font-size:13px;font-weight:600;color:var(--danger)">❌ Notifications désactivées</div>
-          </div>
-          <div style="font-size:11px;color:var(--muted)">Quand activées, tous les utilisateurs recevront les alertes sur leur téléphone.</div>
-        </div>
-
-        <!-- Bouton activer/désactiver -->
-        <button id="adminPushBtn" onclick="adminActivatePush()"
-          style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--ok);border-radius:10px;padding:12px 20px;cursor:pointer;font-size:13px;font-weight:700;width:100%;transition:all .2s;margin-bottom:14px">
-          🔔 Activer les notifications pour tous
-        </button>
-
-        <!-- Envoyer une notif manuelle -->
-        <div style="border-top:1px solid var(--border);padding-top:14px">
-          <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:10px">📤 Envoyer une notification maintenant</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <input type="text" id="pushTitle" class="form-input" placeholder="Titre (ex: Réunion urgente)" style="font-size:13px">
-            <input type="text" id="pushBody" class="form-input" placeholder="Message (ex: Tous en salle B à 14h)" style="font-size:13px">
-            <button onclick="sendManualPush()" class="btn btn-primary btn-sm" style="width:fit-content">
-              📤 Envoyer à tous
+        <!-- Statut auto-emails -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">🚨 Email automatique lors d'une panne</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand une panne est signalée</div>
+            </div>
+            <button onclick="toggleEmailAuto('panne')" id="toggle-email-panne"
+              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-email-panne" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s"></div>
             </button>
           </div>
-          <div id="pushSendOk" style="display:none;color:var(--ok);font-size:12px;font-weight:600;margin-top:8px">✅ Notification envoyée !</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">📢 Email lors d'une annonce</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand une annonce est publiée</div>
+            </div>
+            <button onclick="toggleEmailAuto('annonce')" id="toggle-email-annonce"
+              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-email-annonce" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Envoyer email manuel -->
+        <div style="border-top:1px solid var(--border);padding-top:14px">
+          <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">📤 Envoyer un email maintenant à tous</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input type="text" id="emailSubject" class="form-input" placeholder="Sujet (ex: Réunion urgente demain)" style="font-size:13px">
+            <textarea id="emailMessage" class="form-input" placeholder="Message complet..." rows="4" style="font-size:13px;resize:vertical"></textarea>
+            <button onclick="sendEmailToAll()" class="btn btn-primary btn-sm" style="width:fit-content">
+              📧 Envoyer à tous les utilisateurs
+            </button>
+          </div>
+          <div id="emailSendStatus" style="display:none;font-size:12px;font-weight:600;margin-top:8px"></div>
         </div>
       </div>
 
@@ -1765,7 +1759,6 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-
 // ══════════ FIREBASE CONFIG ══════════
 const firebaseConfig = {
   apiKey: "AIzaSyDq6o-a00NDyMe-Nzmu7uPXSAQxaK6S3g0",
@@ -1780,7 +1773,6 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
-// Notifications: Web Notifications API (no FCM needed)
 
 // ══════════ SAFETY TIMEOUT ══════════
 setTimeout(() => {
@@ -2075,10 +2067,6 @@ onAuthStateChanged(auth, async user => {
     // L'app se charge en arrière-plan pendant ce temps
     initApp();
     showSplash('app');
-    // Initialiser les notifications push (ne demande la permission que si déjà accordée)
-    if (Notification.permission === 'granted') {
-      setTimeout(() => initPushNotifications(), 2000);
-    }
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
@@ -2527,11 +2515,18 @@ window.saveReport = async function() {
       userId: currentUser.uid, name: currentUConf.name, color: currentUConf.color,
       text: `🚨 ALERTE PANNE — Machine ${machine} — ${note||'Vérifier immédiatement'}`,
     });
-    // 🔔 Notification Push à tous
-    await sendPushToAll(
-      `🚨 PANNE — ${machine}`,
-      `Signalée par ${currentUConf.name}. ${note||'Vérifier immédiatement.'}`
-    );
+    // 📧 Email automatique si activé
+    if (emailSettings.panne) {
+      sendEmailToAllUsers(
+        `🚨 PANNE — Machine ${machine}`,
+        `Une panne a été signalée !\n\n` +
+        `Machine : ${machine}\n` +
+        `Signalée par : ${currentUConf.name}\n` +
+        `Date : ${date} — Poste : ${shift}\n` +
+        `Détail : ${note || 'Aucun détail fourni'}\n\n` +
+        `Connectez-vous sur l'application TEV pour plus d'informations.`
+      );
+    }
   }
 
   // Message rapport supprimé pour ne pas polluer le chat
@@ -3498,12 +3493,16 @@ window.publishAnnouncement = async function() {
       author: currentUConf?.name || 'Admin',
       ts: Date.now(), active: true,
     });
-    // 🔔 Notification Push à tous
-    const icons = { info:'ℹ️', urgent:'🚨', rapport:'📋', succes:'✅' };
-    await sendPushToAll(
-      `${icons[currentAnnounceType]||'📢'} ${title || 'Nouvelle annonce'}`,
-      msg || 'Consultez le tableau de bord'
-    );
+    // 📧 Email automatique si activé
+    if (emailSettings.annonce) {
+      const icons = { info:'ℹ️', urgent:'🚨', rapport:'📋', succes:'✅' };
+      sendEmailToAllUsers(
+        `${icons[currentAnnounceType]||'📢'} ${title || 'Nouvelle annonce — TEV'}`,
+        `${title ? title + '\n\n' : ''}${msg || ''}\n\n` +
+        `Publié par : ${currentUConf?.name || 'Administrateur'}\n` +
+        `Connectez-vous sur l'application TEV pour voir tous les détails.`
+      );
+    }
     const ok = document.getElementById('announceOk');
     ok.style.display='block';
     setTimeout(()=>{ ok.style.display='none'; }, 3000);
@@ -3540,222 +3539,108 @@ function renderAnnounceBanner(data) {
     </div>`;
 }
 
-// ══════════ NOTIFICATIONS PUSH (Web API) ══════════
-// Utilise l'API native du navigateur + Firebase Database
-// Fonctionne sur GitHub Pages sans serveur backend
+// ══════════ EMAILS (EmailJS) ══════════
+const EMAILJS_SERVICE_ID  = 'service_x1pu289';
+const EMAILJS_TEMPLATE_ID = 'template_SjMZiM4BkimhJW6I0';
+const EMAILJS_PUBLIC_KEY  = 'WekufjELkayuIsf19YC0g';
 
-let pushEnabled = false;
-let pushCheckInterval = null;
+// Initialiser EmailJS
+(function() {
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
+})();
 
-// ── Afficher une notification native du navigateur ──
-function showBrowserNotif(title, body, icon) {
-  if (Notification.permission !== 'granted') return;
+// Paramètres auto-email (sauvegardés dans Firebase)
+let emailSettings = { panne: true, annonce: true };
+
+// ── Envoyer un email à une adresse ──
+async function sendEmail(toEmail, toName, subject, message) {
+  if (typeof emailjs === 'undefined') {
+    console.warn('EmailJS non chargé');
+    return false;
+  }
   try {
-    const n = new Notification(title, {
-      body,
-      icon: icon || '/icône-192.png',
-      badge: '/icône-192.png',
-      tag: 'tev-' + Date.now(),
-      requireInteraction: false,
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: toEmail,
+      to_name:  toName || 'Utilisateur',
+      subject,
+      message,
+      from_name: 'TEV — Technicien Eau Vitale',
     });
-    n.onclick = () => { window.focus(); n.close(); };
-    setTimeout(() => n.close(), 6000);
-  } catch(e) { console.warn('Notif error:', e); }
+    return true;
+  } catch(e) {
+    console.warn('Email error:', e);
+    return false;
+  }
 }
 
-// ── Notification visuelle dans l'app ──
-function showInAppNotification(title, body) {
-  const el = document.createElement('div');
-  el.style.cssText = `
-    position:fixed;top:70px;right:16px;z-index:99999;
-    background:var(--card);border:1px solid var(--border2);
-    border-radius:14px;padding:14px 16px;max-width:300px;
-    box-shadow:0 8px 30px rgba(0,0,0,.25);
-    display:flex;align-items:flex-start;gap:12px;
-    animation:fadeIn .3s ease;
-  `;
-  el.innerHTML = `
-    <div style="font-size:22px;flex-shrink:0">🔔</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px">${title}</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.4">${body}</div>
-    </div>
-    <div onclick="this.parentElement.remove()" style="font-size:20px;color:var(--muted);cursor:pointer;flex-shrink:0">×</div>
-  `;
-  document.body.appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, 6000);
-}
-
-// ── Envoyer une notification à tous via Firebase Database ──
-async function sendPushToAll(title, body) {
+// ── Envoyer un email à TOUS les utilisateurs ──
+async function sendEmailToAllUsers(subject, message) {
   try {
-    await push(ref(db, 'pushQueue'), {
-      title, body,
-      ts: Date.now(),
-      sentBy: currentUser?.uid || 'system'
-    });
-  } catch(e) { console.warn('Push send error:', e); }
+    const snap = await get(ref(db, 'userProfiles'));
+    const profiles = snap.val() || {};
+    const users = Object.values(profiles).filter(p => p.status === 'active' && p.email);
+    let sent = 0;
+    for (const u of users) {
+      const ok = await sendEmail(u.email, u.name, subject, message);
+      if (ok) sent++;
+      // Petite pause pour ne pas dépasser les limites EmailJS
+      await new Promise(r => setTimeout(r, 200));
+    }
+    return sent;
+  } catch(e) {
+    console.warn('sendEmailToAllUsers error:', e);
+    return 0;
+  }
 }
 
-// ── Écouter les nouvelles notifications depuis Firebase ──
-let lastNotifTs = Date.now();
-function startListeningNotifs() {
-  onValue(ref(db, 'pushQueue'), snap => {
-    if (!pushEnabled) return;
-    const queue = snap.val();
-    if (!queue) return;
-    Object.values(queue).forEach(n => {
-      if ((n.ts || 0) > lastNotifTs && n.sentBy !== currentUser?.uid) {
-        showBrowserNotif(n.title, n.body);
-        showInAppNotification(n.title, n.body);
-        lastNotifTs = n.ts;
-      }
-    });
+// ── Bouton admin : envoyer email manuel ──
+window.sendEmailToAll = async function() {
+  const subject = document.getElementById('emailSubject')?.value.trim();
+  const message = document.getElementById('emailMessage')?.value.trim();
+  const statusEl = document.getElementById('emailSendStatus');
+  if (!subject || !message) { alert('Entrez un sujet et un message.'); return; }
+
+  const btn = document.querySelector('[onclick="sendEmailToAll()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi en cours...'; }
+  if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = 'var(--muted)'; statusEl.textContent = '⏳ Envoi des emails...'; }
+
+  const sent = await sendEmailToAllUsers(subject, message);
+
+  if (btn) { btn.disabled = false; btn.textContent = '📧 Envoyer à tous les utilisateurs'; }
+  if (statusEl) {
+    statusEl.style.color = sent > 0 ? 'var(--ok)' : 'var(--danger)';
+    statusEl.textContent = sent > 0 ? `✅ ${sent} email(s) envoyé(s) avec succès !` : '❌ Échec — vérifiez votre connexion.';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+  }
+  if (document.getElementById('emailSubject')) document.getElementById('emailSubject').value = '';
+  if (document.getElementById('emailMessage')) document.getElementById('emailMessage').value = '';
+};
+
+// ── Toggle auto-email ──
+window.toggleEmailAuto = async function(type) {
+  emailSettings[type] = !emailSettings[type];
+  updateEmailToggles();
+  try { await update(ref(db, 'system/emailSettings'), emailSettings); } catch(e) {}
+};
+
+function updateEmailToggles() {
+  ['panne','annonce'].forEach(key => {
+    const btn  = document.getElementById('toggle-email-'+key);
+    const knob = document.getElementById('knob-email-'+key);
+    if (!btn) return;
+    const on = emailSettings[key];
+    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
+    if (knob) { knob.style.right = on ? '3px' : ''; knob.style.left = on ? '' : '3px'; }
   });
 }
 
-// ── Admin : activer les notifications ──
-window.adminActivatePush = async function() {
-  const btn  = document.getElementById('adminPushBtn');
-  const stat = document.getElementById('adminPushStatus');
-  const dot  = document.getElementById('adminPushDot');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Demande de permission...'; }
-
-  if (!('Notification' in window)) {
-    if (stat) { stat.textContent = '❌ Votre navigateur ne supporte pas les notifications.'; stat.style.color = 'var(--danger)'; }
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications pour tous'; }
-    return;
-  }
-
-  let permission = Notification.permission;
-  if (permission === 'default') {
-    permission = await Notification.requestPermission();
-  }
-
-  if (permission !== 'granted') {
-    if (stat) {
-      stat.innerHTML = '❌ Permission refusée.<br><span style="font-size:11px;font-weight:400">Allez dans Chrome → ⋮ → Paramètres → Paramètres du site → Notifications → alban3886.github.io → Autoriser</span>';
-      stat.style.color = 'var(--danger)';
-    }
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications pour tous'; }
-    return;
-  }
-
-  // Permission accordée !
-  pushEnabled = true;
-  lastNotifTs = Date.now();
-  startListeningNotifs();
-
-  // Sauvegarder dans Firebase
-  await update(ref(db, 'system/push'), {
-    enabled: true,
-    activatedBy: currentUConf?.name || 'Admin',
-    activatedAt: Date.now()
-  });
-
-  updateAdminPushUI(true);
-
-  // Test de notification
-  setTimeout(() => {
-    showBrowserNotif('✅ TEV — Notifications activées !', 'Vous recevrez les alertes de pannes et annonces.');
-  }, 500);
-};
-
-// ── Admin : désactiver ──
-window.adminDeactivatePush = async function() {
-  pushEnabled = false;
-  await update(ref(db, 'system/push'), { enabled: false });
-  updateAdminPushUI(false);
-};
-
-function updateAdminPushUI(enabled) {
-  const btn  = document.getElementById('adminPushBtn');
-  const stat = document.getElementById('adminPushStatus');
-  const dot  = document.getElementById('adminPushDot');
-  if (!btn) return;
-  if (enabled) {
-    if (stat) { stat.textContent = '✅ Activées — vous recevrez toutes les alertes sur cet appareil.'; stat.style.color = 'var(--ok)'; }
-    if (dot)  { dot.style.background = 'var(--ok)'; dot.style.boxShadow = '0 0 6px var(--ok)'; }
-    btn.textContent = '🔕 Désactiver les notifications';
-    btn.style.background = 'rgba(239,68,68,.12)';
-    btn.style.borderColor = 'rgba(239,68,68,.3)';
-    btn.style.color = 'var(--danger)';
-    btn.disabled = false;
-    btn.onclick = adminDeactivatePush;
-  } else {
-    if (stat) { stat.textContent = '❌ Notifications désactivées.'; stat.style.color = 'var(--danger)'; }
-    if (dot)  { dot.style.background = 'var(--danger)'; dot.style.boxShadow = 'none'; }
-    btn.textContent = '🔔 Activer les notifications pour tous';
-    btn.style.background = 'rgba(34,197,94,.12)';
-    btn.style.borderColor = 'rgba(34,197,94,.3)';
-    btn.style.color = 'var(--ok)';
-    btn.disabled = false;
-    btn.onclick = adminActivatePush;
-  }
-}
-
-// ── Utilisateur individuel : activer sur son appareil ──
-window.userActivatePush = async function() {
-  const btn  = document.getElementById('pushToggleBtn');
-  const stat = document.getElementById('pushStatusText');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Demande de permission...'; }
-
-  if (!('Notification' in window)) {
-    if (stat) { stat.textContent = '❌ Navigateur non compatible.'; stat.style.color = 'var(--danger)'; }
-    if (btn)  { btn.disabled = false; }
-    return;
-  }
-
-  let perm = Notification.permission;
-  if (perm === 'default') perm = await Notification.requestPermission();
-
-  if (perm !== 'granted') {
-    if (stat) {
-      stat.innerHTML = '❌ Refusé.<br><small>Chrome → ⋮ → Paramètres → Paramètres du site → Notifications → alban3886.github.io → Autoriser</small>';
-      stat.style.color = 'var(--danger)';
-    }
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 Recevoir les notifications'; }
-    return;
-  }
-
-  pushEnabled = true;
-  lastNotifTs = Date.now();
-  startListeningNotifs();
-
-  if (stat) { stat.textContent = '✅ Notifications activées sur cet appareil !'; stat.style.color = 'var(--ok)'; }
-  if (btn)  { btn.textContent = '✅ Activées'; btn.style.opacity = '.7'; btn.disabled = true; }
-
-  setTimeout(() => showBrowserNotif('✅ TEV', 'Vous recevrez maintenant les alertes !'), 400);
-};
-
-// ── Envoi manuel depuis admin ──
-window.sendManualPush = async function() {
-  const title = document.getElementById('pushTitle')?.value.trim();
-  const body  = document.getElementById('pushBody')?.value.trim();
-  if (!title || !body) { alert('Entrez un titre et un message.'); return; }
-  await sendPushToAll(title, body);
-  // Notif in-app pour l'admin lui-même
-  showBrowserNotif(title, body);
-  document.getElementById('pushTitle').value = '';
-  document.getElementById('pushBody').value  = '';
-  const ok = document.getElementById('pushSendOk');
-  if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
-};
-
-// ── Écouter statut push Firebase pour UI admin ──
-function listenAdminPushStatus() {
-  onValue(ref(db, 'system/push'), snap => {
-    const data = snap.val();
-    // Si l'admin avait activé et la page se recharge → réactiver auto
-    if (data?.enabled && Notification.permission === 'granted' && !pushEnabled) {
-      pushEnabled = true;
-      lastNotifTs = Date.now();
-      startListeningNotifs();
-    }
-    updateAdminPushUI(data?.enabled === true);
-  });
-}
-listenAdminPushStatus();
+// Charger les paramètres email depuis Firebase
+onValue(ref(db, 'system/emailSettings'), snap => {
+  if (snap.val()) { emailSettings = { ...emailSettings, ...snap.val() }; }
+  updateEmailToggles();
+});
 
 // ══════════ GESTION DES THÈMES ══════════
 const THEMES = ['dark','light','ocean','forest'];
