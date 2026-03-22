@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1024">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -105,6 +105,17 @@ body.theme-forest {
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
+
+/* ══ FORCER MODE DESKTOP SUR MOBILE ══
+   Le viewport meta width=1024 est ignoré par Chrome Android.
+   On utilise JS pour calculer le zoom exact selon la largeur réelle.
+   Le CSS ci-dessous prépare le conteneur. */
+#app-scaler {
+  width: 1024px;
+  height: 100vh;
+  transform-origin: top left;
+  overflow: hidden;
+}
 
 /* ══════════ LOGIN ══════════ */
 #loginScreen {
@@ -535,8 +546,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
+<div id="app-scaler">
 <!-- BANNIÈRE INSTALLATION PWA -->
 <div id="pwaInstallBanner" style="
   display:none; position:fixed; bottom:0; left:0; right:0; z-index:99999;
@@ -4300,6 +4310,31 @@ window.addEventListener('appinstalled', () => {
   if (installBanner) installBanner.style.display = 'none';
   deferredPrompt = null;
 });
+
+// ══ FORCER LAYOUT DESKTOP SUR MOBILE ══
+// Calcule le zoom exact pour que 1024px logiques = largeur réelle de l'écran
+function applyDesktopScale() {
+  const scaler = document.getElementById('app-scaler');
+  if (!scaler) return;
+  const screenW = window.innerWidth;
+  const targetW = 1024;
+  if (screenW < targetW) {
+    const scale = screenW / targetW;
+    scaler.style.transform = `scale(${scale})`;
+    scaler.style.width = targetW + 'px';
+    scaler.style.height = (window.innerHeight / scale) + 'px';
+    document.body.style.width = screenW + 'px';
+    document.body.style.height = window.innerHeight + 'px';
+    document.body.style.overflow = 'hidden';
+  } else {
+    scaler.style.transform = '';
+    scaler.style.width = '100%';
+    scaler.style.height = '100vh';
+  }
+}
+applyDesktopScale();
+window.addEventListener('resize', applyDesktopScale);
 </script>
+</div><!-- end app-scaler -->
 </body>
 </html>
