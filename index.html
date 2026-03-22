@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=1024">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -464,20 +464,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 
 }
 
-@media(max-width:600px) {
-  body { overflow-x:auto; }
-  #app {
-    grid-template-columns:64px 200px 1fr;
-    grid-template-areas:"icon topbar topbar" "icon sidebar main";
-    min-width:520px;
-  }
-  .icon-bar { display:flex !important; }
-  .sidebar { display:block !important; }
-  .presence-pills { display:flex !important; }
-  #mobileMenuBtn { display:none !important; }
-  .topbar-date { display:block !important; }
-}
-
 @keyframes splashPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,.2)} 50%{box-shadow:0 0 28px rgba(255,215,0,.5)} }
 
 /* PROFIL */
@@ -538,22 +524,22 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.12);
     border-radius:20px;
-    padding:20px 24px 18px;
+    padding:36px 32px 28px;
     text-align:center;
     backdrop-filter:blur(10px);
     box-shadow:0 20px 60px rgba(0,0,0,.5);
     position:relative;
   ">
     <!-- Croix dorée -->
-    <div style="font-size:32px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
+    <div style="font-size:38px;margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
 
     <!-- Message -->
     <p style="
       font-family:'Barlow',sans-serif;
-      font-size:15px;
-      line-height:1.45;
+      font-size:16px;
+      line-height:1.85;
       color:rgba(255,255,255,.88);
-      margin:0 0 6px;
+      margin:0 0 10px;
       letter-spacing:.01em;
     ">
       Cher amis, ceci n'est qu'une idée simple.<br>
@@ -562,20 +548,20 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     </p>
     <p style="
       font-family:'Barlow',sans-serif;
-      font-size:14px;
-      line-height:1.4;
+      font-size:15px;
+      line-height:1.8;
       color:rgba(255,255,255,.7);
-      margin:0 0 6px;
+      margin:0 0 10px;
     ">
       Ceci n'est qu'une idée, car on avance dans un monde professionnel<br>
       et on a besoin de nous tous chaque jour.
     </p>
     <p style="
       font-family:'Barlow',sans-serif;
-      font-size:14px;
-      line-height:1.4;
+      font-size:15px;
+      line-height:1.8;
       color:rgba(255,255,255,.7);
-      margin:0 0 10px;
+      margin:0 0 22px;
     ">
       Ceci n'est pas une idée de l'administration,<br>
       ni une imposition ou une chose pour mettre son prochain en danger.<br>
@@ -585,12 +571,12 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <!-- Signature -->
     <div style="
       font-family:'Barlow Condensed',sans-serif;
-      font-size:19px;
+      font-size:20px;
       font-weight:700;
       letter-spacing:.1em;
       color:#ffd700;
       text-shadow:0 0 16px rgba(255,215,0,.5);
-      margin-bottom:12px;
+      margin-bottom:28px;
     ">✨ Soyez bénis. CHRIST ROI DES ROIS ✨</div>
 
     <!-- Barre de progression -->
