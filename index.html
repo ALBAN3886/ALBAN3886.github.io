@@ -3651,35 +3651,61 @@ const EMAILJS_SERVICE_ID  = 'service_x1pu289';
 const EMAILJS_TEMPLATE_ID = 'template_SjMZiM4BkimhJW6I0';
 const EMAILJS_PUBLIC_KEY  = 'WekufjELkayuIsf19YC0g';
 
-// Initialiser EmailJS
-(function() {
+// Initialiser EmailJS — retry jusqu'à ce que le script soit chargé
+function initEmailJS() {
   if (typeof emailjs !== 'undefined') {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    console.log('✅ EmailJS initialisé');
+  } else {
+    setTimeout(initEmailJS, 300);
   }
-})();
+}
+initEmailJS();
 
 // Paramètres auto-email (sauvegardés dans Firebase)
 let emailSettings = { panne: true, annonce: true, rapport: true };
 
 // ── Envoyer un email à une adresse ──
 async function sendEmail(toEmail, toName, subject, message) {
+  // S'assurer qu'EmailJS est initialisé
   if (typeof emailjs === 'undefined') {
-    console.warn('EmailJS non chargé');
+    console.warn('EmailJS non chargé — email non envoyé à', toEmail);
     return false;
   }
   try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    // Ré-initialiser au cas où
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
       to_email: toEmail,
       to_name:  toName || 'Utilisateur',
       subject,
       message,
       from_name: 'TEV — Technicien Eau Vitale',
     });
+    console.log('📧 Email envoyé à', toEmail, result.status);
     return true;
   } catch(e) {
-    console.warn('Email error:', e);
+    console.warn('Email error pour', toEmail, ':', e);
     return false;
   }
+}
+
+// ── Toast notification visuelle ──
+function showToast(msg, type) {
+  let toast = document.getElementById('emailToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'emailToast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:99999;padding:12px 20px;border-radius:12px;font-family:Barlow,sans-serif;font-size:14px;font-weight:600;max-width:320px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .4s';
+    document.body.appendChild(toast);
+  }
+  toast.style.background = type === 'ok' ? '#16a34a' : type === 'err' ? '#dc2626' : '#0099cc';
+  toast.style.color = '#fff';
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.display = 'block';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display='none', 400); }, 4000);
 }
 
 // ── Envoyer un email à TOUS les utilisateurs ──
@@ -3688,16 +3714,25 @@ async function sendEmailToAllUsers(subject, message) {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
     const users = Object.values(profiles).filter(p => p.email);
+    if (users.length === 0) {
+      showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
+      return 0;
+    }
+    showToast('📧 Envoi en cours à ' + users.length + ' utilisateur(s)...', 'info');
     let sent = 0;
     for (const u of users) {
       const ok = await sendEmail(u.email, u.name, subject, message);
       if (ok) sent++;
-      // Petite pause pour ne pas dépasser les limites EmailJS
       await new Promise(r => setTimeout(r, 200));
+    }
+    if (sent > 0) {
+      showToast('✅ ' + sent + ' email(s) envoyé(s) avec succès !', 'ok');
+    } else {
+      showToast('❌ Échec — vérifiez EmailJS ou la connexion internet', 'err');
     }
     return sent;
   } catch(e) {
-    console.warn('sendEmailToAllUsers error:', e);
+    showToast('❌ Erreur : ' + e.message, 'err');
     return 0;
   }
 }
