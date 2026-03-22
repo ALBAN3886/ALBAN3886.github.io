@@ -1446,7 +1446,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="card" style="border-color:rgba(14,165,233,.3);background:rgba(14,165,233,.03);margin-bottom:16px">
         <div class="card-title" style="color:var(--soufflage)">📧 Notifications par Email</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
+          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">rapports avec anomalie</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
         </p>
 
         <!-- Statut auto-emails -->
@@ -1459,6 +1459,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
             <button onclick="toggleEmailAuto('panne')" id="toggle-email-panne"
               style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
               <div id="knob-email-panne" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s"></div>
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">📋 Email lors d'un rapport anomalie (warn/arrêt)</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand un rapport non-OK est soumis ou modifié</div>
+            </div>
+            <button onclick="toggleEmailAuto('rapport')" id="toggle-email-rapport"
+              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-email-rapport" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s"></div>
             </button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
@@ -2503,6 +2513,7 @@ window.saveReport = async function() {
     machine, date, shift, status, fields, note,
   });
 
+  // ── Statut ≠ OK : alerte spécifique panne/ralentissement/arrêt ──
   if (status === 'panne' || panneSwitchOn) {
     await push(ref(db,'alerts'), {
       ts: serverTimestamp(), type:'danger', machine,
@@ -2515,7 +2526,6 @@ window.saveReport = async function() {
       userId: currentUser.uid, name: currentUConf.name, color: currentUConf.color,
       text: `🚨 ALERTE PANNE — Machine ${machine} — ${note||'Vérifier immédiatement'}`,
     });
-    // 📧 Email automatique si activé
     if (emailSettings.panne) {
       sendEmailToAllUsers(
         `🚨 PANNE — Machine ${machine}`,
@@ -2527,9 +2537,51 @@ window.saveReport = async function() {
         `Connectez-vous sur l'application TEV pour plus d'informations.`
       );
     }
+  } else if (status === 'warn') {
+    await push(ref(db,'alerts'), {
+      ts: serverTimestamp(), type:'warn', machine,
+      operatorName: currentUConf.name,
+      msg: `⚠️ Ralentissement signalé sur machine ${machine} par ${currentUConf.name}`,
+      detail: note || 'Aucun détail fourni', read: false,
+    });
+  } else if (status === 'arret') {
+    await push(ref(db,'alerts'), {
+      ts: serverTimestamp(), type:'warn', machine,
+      operatorName: currentUConf.name,
+      msg: `⏸️ Arrêt signalé sur machine ${machine} par ${currentUConf.name}`,
+      detail: note || 'Aucun détail fourni', read: false,
+    });
   }
 
-  // Message rapport supprimé pour ne pas polluer le chat
+  // ── Message rapport dans le chat groupe (tous statuts) ──
+  const statusEmoji = { ok:'✅', warn:'⚠️', panne:'🔴', arret:'⏸️' }[status] || '📋';
+  const statusLabel = { ok:'En fonctionnement', warn:'Ralentissement', panne:'PANNE', arret:'Arrêt' }[status] || status;
+  const m_obj = MACHINES.find(x => x.id === machine);
+  const prodVal = fields[m_obj?.fields[0]?.key] || 0;
+  const chatText = `${statusEmoji} Rapport ${machine} — ${shift} | Production : ${Number(prodVal).toLocaleString('fr-FR')} | Statut : ${statusLabel}${note ? ` | 📝 ${note}` : ''}`;
+  await push(ref(db,'groupChat'), {
+    ts: serverTimestamp(),
+    senderId: currentUser.uid,
+    senderName: currentUConf.name,
+    senderColor: currentUConf.color,
+    text: chatText,
+    isReport: true,
+  });
+
+  // ── Email à tous si statut ≠ OK et toggle rapport activé ──
+  if (status !== 'ok' && emailSettings.rapport) {
+    sendEmailToAllUsers(
+      `${statusEmoji} Rapport ${statusLabel} — Machine ${machine}`,
+      `Un nouveau rapport a été soumis.\n\n` +
+      `Machine : ${machine}\n` +
+      `Opérateur : ${currentUConf.name}\n` +
+      `Date : ${date} — Poste : ${shift}\n` +
+      `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
+      `Statut : ${statusLabel}\n` +
+      `Détail : ${note || 'Aucun commentaire'}\n\n` +
+      `Connectez-vous sur l'application TEV pour plus d'informations.`
+    );
+  }
 
   panneSwitchOn = false;
   document.getElementById('panneSwitch').classList.remove('on');
@@ -2675,6 +2727,61 @@ window.saveEditReport = async function() {
 
   try {
     await set(ref(db, `reports/${id}`), updated);
+
+    // ── Message de modification dans le chat groupe ──
+    const statusEmoji = { ok:'✅', warn:'⚠️', panne:'🔴', arret:'⏸️' }[updated.status] || '📋';
+    const statusLabel = { ok:'En fonctionnement', warn:'Ralentissement', panne:'PANNE', arret:'Arrêt' }[updated.status] || updated.status;
+    const m_edit = MACHINES.find(x => x.id === updated.machine);
+    const prodVal = updated.fields?.[m_edit?.fields[0]?.key] || 0;
+    const editText = `✏️ Rapport modifié — ${updated.machine} — ${updated.shift} | Production : ${Number(prodVal).toLocaleString('fr-FR')} | Statut : ${statusLabel}${updated.note ? ` | 📝 ${updated.note}` : ''}`;
+    await push(ref(db,'groupChat'), {
+      ts: serverTimestamp(),
+      senderId: currentUser.uid,
+      senderName: currentUConf.name,
+      senderColor: currentUConf.color,
+      text: editText,
+      isReport: true,
+    });
+
+    // ── Alerte si statut ≠ OK ──
+    if (updated.status === 'warn') {
+      await push(ref(db,'alerts'), {
+        ts: serverTimestamp(), type:'warn', machine: updated.machine,
+        operatorName: currentUConf.name,
+        msg: `⚠️ Rapport modifié — Ralentissement sur ${updated.machine} (par ${currentUConf.name})`,
+        detail: updated.note || 'Aucun détail', read: false,
+      });
+    } else if (updated.status === 'panne') {
+      await push(ref(db,'alerts'), {
+        ts: serverTimestamp(), type:'danger', machine: updated.machine,
+        operatorName: currentUConf.name,
+        msg: `🚨 Rapport modifié — PANNE sur ${updated.machine} (par ${currentUConf.name})`,
+        detail: updated.note || 'Aucun détail', read: false,
+      });
+    } else if (updated.status === 'arret') {
+      await push(ref(db,'alerts'), {
+        ts: serverTimestamp(), type:'warn', machine: updated.machine,
+        operatorName: currentUConf.name,
+        msg: `⏸️ Rapport modifié — Arrêt sur ${updated.machine} (par ${currentUConf.name})`,
+        detail: updated.note || 'Aucun détail', read: false,
+      });
+    }
+
+    // ── Email si statut ≠ OK et toggle rapport activé ──
+    if (updated.status !== 'ok' && emailSettings.rapport) {
+      sendEmailToAllUsers(
+        `✏️ Rapport modifié — ${statusLabel} — Machine ${updated.machine}`,
+        `Un rapport a été modifié.\n\n` +
+        `Machine : ${updated.machine}\n` +
+        `Modifié par : ${currentUConf.name}\n` +
+        `Date : ${updated.date} — Poste : ${updated.shift}\n` +
+        `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
+        `Statut : ${statusLabel}\n` +
+        `Détail : ${updated.note || 'Aucun commentaire'}\n\n` +
+        `Connectez-vous sur l'application TEV pour plus d'informations.`
+      );
+    }
+
     const ok = document.getElementById('editSaveOk');
     ok.style.display = 'block';
     setTimeout(() => {
@@ -3552,7 +3659,7 @@ const EMAILJS_PUBLIC_KEY  = 'WekufjELkayuIsf19YC0g';
 })();
 
 // Paramètres auto-email (sauvegardés dans Firebase)
-let emailSettings = { panne: true, annonce: true };
+let emailSettings = { panne: true, annonce: true, rapport: true };
 
 // ── Envoyer un email à une adresse ──
 async function sendEmail(toEmail, toName, subject, message) {
@@ -3580,7 +3687,7 @@ async function sendEmailToAllUsers(subject, message) {
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
-    const users = Object.values(profiles).filter(p => p.status === 'active' && p.email);
+    const users = Object.values(profiles).filter(p => p.email);
     let sent = 0;
     for (const u of users) {
       const ok = await sendEmail(u.email, u.name, subject, message);
@@ -3626,7 +3733,7 @@ window.toggleEmailAuto = async function(type) {
 };
 
 function updateEmailToggles() {
-  ['panne','annonce'].forEach(key => {
+  ['panne','annonce','rapport'].forEach(key => {
     const btn  = document.getElementById('toggle-email-'+key);
     const knob = document.getElementById('knob-email-'+key);
     if (!btn) return;
