@@ -102,6 +102,127 @@ body.theme-forest {
   --warn:    #fbbf24;
   --danger:  #f87171;
 }
+/* ── THÈME SUNSET ── */
+body.theme-sunset {
+  --bg:      #1a0a0a;
+  --bg2:     #2a1010;
+  --surface: #3a1818;
+  --card:    #2e1212;
+  --border:  rgba(255,100,50,.15);
+  --border2: rgba(255,100,50,.25);
+  --text:    #ffe4d0;
+  --muted:   #b87060;
+  --muted2:  #8a4a38;
+  --soufflage:   #ff6b35;
+  --remplissage: #ff9f1c;
+  --etiquette:   #ffbf69;
+  --emballage:   #ff4d6d;
+  --b19:         #c77dff;
+  --ok:      #06d6a0;
+  --warn:    #ff9f1c;
+  --danger:  #ef233c;
+}
+/* ── THÈME AURORA ── */
+body.theme-aurora {
+  --bg:      #050d1a;
+  --bg2:     #071525;
+  --surface: #0a1e30;
+  --card:    #081828;
+  --border:  rgba(0,255,180,.1);
+  --border2: rgba(0,255,180,.2);
+  --text:    #e0fff5;
+  --muted:   #4a9e8a;
+  --muted2:  #2e7a68;
+  --soufflage:   #00ffcc;
+  --remplissage: #00e5ff;
+  --etiquette:   #aaff00;
+  --emballage:   #ff6b9d;
+  --b19:         #bf5fff;
+  --ok:      #00ffcc;
+  --warn:    #aaff00;
+  --danger:  #ff4d6d;
+}
+/* ── THÈME ROSE GOLD ── */
+body.theme-rosegold {
+  --bg:      #fdf0f0;
+  --bg2:     #ffffff;
+  --surface: #fff5f5;
+  --card:    #ffffff;
+  --border:  #f0d0d0;
+  --border2: #e8b8b8;
+  --text:    #3d1f1f;
+  --muted:   #b07070;
+  --muted2:  #c89090;
+  --soufflage:   #e8748a;
+  --remplissage: #c0786e;
+  --etiquette:   #d4956a;
+  --emballage:   #b85c78;
+  --b19:         #9b59b6;
+  --ok:      #27ae60;
+  --warn:    #e67e22;
+  --danger:  #c0392b;
+}
+/* ── THÈME MIDNIGHT PURPLE ── */
+body.theme-midnight {
+  --bg:      #0d0618;
+  --bg2:     #150a28;
+  --surface: #1e1035;
+  --card:    #180c2e;
+  --border:  rgba(160,80,255,.15);
+  --border2: rgba(160,80,255,.25);
+  --text:    #ede0ff;
+  --muted:   #8060aa;
+  --muted2:  #604888;
+  --soufflage:   #b060ff;
+  --remplissage: #7c4dff;
+  --etiquette:   #e040fb;
+  --emballage:   #ff4081;
+  --b19:         #64ffda;
+  --ok:      #69f0ae;
+  --warn:    #ffd740;
+  --danger:  #ff5252;
+}
+/* ── THÈME ARCTIC ── */
+body.theme-arctic {
+  --bg:      #f0f8ff;
+  --bg2:     #ffffff;
+  --surface: #f5fbff;
+  --card:    #ffffff;
+  --border:  #c8e8f8;
+  --border2: #a8d8f0;
+  --text:    #1a3040;
+  --muted:   #6090b0;
+  --muted2:  #88aac0;
+  --soufflage:   #0090d0;
+  --remplissage: #00b8a0;
+  --etiquette:   #0070c0;
+  --emballage:   #0050a0;
+  --b19:         #6040c0;
+  --ok:      #00a878;
+  --warn:    #f08030;
+  --danger:  #d03030;
+}
+/* ── THÈME VOLCANIC ── */
+body.theme-volcanic {
+  --bg:      #0e0800;
+  --bg2:     #1a1000;
+  --surface: #251800;
+  --card:    #201400;
+  --border:  rgba(255,120,0,.15);
+  --border2: rgba(255,120,0,.25);
+  --text:    #fff0d0;
+  --muted:   #aa7030;
+  --muted2:  #805020;
+  --soufflage:   #ff8c00;
+  --remplissage: #ff6000;
+  --etiquette:   #ffd000;
+  --emballage:   #ff3000;
+  --b19:         #ff00aa;
+  --ok:      #80ff40;
+  --warn:    #ffd000;
+  --danger:  #ff2000;
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
@@ -1439,6 +1560,102 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
             </div>
           </div>
 
+          <!-- Sunset -->
+          <div onclick="applyTheme('sunset')" id="theme-sunset" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#1a0a0a,#3a1818);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff9f1c"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#06d6a0"></div>
+              </div>
+              <div style="height:4px;background:#2e1212;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#2a1010;border-radius:2px;width:70%"></div>
+            </div>
+            <div style="background:#1a0a0a;padding:8px 12px;font-size:12px;font-weight:700;color:#ff6b35;display:flex;align-items:center;justify-content:space-between">
+              🌅 Sunset <span id="check-sunset" style="color:#22c55e;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Aurora -->
+          <div onclick="applyTheme('aurora')" id="theme-aurora" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#050d1a,#0a1e30);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff6b9d"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#aaff00"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#00ffcc"></div>
+              </div>
+              <div style="height:4px;background:#081828;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#071525;border-radius:2px;width:70%"></div>
+            </div>
+            <div style="background:#050d1a;padding:8px 12px;font-size:12px;font-weight:700;color:#00ffcc;display:flex;align-items:center;justify-content:space-between">
+              🌌 Aurora <span id="check-aurora" style="color:#22c55e;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Rose Gold -->
+          <div onclick="applyTheme('rosegold')" id="theme-rosegold" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#fdf0f0,#fff5f5);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#c0392b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#e67e22"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#27ae60"></div>
+              </div>
+              <div style="height:4px;background:#f0d0d0;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#fff5f5;border-radius:2px;width:70%;border:1px solid #f0d0d0"></div>
+            </div>
+            <div style="background:#fdf0f0;padding:8px 12px;font-size:12px;font-weight:700;color:#e8748a;display:flex;align-items:center;justify-content:space-between">
+              🌸 Rose Gold <span id="check-rosegold" style="color:#27ae60;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Midnight -->
+          <div onclick="applyTheme('midnight')" id="theme-midnight" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0d0618,#1e1035);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff5252"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffd740"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#69f0ae"></div>
+              </div>
+              <div style="height:4px;background:#180c2e;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#150a28;border-radius:2px;width:70%"></div>
+            </div>
+            <div style="background:#0d0618;padding:8px 12px;font-size:12px;font-weight:700;color:#b060ff;display:flex;align-items:center;justify-content:space-between">
+              🔮 Midnight <span id="check-midnight" style="color:#69f0ae;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Arctic -->
+          <div onclick="applyTheme('arctic')" id="theme-arctic" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#f0f8ff,#f5fbff);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#d03030"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f08030"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#00a878"></div>
+              </div>
+              <div style="height:4px;background:#c8e8f8;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#f5fbff;border-radius:2px;width:70%;border:1px solid #c8e8f8"></div>
+            </div>
+            <div style="background:#f0f8ff;padding:8px 12px;font-size:12px;font-weight:700;color:#0090d0;display:flex;align-items:center;justify-content:space-between">
+              🧊 Arctic <span id="check-arctic" style="color:#00a878;display:none">✓</span>
+            </div>
+          </div>
+
+          <!-- Volcanic -->
+          <div onclick="applyTheme('volcanic')" id="theme-volcanic" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0e0800,#251800);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff2000"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffd000"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#80ff40"></div>
+              </div>
+              <div style="height:4px;background:#201400;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#1a1000;border-radius:2px;width:70%"></div>
+            </div>
+            <div style="background:#0e0800;padding:8px 12px;font-size:12px;font-weight:700;color:#ff8c00;display:flex;align-items:center;justify-content:space-between">
+              🌋 Volcanic <span id="check-volcanic" style="color:#80ff40;display:none">✓</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -2571,10 +2788,10 @@ window.saveReport = async function() {
     isReport: true,
   });
 
-  // ── Email à tous si statut ≠ OK et toggle rapport activé ──
-  if (status !== 'ok' && emailSettings.rapport) {
+  // ── Email à tous : toujours pour Emballage et B19, sinon seulement si statut ≠ OK ──
+  if (emailSettings.rapport && (machine === 'Emballage' || machine === 'B19' || status !== 'ok')) {
     sendEmailToAllUsers(
-      `${statusEmoji} Rapport ${statusLabel} — Machine ${machine}`,
+      `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
       `Un nouveau rapport a été soumis.\n\n` +
       `Machine : ${machine}\n` +
       `Opérateur : ${currentUConf.name}\n` +
@@ -3845,7 +4062,7 @@ onValue(ref(db, 'system/emailSettings'), snap => {
 });
 
 // ══════════ GESTION DES THÈMES ══════════
-const THEMES = ['dark','light','ocean','forest'];
+const THEMES = ['dark','light','ocean','forest','sunset','aurora','rosegold','midnight','arctic','volcanic'];
 
 function applyThemeUI(theme) {
   // Retirer tous les thèmes
@@ -3861,7 +4078,7 @@ function applyThemeUI(theme) {
   const activeCard = document.getElementById('theme-'+theme);
   const activeCheck = document.getElementById('check-'+theme);
   if (activeCard) {
-    const colors = { dark:'rgba(168,85,247,.8)', light:'rgba(0,153,204,.8)', ocean:'rgba(0,212,255,.8)', forest:'rgba(74,222,128,.8)' };
+    const colors = { dark:'rgba(168,85,247,.8)', light:'rgba(0,153,204,.8)', ocean:'rgba(0,212,255,.8)', forest:'rgba(74,222,128,.8)', sunset:'rgba(255,107,53,.8)', aurora:'rgba(0,255,204,.8)', rosegold:'rgba(232,116,138,.8)', midnight:'rgba(176,96,255,.8)', arctic:'rgba(0,144,208,.8)', volcanic:'rgba(255,140,0,.8)' };
     activeCard.style.border = `2px solid ${colors[theme]||'rgba(168,85,247,.8)'}`;
     activeCard.style.boxShadow = `0 0 0 3px ${colors[theme]||'rgba(168,85,247,.2)'}44`;
   }
