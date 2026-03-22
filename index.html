@@ -542,22 +542,22 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     background:rgba(255,255,255,.04);
     border:1px solid rgba(255,255,255,.12);
     border-radius:20px;
-    padding:36px 32px 28px;
+    padding:20px 24px 20px;
     text-align:center;
     backdrop-filter:blur(10px);
     box-shadow:0 20px 60px rgba(0,0,0,.5);
     position:relative;
   ">
     <!-- Croix dorée -->
-    <div style="font-size:38px;margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
+    <div style="font-size:34px;margin-bottom:10px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
 
     <!-- Message -->
     <p style="
       font-family:'Barlow',sans-serif;
       font-size:16px;
-      line-height:1.85;
+      line-height:1.5;
       color:rgba(255,255,255,.88);
-      margin:0 0 10px;
+      margin:0 0 6px;
       letter-spacing:.01em;
     ">
       Cher amis, ceci n'est qu'une idée simple.<br>
@@ -567,9 +567,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <p style="
       font-family:'Barlow',sans-serif;
       font-size:15px;
-      line-height:1.8;
+      line-height:1.45;
       color:rgba(255,255,255,.7);
-      margin:0 0 10px;
+      margin:0 0 6px;
     ">
       Ceci n'est qu'une idée, car on avance dans un monde professionnel<br>
       et on a besoin de nous tous chaque jour.
@@ -577,9 +577,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <p style="
       font-family:'Barlow',sans-serif;
       font-size:15px;
-      line-height:1.8;
+      line-height:1.45;
       color:rgba(255,255,255,.7);
-      margin:0 0 22px;
+      margin:0 0 12px;
     ">
       Ceci n'est pas une idée de l'administration,<br>
       ni une imposition ou une chose pour mettre son prochain en danger.<br>
@@ -594,7 +594,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       letter-spacing:.1em;
       color:#ffd700;
       text-shadow:0 0 16px rgba(255,215,0,.5);
-      margin-bottom:28px;
+      margin-bottom:14px;
     ">✨ Soyez bénis. CHRIST ROI DES ROIS ✨</div>
 
     <!-- Barre de progression -->
@@ -678,28 +678,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       ACCÉDER À L'APPLICATION →
     </button>
     <div style="margin-top:24px;font-size:11px;color:rgba(255,255,255,.25);letter-spacing:.1em;text-transform:uppercase">Alban Technology A.E.T © 2026</div>
-  </div>
-</div>
-
-<!-- ÉCRAN ATTENTE VALIDATION ADMIN -->
-<div id="pendingScreen" style="display:none;position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#0a0f1e,#0d1a2e);align-items:center;justify-content:center;padding:24px">
-  <div style="max-width:420px;width:100%;text-align:center;animation:fadeIn .5s ease">
-    <div style="width:80px;height:80px;border-radius:50%;background:rgba(245,158,11,.15);border:2px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 24px;animation:pulse 2s infinite">⏳</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:.05em;margin-bottom:10px">Compte en attente</div>
-    <div style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:24px">
-      Votre inscription a bien été reçue.<br>
-      <span style="color:#fbbf24;font-weight:600">L'administrateur doit valider votre compte</span><br>
-      avant que vous puissiez accéder à l'application.
-    </div>
-    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:16px;margin-bottom:24px">
-      <div style="display:flex;align-items:center;gap:10px;justify-content:center">
-        <div style="width:10px;height:10px;background:#fbbf24;border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0"></div>
-        <div style="font-size:13px;font-weight:600;color:#fbbf24">En attente de validation...</div>
-      </div>
-      <div id="pendingUserInfo" style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px"></div>
-    </div>
-    <div style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:20px">Contactez votre administrateur si vous attendez depuis longtemps.</div>
-    <button onclick="doSignOut()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);border-radius:10px;padding:10px 24px;cursor:pointer;font-size:13px;font-weight:600">Se déconnecter</button>
   </div>
 </div>
 
@@ -1379,16 +1357,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         </div>
       </div>
 
-      <!-- COMPTES EN ATTENTE DE VALIDATION -->
-      <div class="card" style="border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--warn);display:flex;align-items:center;gap:10px">
-          ⏳ Comptes en attente de validation
-          <span id="pendingBadge" style="display:none;background:var(--warn);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px">0</span>
-        </div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Ces utilisateurs se sont inscrits mais attendent votre approbation.</p>
-        <div id="pendingUserList"><div class="empty"><div class="eico">✅</div><p>Aucun compte en attente</p></div></div>
-      </div>
-
       <!-- UTILISATEURS ENREGISTRÉS -->
       <div class="card">
         <div class="card-title">👥 Comptes utilisateurs enregistrés</div>
@@ -1814,13 +1782,9 @@ window.doRegister = async function() {
   btn.disabled = true; btn.textContent = 'Création...';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-    await set(ref(db, `userProfiles/${cred.user.uid}`), {
-      name, role, email,
-      status: 'pending',
-      createdAt: Date.now()
-    });
+    await set(ref(db, `userProfiles/${cred.user.uid}`), { name, role, email, createdAt: Date.now() });
     err.style.color = 'var(--ok)';
-    err.textContent = '✅ Compte créé ! En attente de validation par l\'administrateur.';
+    err.textContent = '✅ Compte créé ! Connexion en cours...';
   } catch(e) {
     if (e.code === 'auth/email-already-in-use') err.textContent = 'Cette adresse e-mail est déjà utilisée.';
     else if (e.code === 'auth/invalid-email')   err.textContent = 'Adresse e-mail invalide.';
@@ -1893,18 +1857,6 @@ onAuthStateChanged(auth, async user => {
         const snap = await get(ref(db, `userProfiles/${user.uid}`));
         if (snap.exists()) {
           const p = snap.val();
-
-          // ── Compte en attente de validation ──
-          if (p.status === 'pending') {
-            document.getElementById('loginScreen').classList.remove('show');
-            document.getElementById('loginScreen').style.display = 'none';
-            const ps = document.getElementById('pendingScreen');
-            ps.style.display = 'flex';
-            const info = document.getElementById('pendingUserInfo');
-            if (info) info.textContent = `${p.name||''} · ${p.role||''} · Inscrit le ${new Date(p.createdAt||Date.now()).toLocaleDateString('fr-FR')}`;
-            return;
-          }
-
           conf = {
             email:   p.email || user.email,
             name:    p.name,
@@ -1919,6 +1871,7 @@ onAuthStateChanged(auth, async user => {
     if (!conf) { await signOut(auth); return; }
     currentUConf = conf;
 
+    // Load extra profile data (phone, photoURL)
     try {
       const snap2 = await get(ref(db, `userProfiles/${user.uid}`));
       if (snap2.exists()) {
@@ -1928,19 +1881,21 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) {}
 
+    // Charger le cache de photos de tous les utilisateurs
     await loadPhotosCache();
+    // Ajouter soi-même au cache
     photosCache[user.uid] = { photoURL: currentUConf.photoURL||null, color: currentUConf.color, name: currentUConf.name };
 
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('pendingScreen').style.display = 'none';
 
+    // Montrer le splash 30s AVANT d'accéder à l'app
+    // L'app se charge en arrière-plan pendant ce temps
     initApp();
     showSplash('app');
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
-    document.getElementById('pendingScreen').style.display = 'none';
     loadDynamicUsers();
   }
 });
@@ -3581,62 +3536,28 @@ function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
   if (!isAdmin) { navigate('dashboard'); return; }
 
-  const isSuperOnly = currentUConf?.role === 'Superviseur';
+  const isSuperOnly = currentUConf?.role === 'Superviseur'; // Superviseur mais pas Admin
   const listEl = document.getElementById('adminUserList');
-  const pendingEl = document.getElementById('pendingUserList');
-  const pendingBadge = document.getElementById('pendingBadge');
   if (!listEl) return;
 
   get(ref(db, 'userProfiles')).then(snap => {
     const profiles = snap.val() || {};
-    const allUsers = Object.entries(profiles);
-
-    // ── Séparer pending / actifs ──
-    const pendingUsers = allUsers.filter(([,p]) => p.status === 'pending');
-    const activeUsers  = allUsers.filter(([,p]) => p.status !== 'pending');
-
-    // Badge compteur
-    if (pendingBadge) {
-      pendingBadge.textContent = pendingUsers.length;
-      pendingBadge.style.display = pendingUsers.length > 0 ? 'inline-block' : 'none';
-    }
-
-    // Liste en attente
-    if (pendingEl) {
-      if (pendingUsers.length === 0) {
-        pendingEl.innerHTML = '<div class="empty"><div class="eico">✅</div><p>Aucun compte en attente</p></div>';
-      } else {
-        pendingEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">
-          ${pendingUsers.map(([uid, p]) => `
-            <div style="background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-              <div style="width:42px;height:42px;border-radius:50%;background:rgba(245,158,11,.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fbbf24;flex-shrink:0">${(p.name||'?').charAt(0).toUpperCase()}</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-weight:700;color:var(--text);font-size:14px">${esc(p.name||'—')}</div>
-                <div style="font-size:12px;color:var(--muted)">${esc(p.email||'—')} · ${esc(p.role||'—')}</div>
-                <div style="font-size:11px;color:rgba(245,158,11,.7);margin-top:2px">📅 Inscrit le ${new Date(p.createdAt||Date.now()).toLocaleDateString('fr-FR')}</div>
-              </div>
-              <div style="display:flex;gap:8px;flex-shrink:0">
-                <button onclick="validateUser('${uid}')" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--ok);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:700">✅ Valider</button>
-                <button onclick="rejectUser('${uid}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:700">❌ Refuser</button>
-              </div>
-            </div>`).join('')}
-        </div>`;
-      }
-    }
-
-    // ── Comptes actifs ──
-    if (activeUsers.length === 0) {
+    const users = Object.entries(profiles);
+    if (users.length === 0) {
       listEl.innerHTML = '<div class="empty"><div class="eico">👥</div><p>Aucun utilisateur enregistré</p></div>';
       return;
     }
 
-    const ROLES_ADMIN      = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19','Superviseur','Admin'];
+    // Rôles disponibles selon qui est connecté
+    // Superviseur → peut seulement changer les rôles techniciens
+    // Admin → peut tout changer
+    const ROLES_ADMIN     = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19','Superviseur','Admin'];
     const ROLES_SUPERVISEUR = ['Technicien Soufflage','Technicien Remplissage','Technicien Étiquette','Technicien Emballage','Technicien B19'];
     const availableRoles = isSuperOnly ? ROLES_SUPERVISEUR : ROLES_ADMIN;
 
     listEl.innerHTML = `<div class="table-wrap"><table>
       <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th>${!isSuperOnly?'<th>Changer le rôle</th>':''}<th></th></tr></thead>
-      <tbody>${activeUsers.map(([uid, p]) => {
+      <tbody>${users.map(([uid, p]) => {
         const color = (MACHINE_MAP[p.role]||{}).color||'#888';
         const isAdminUser = p.role==='Admin';
         const isSuperUser = p.role==='Superviseur';
@@ -3645,7 +3566,10 @@ function renderAdminPage() {
           : isSuperUser
             ? 'background:rgba(139,92,246,.15);color:#8b5cf6;border:1px solid rgba(139,92,246,.3);'
             : `background:${color}15;color:${color};border:1px solid ${color}30;`;
+
+        // Le Superviseur ne peut pas modifier un Admin ou autre Superviseur
         const canChangeRole = !isSuperOnly;
+
         return `<tr>
           <td style="font-weight:600;white-space:nowrap">
             ${p.photoURL
@@ -3653,7 +3577,11 @@ function renderAdminPage() {
               : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:${color};align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#000;vertical-align:middle;margin-right:8px">${(p.name||'?').charAt(0)}</span>`}
             ${esc(p.name||'—')}
           </td>
-          <td><span style="padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;${badgeStyle}">${isAdminUser?'⚙️ ':isSuperUser?'🔧 ':''}${esc(p.role||'—')}</span></td>
+          <td>
+            <span style="padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;${badgeStyle}">
+              ${isAdminUser?'⚙️ ':isSuperUser?'🔧 ':''}${esc(p.role||'—')}
+            </span>
+          </td>
           <td style="color:var(--muted);font-size:12px">${esc(p.email||'—')}</td>
           ${canChangeRole ? `<td>
             <div style="display:flex;align-items:center;gap:8px">
@@ -3663,7 +3591,9 @@ function renderAdminPage() {
               <button onclick="changeUserRole('${uid}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Appliquer</button>
             </div>
           </td>` : '<td></td>'}
-          <td><button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button></td>
+          <td>
+            <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>
+          </td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>`;
@@ -3704,38 +3634,6 @@ window.deleteUserProfile = async function(uid) {
   if (!confirm('Supprimer ce profil utilisateur ? Il pourra recréer un compte.')) return;
   await remove(ref(db, `userProfiles/${uid}`));
   renderAdminPage();
-};
-
-// ── Valider un compte en attente ──
-window.validateUser = async function(uid) {
-  try {
-    await update(ref(db, `userProfiles/${uid}`), { status: 'active' });
-    const snap = await get(ref(db, `userProfiles/${uid}`));
-    const p = snap.val();
-    if (p) {
-      await push(ref(db, 'groupChat'), {
-        ts: serverTimestamp(),
-        senderId: 'system',
-        senderName: 'Système',
-        senderColor: '#22c55e',
-        text: `✅ ${p.name} a été validé(e) et peut maintenant accéder à l'application.`,
-        system: true,
-      });
-    }
-    renderAdminPage();
-  } catch(e) { alert('Erreur : ' + e.message); }
-};
-
-// ── Refuser un compte en attente ──
-window.rejectUser = async function(uid) {
-  const snap = await get(ref(db, `userProfiles/${uid}`));
-  const p = snap.val();
-  const name = p?.name || 'cet utilisateur';
-  if (!confirm(`Refuser et supprimer le compte de ${name} ?`)) return;
-  try {
-    await remove(ref(db, `userProfiles/${uid}`));
-    renderAdminPage();
-  } catch(e) { alert('Erreur : ' + e.message); }
 };
 
 window.resetSection = async function(section, label) {
