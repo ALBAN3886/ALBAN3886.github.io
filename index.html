@@ -1059,6 +1059,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <!-- BANNIÈRE ANNONCE ADMIN -->
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
+      <!-- BANNIÈRE FORMAT DE PRODUCTION -->
+      <div id="formatBanner" style="display:none;margin-bottom:16px;animation:fadeIn .4s ease"></div>
+
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
       <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.08);pointer-events:none"></div>
@@ -1508,6 +1511,38 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="page" id="page-admin">
       <div class="page-header">
         <div><h2>⚙️ Administration</h2><p>Gestion et réinitialisation des données</p></div>
+      </div>
+
+      <!-- 📐 FORMAT DE PRODUCTION -->
+      <div class="card" style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.04);margin-bottom:16px">
+        <div class="card-title" style="color:#a5b4fc">📐 Format de Production</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Sélectionnez le format de bouteille en cours de production. Il s'affichera <strong style="color:var(--text)">en grand sur le tableau de bord</strong> pour tous les utilisateurs.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+          <div onclick="setProductionFormat('0.35')" id="fmt-035" style="border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;padding:16px 10px;text-align:center;transition:all .2s">
+            <div style="font-size:28px;margin-bottom:6px">🔹</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text)">0,35</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Litres</div>
+          </div>
+          <div onclick="setProductionFormat('0.5')" id="fmt-05" style="border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;padding:16px 10px;text-align:center;transition:all .2s">
+            <div style="font-size:28px;margin-bottom:6px">🔸</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text)">0,5</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Litres</div>
+          </div>
+          <div onclick="setProductionFormat('1.5')" id="fmt-15" style="border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;padding:16px 10px;text-align:center;transition:all .2s">
+            <div style="font-size:28px;margin-bottom:6px">🔷</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text)">1,5</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Litres</div>
+          </div>
+          <div onclick="setProductionFormat('1.6')" id="fmt-16" style="border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;padding:16px 10px;text-align:center;transition:all .2s">
+            <div style="font-size:28px;margin-bottom:6px">🔶</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text)">1,6</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Litres</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div id="currentFormatLabel" style="font-size:13px;color:var(--muted)">Aucun format sélectionné</div>
+          <button onclick="setProductionFormat('')" class="btn btn-ghost btn-sm" style="border-color:rgba(239,68,68,.3);color:var(--danger)">✕ Désactiver</button>
+        </div>
       </div>
 
       <!-- 🎨 THÈME DE L'APPLICATION -->
@@ -4086,6 +4121,62 @@ function updateEmailToggles() {
 onValue(ref(db, 'system/emailSettings'), snap => {
   if (snap.val()) { emailSettings = { ...emailSettings, ...snap.val() }; }
   updateEmailToggles();
+});
+
+// ══════════ FORMAT DE PRODUCTION ══════════
+const FORMAT_LABELS = { '0.35':'0,35 L', '0.5':'0,5 L', '1.5':'1,5 L', '1.6':'1,6 L' };
+const FORMAT_EMOJIS = { '0.35':'🔹', '0.5':'🔸', '1.5':'🔷', '1.6':'🔶' };
+const FORMAT_COLORS = { '0.35':'#60a5fa', '0.5':'#34d399', '1.5':'#a78bfa', '1.6':'#fb923c' };
+
+window.setProductionFormat = async function(fmt) {
+  try {
+    await set(ref(db, 'system/productionFormat'), fmt || null);
+  } catch(e) { console.warn(e); }
+};
+
+function renderFormatBanner(fmt) {
+  const banner = document.getElementById('formatBanner');
+  if (!banner) return;
+
+  // Update admin card selection UI
+  ['035','05','15','16'].forEach(id => {
+    const el = document.getElementById('fmt-'+id);
+    if (el) { el.style.border = '2px solid var(--border)'; el.style.background = 'var(--surface)'; el.style.transform = ''; }
+  });
+  const fmtIdMap = { '0.35':'035', '0.5':'05', '1.5':'15', '1.6':'16' };
+  const activeId = fmtIdMap[fmt];
+  if (activeId) {
+    const activeEl = document.getElementById('fmt-'+activeId);
+    const col = FORMAT_COLORS[fmt] || '#a5b4fc';
+    if (activeEl) { activeEl.style.border = `2px solid ${col}`; activeEl.style.background = col+'18'; activeEl.style.transform = 'scale(1.04)'; }
+  }
+  const lbl = document.getElementById('currentFormatLabel');
+  if (lbl) lbl.textContent = fmt ? `✅ Format actif : ${FORMAT_LABELS[fmt] || fmt}` : 'Aucun format sélectionné';
+
+  // Show/hide dashboard banner
+  if (!fmt) { banner.style.display = 'none'; return; }
+  const color = FORMAT_COLORS[fmt] || '#a5b4fc';
+  const emoji = FORMAT_EMOJIS[fmt] || '📐';
+  const label = FORMAT_LABELS[fmt] || fmt;
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div style="background:linear-gradient(135deg,${color}22,${color}11);border:2px solid ${color}55;border-radius:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 4px 20px ${color}22">
+      <div style="width:64px;height:64px;border-radius:16px;background:${color}33;border:2px solid ${color}66;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0">${emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:${color};font-weight:700;margin-bottom:4px">📐 Format de production en cours</div>
+        <div style="font-family:var(--font-display);font-size:clamp(32px,8vw,56px);font-weight:900;color:${color};line-height:1;letter-spacing:.02em">${label}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Bouteilles</div>
+        <div style="font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text)">Eau Vitale</div>
+      </div>
+    </div>`;
+}
+
+// Écouter le format en temps réel depuis Firebase
+onValue(ref(db, 'system/productionFormat'), snap => {
+  const fmt = snap.val() || '';
+  renderFormatBanner(fmt);
 });
 
 // ══════════ GESTION DES THÈMES ══════════
