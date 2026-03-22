@@ -938,7 +938,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
-      <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
+      <div id="dashCounter" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.08);pointer-events:none"></div>
 
         <!-- En-tête mois -->
@@ -974,7 +974,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
         </div>
       </div>
-      <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+      <div id="dashStats" class="stats-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-box s1"><div class="slabel">🫧 Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub" id="gs1date">—</div></div>
         <div class="stat-box s2"><div class="slabel">🧴 Remplissage</div><div class="sval" id="gs2">—</div><div class="ssub" id="gs2date">—</div></div>
         <div class="stat-box s3"><div class="slabel">🏷️ Étiquette</div><div class="sval" id="gs3">—</div><div class="ssub" id="gs3date">—</div></div>
@@ -983,13 +983,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
       <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
 
-      <!-- TABLEAU CARTONS EMBALLAGE -->
-      <div class="card" id="emballageCartonsCard">
-        <div class="card-title" style="color:var(--emballage)">📦 Détail Emballage — Cartons</div>
-        <div id="emballageCartonsTable"><div class="empty"><div class="eico">📦</div><p>Aucun rapport Emballage</p></div></div>
-      </div>
-
-      <div class="card">
+      <div class="card" id="dashReportsCard">
         <div class="card-title">📋 Rapports du <span id="dashReportDateLabel">jour sélectionné</span></div>
         <div class="table-wrap" id="allReportsTable"><div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div></div>
       </div>
@@ -1437,48 +1431,86 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
               🌿 Forêt <span id="check-forest" style="color:#4ade80;display:none">✓</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ SECTIONS VISIBLES SUR LE TABLEAU DE BORD ══ -->
+      <div class="card" style="border-color:rgba(0,184,230,.25);background:rgba(0,184,230,.03);margin-bottom:16px">
+        <div class="card-title" style="color:var(--soufflage)">📊 Sections visibles sur le Tableau de Bord</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Activez ou désactivez les sections affichées à tous les utilisateurs.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
+            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📊 Compteur mensuel B19 + Emballage</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Widget foncé avec les totaux du mois</div></div>
+            <button onclick="toggleDashSection('showCounter')" id="toggle-showCounter" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-showCounter" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
+            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📈 Statistiques des 5 machines</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Ligne de stats Soufflage, Remplissage, etc.</div></div>
+            <button onclick="toggleDashSection('showStats')" id="toggle-showStats" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-showStats" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
+            <div><div style="font-weight:600;font-size:13px;color:var(--text)">🏭 Cartes machines détaillées</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Soufflage, Remplissage, Étiquette, Emballage, B19</div></div>
+            <button onclick="toggleDashSection('showMachines')" id="toggle-showMachines" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-showMachines" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
+            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📋 Tableau des rapports du jour</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Liste de tous les rapports soumis</div></div>
+            <button onclick="toggleDashSection('showReports')" id="toggle-showReports" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
+              <div id="knob-showReports" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
 
         </div>
       </div>
 
-      <!-- 📅 DATE DES RAPPORTS AFFICHÉS SUR LE TABLEAU DE BORD -->
+      <!-- ══ DATE DES RAPPORTS PAR MACHINE ══ -->
       <div class="card" style="border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.03);margin-bottom:16px">
-        <div class="card-title" style="color:#a5b4fc">📅 Date des rapports affichés</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:18px">
-          Choisissez la date dont les rapports seront affichés sur le tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.
-          Par exemple, sélectionnez <em>vendredi dernier</em> pour que tout le monde voit les rapports de ce jour.
-        </p>
+        <div class="card-title" style="color:#a5b4fc">📅 Date des rapports par machine</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez la date affichée pour chaque machine sur le tableau de bord. Par défaut : <strong style="color:var(--text)">hier</strong>.</p>
 
-        <!-- Mode automatique / manuel -->
-        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-          <button onclick="setDashDateMode('auto')" id="dashmode-auto"
-            style="padding:9px 20px;border-radius:20px;border:2px solid #a5b4fc;background:#a5b4fc;color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">
-            🔄 Automatique (hier)
-          </button>
-          <button onclick="setDashDateMode('manual')" id="dashmode-manual"
-            style="padding:9px 20px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s">
-            📌 Date fixe
-          </button>
+        <!-- Toutes les machines en même temps -->
+        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+          <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">🌍 Appliquer une date à toutes les machines</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="date" id="globalMachineDate" class="form-input" style="width:auto;padding:7px 10px;font-size:13px;flex:1;min-width:140px">
+            <button onclick="applyGlobalMachineDate()" class="btn btn-primary btn-sm">✓ Appliquer tout</button>
+            <button onclick="resetAllMachineDates()" class="btn btn-ghost btn-sm">🔄 Tout remettre à hier</button>
+          </div>
         </div>
 
-        <!-- Sélecteur de date (visible en mode manuel) -->
-        <div id="adminDatePickerWrap" style="display:none">
-          <div class="form-label" style="margin-bottom:8px">Choisir une date spécifique</div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input type="date" class="form-input" id="adminDashDate" style="width:auto;padding:10px 14px"
-              onchange="applyAdminDashDate()">
-            <button onclick="applyAdminDashDate()" class="btn btn-primary btn-sm">✓ Appliquer pour tous</button>
-          </div>
-          <div id="adminDateApplied" style="display:none;color:var(--ok);font-size:13px;font-weight:600;margin-top:8px">✓ Date appliquée !</div>
-        </div>
+        <!-- Par machine -->
+        <div style="display:flex;flex-direction:column;gap:8px">
 
-        <!-- Date actuellement affichée -->
-        <div style="margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px">
-          <div style="font-size:20px">📋</div>
-          <div>
-            <div style="font-size:12px;color:var(--muted);margin-bottom:2px">Date actuellement affichée sur le tableau de bord :</div>
-            <div id="adminCurrentDate" style="font-weight:700;color:var(--text);font-size:14px">—</div>
-          </div>
+          ${[
+            {id:'Soufflage',   icon:'🫧', color:'#00b8e6'},
+            {id:'Remplissage', icon:'🧴', color:'#00d97e'},
+            {id:'Étiquette',   icon:'🏷️', color:'#f59e0b'},
+            {id:'Emballage',   icon:'📦', color:'#f97316'},
+            {id:'B19',         icon:'⚙️', color:'#a855f7'}
+          ].map(m => `
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;min-width:110px">
+              <span style="font-size:16px">${m.icon}</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--text)">${m.id}</div>
+                <div id="machdate-label-${m.id}" style="font-size:11px;color:var(--muted)">📅 hier</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <input type="date" id="machdate-${m.id}" class="form-input" style="width:auto;padding:6px 10px;font-size:12px">
+              <button onclick="applyMachineDate('${m.id}')" style="background:${m.color};border:none;color:#000;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700">✓ OK</button>
+              <button onclick="resetMachineDate('${m.id}')" style="background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px">🔄</button>
+            </div>
+          </div>`).join('')}
+
         </div>
       </div>
 
@@ -2262,7 +2294,7 @@ window.navigate = function(page) {
   if (page==='historique') renderHistory();
   if (page==='profil') renderProfile();
   if (page==='equipe') renderEquipePage();
-  if (page==='admin')  { renderAdminPage(); updateAdminCurrentDate(); }
+  if (page==='admin')  renderAdminPage();
   if (page==='emballage') renderEmballagePage();
   if (page==='b19')       renderB19Page();
   if (page==='total')     renderTotalPage();
@@ -2286,7 +2318,6 @@ function getYesterday() {
 
 function renderDashboard() {
   const picker = document.getElementById('dashDatePicker');
-  // Toujours recalculer hier si aucune sélection manuelle récente
   if (!picker.dataset.manuallySet) {
     picker.value = getYesterday();
   }
@@ -2294,9 +2325,11 @@ function renderDashboard() {
   const allReps = Object.values(allReports);
   const selReps = allReps.filter(r => r.date === selDate);
 
-  // Stats haut — uniquement la date sélectionnée, pas de fallback sur d'autres dates
+  // getBest utilise la date spécifique à chaque machine si définie par l'admin
   function getBest(machine) {
-    return selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
+    const date = getMachineDate(machine); // date fixée par admin ou hier
+    const reps = allReps.filter(r => r.machine === machine && r.date === date);
+    return reps.sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
   }
 
   const soufR = getBest('Soufflage');
@@ -3512,98 +3545,100 @@ function renderAnnounceBanner(data) {
     </div>`;
 }
 
-// ══════════ DATE TABLEAU DE BORD (Admin) ══════════
-let dashDateMode = 'auto'; // 'auto' ou 'manual'
-let dashForcedDate = null; // date fixée par l'admin
+// ══════════ SECTIONS DASHBOARD ══════════
+const DASH_SECTIONS = ['showCounter','showStats','showMachines','showReports'];
+let dashSettings = {showCounter:true,showStats:true,showMachines:true,showReports:true};
 
-window.setDashDateMode = async function(mode) {
-  dashDateMode = mode;
-  const autoBtn   = document.getElementById('dashmode-auto');
-  const manualBtn = document.getElementById('dashmode-manual');
-  const wrap      = document.getElementById('adminDatePickerWrap');
-  if (autoBtn && manualBtn) {
-    if (mode === 'auto') {
-      autoBtn.style.background = '#a5b4fc'; autoBtn.style.borderColor = '#a5b4fc'; autoBtn.style.color = '#fff';
-      manualBtn.style.background = 'none'; manualBtn.style.borderColor = 'var(--border)'; manualBtn.style.color = 'var(--muted)';
-      if (wrap) wrap.style.display = 'none';
-    } else {
-      manualBtn.style.background = '#a5b4fc'; manualBtn.style.borderColor = '#a5b4fc'; manualBtn.style.color = '#fff';
-      autoBtn.style.background = 'none'; autoBtn.style.borderColor = 'var(--border)'; autoBtn.style.color = 'var(--muted)';
-      if (wrap) wrap.style.display = 'block';
-      // Pré-remplir avec la date actuelle du picker
-      const inp = document.getElementById('adminDashDate');
-      if (inp && !inp.value) inp.value = getYesterday();
-    }
-  }
-  // Sauvegarder le mode
-  try {
-    await update(ref(db,'system/dashDate'), { mode, date: mode === 'auto' ? null : (dashForcedDate || getYesterday()) });
-  } catch(e) {}
-  updateAdminCurrentDate();
-};
-
-window.applyAdminDashDate = async function() {
-  const inp = document.getElementById('adminDashDate');
-  if (!inp || !inp.value) return;
-  dashForcedDate = inp.value;
-  try {
-    await update(ref(db,'system/dashDate'), { mode:'manual', date: dashForcedDate });
-  } catch(e) {}
-  // Forcer la mise à jour du dashboard
-  const picker = document.getElementById('dashDatePicker');
-  if (picker) { picker.value = dashForcedDate; picker.dataset.manuallySet = '1'; }
-  renderDashboard();
-  const ok = document.getElementById('adminDateApplied');
-  if (ok) { ok.style.display='block'; setTimeout(()=>ok.style.display='none', 2500); }
-  updateAdminCurrentDate();
-};
-
-function updateAdminCurrentDate() {
-  const el = document.getElementById('adminCurrentDate');
-  if (!el) return;
-  if (dashDateMode === 'auto') {
-    el.textContent = '🔄 Automatique — ' + formatDate(getYesterday()) + ' (hier)';
-    el.style.color = '#a5b4fc';
-  } else if (dashForcedDate) {
-    el.textContent = '📌 Fixée — ' + formatDate(dashForcedDate);
-    el.style.color = 'var(--warn)';
-  }
-}
-
-// Écouter les changements de date en temps réel
-function listenDashDate() {
-  onValue(ref(db,'system/dashDate'), snap => {
-    const data = snap.val();
-    if (!data) return;
-    dashDateMode = data.mode || 'auto';
-    dashForcedDate = data.date || null;
-
-    // Appliquer au picker du dashboard
-    const picker = document.getElementById('dashDatePicker');
-    if (picker) {
-      if (dashDateMode === 'manual' && dashForcedDate) {
-        picker.value = dashForcedDate;
-        picker.dataset.manuallySet = '1';
-      } else {
-        delete picker.dataset.manuallySet;
-        picker.value = getYesterday();
-      }
-    }
-    renderDashboard();
-
-    // Mettre à jour l'UI admin si on y est
-    const autoBtn = document.getElementById('dashmode-auto');
-    if (autoBtn) {
-      setDashDateMode(dashDateMode);
-      if (dashDateMode === 'manual' && dashForcedDate) {
-        const inp = document.getElementById('adminDashDate');
-        if (inp) inp.value = dashForcedDate;
-      }
-    }
-    updateAdminCurrentDate();
+function applyDashSettings(s) {
+  dashSettings = {...dashSettings,...s};
+  const elC = document.getElementById('dashCounter');
+  const elS = document.getElementById('dashStats');
+  const elM = document.getElementById('machineCards');
+  const elR = document.getElementById('dashReportsCard');
+  if (elC) elC.style.display = dashSettings.showCounter  ? '' : 'none';
+  if (elS) elS.style.display = dashSettings.showStats    ? '' : 'none';
+  if (elM) elM.style.display = dashSettings.showMachines ? '' : 'none';
+  if (elR) elR.style.display = dashSettings.showReports  ? '' : 'none';
+  DASH_SECTIONS.forEach(k => {
+    const btn  = document.getElementById('toggle-'+k);
+    const knob = document.getElementById('knob-'+k);
+    if (!btn) return;
+    const on = dashSettings[k];
+    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
+    if (knob) { knob.style.right = on?'3px':''; knob.style.left = on?'':'3px'; }
   });
 }
-listenDashDate();
+window.toggleDashSection = async function(k) {
+  dashSettings[k] = !dashSettings[k];
+  applyDashSettings(dashSettings);
+  try { await update(ref(db,'system/dashSettings'), dashSettings); } catch(e){}
+};
+onValue(ref(db,'system/dashSettings'), snap => { if(snap.val()) applyDashSettings(snap.val()); });
+
+// ══════════ DATES PAR MACHINE ══════════
+let machineDates = {};
+
+function getMachineDate(machine) {
+  return machineDates[machine] || getYesterday();
+}
+
+function updateMachineDateLabels() {
+  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
+    const lbl = document.getElementById('machdate-label-'+m);
+    const inp = document.getElementById('machdate-'+m);
+    const d = machineDates[m];
+    if (lbl) { lbl.textContent = d ? '📌 '+formatDate(d) : '📅 hier'; lbl.style.color = d ? 'var(--warn)' : 'var(--muted)'; }
+    if (inp && d && !inp.value) inp.value = d;
+  });
+}
+
+window.applyMachineDate = async function(machine) {
+  const inp = document.getElementById('machdate-'+machine);
+  if (!inp || !inp.value) return;
+  machineDates[machine] = inp.value;
+  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
+  updateMachineDateLabels();
+  renderDashboard();
+};
+window.resetMachineDate = async function(machine) {
+  machineDates[machine] = null;
+  const inp = document.getElementById('machdate-'+machine);
+  if (inp) inp.value = '';
+  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
+  updateMachineDateLabels();
+  renderDashboard();
+};
+window.applyGlobalMachineDate = async function() {
+  const inp = document.getElementById('globalMachineDate');
+  if (!inp || !inp.value) return;
+  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
+    machineDates[m] = inp.value;
+    const mi = document.getElementById('machdate-'+m);
+    if (mi) mi.value = inp.value;
+  });
+  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
+  updateMachineDateLabels();
+  renderDashboard();
+};
+window.resetAllMachineDates = async function() {
+  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
+    machineDates[m] = null;
+    const mi = document.getElementById('machdate-'+m);
+    if (mi) mi.value = '';
+  });
+  const gi = document.getElementById('globalMachineDate');
+  if (gi) gi.value = '';
+  try { await set(ref(db,'system/machineDates'), null); } catch(e){}
+  updateMachineDateLabels();
+  renderDashboard();
+};
+onValue(ref(db,'system/machineDates'), snap => {
+  machineDates = snap.val() || {};
+  updateMachineDateLabels();
+  if (currentUser) renderDashboard();
+});
+
+// ══════════ GESTION DES THÈMES ══════════
 const THEMES = ['dark','light','ocean','forest'];
 
 function applyThemeUI(theme) {
