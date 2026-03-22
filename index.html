@@ -17,94 +17,123 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* ── THÈME SOMBRE (défaut) ── */
-  --bg:      #0f1117;
-  --bg2:     #161b25;
-  --surface: #1e2535;
-  --card:    #1a2030;
-  --border:  rgba(255,255,255,.08);
-  --border2: rgba(255,255,255,.14);
-  --text:    #e8edf5;
-  --muted:   #7a8caa;
-  --muted2:  #5a6b85;
-  --soufflage:   #00b8e6;
-  --remplissage: #00d97e;
+  /* ── THÈME 1 : BLANC ÉPURÉ (défaut) ── */
+  --bg:      #f5f7fa;
+  --bg2:     #ffffff;
+  --surface: #eef1f6;
+  --card:    #ffffff;
+  --border:  #dde3ed;
+  --border2: #c5cfe0;
+  --text:    #1e2840;
+  --muted:   #6b7a99;
+  --muted2:  #9aa5be;
+  --soufflage:   #0ea5e9;
+  --remplissage: #10b981;
   --etiquette:   #f59e0b;
   --emballage:   #f97316;
-  --b19:         #a855f7;
+  --b19:         #8b5cf6;
   --admin:       #7c3aed;
-  --ok:      #22c55e;
+  --ok:      #10b981;
   --warn:    #f59e0b;
   --danger:  #ef4444;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
+  --bg-image: none;
 }
 
-/* ── THÈME CLAIR ── */
-body.theme-light {
-  --bg:      #f0f4f8;
-  --bg2:     #ffffff;
-  --surface: #f8f9fb;
-  --card:    #ffffff;
-  --border:  #e2e6ed;
-  --border2: #c8d0dc;
-  --text:    #1a2030;
-  --muted:   #7a8599;
-  --muted2:  #9aa3b5;
-  --soufflage:   #0099cc;
-  --remplissage: #00aa66;
-  --etiquette:   #cc8800;
-  --emballage:   #e05520;
-  --b19:         #8833cc;
-  --ok:      #16a34a;
-  --warn:    #d97706;
-  --danger:  #dc2626;
+/* ── THÈME 2 : CIEL AZUR ── */
+body.theme-azure {
+  --bg:#e8f4fd; --bg2:#ffffff; --surface:#d6eaf8; --card:rgba(255,255,255,.93);
+  --border:rgba(14,165,233,.2); --border2:rgba(14,165,233,.35);
+  --text:#0c2340; --muted:#4a7fa5; --muted2:#80aec8;
+  --soufflage:#0284c7; --remplissage:#059669; --etiquette:#d97706; --emballage:#ea580c; --b19:#7c3aed;
+  --ok:#059669; --warn:#d97706; --danger:#dc2626;
+  --bg-image:linear-gradient(160deg,#e0f2fe 0%,#bae6fd 40%,#e0f2fe 70%,#f0f9ff 100%);
 }
-
-/* ── THÈME OCEAN ── */
-body.theme-ocean {
-  --bg:      #071a2e;
-  --bg2:     #0d2540;
-  --surface: #0f2d4a;
-  --card:    #0d2640;
-  --border:  rgba(0,180,255,.15);
-  --border2: rgba(0,180,255,.25);
-  --text:    #d0eaff;
-  --muted:   #5b8db8;
-  --muted2:  #3d6e99;
-  --soufflage:   #00d4ff;
-  --remplissage: #00e5a0;
-  --etiquette:   #ffd166;
-  --emballage:   #ff8c42;
-  --b19:         #c084fc;
-  --ok:      #00e5a0;
-  --warn:    #ffd166;
-  --danger:  #ff4d6d;
+/* ── THÈME 3 : PÊCHE ROSÉE ── */
+body.theme-peach {
+  --bg:#fff5f0; --bg2:#ffffff; --surface:#ffe8dc; --card:rgba(255,255,255,.93);
+  --border:rgba(251,113,57,.2); --border2:rgba(251,113,57,.35);
+  --text:#3d1505; --muted:#a05030; --muted2:#c88060;
+  --soufflage:#ef4444; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#8b5cf6;
+  --ok:#10b981; --warn:#f59e0b; --danger:#dc2626;
+  --bg-image:linear-gradient(160deg,#fff5f0 0%,#ffe4d6 35%,#ffd6c8 65%,#fff0e8 100%);
 }
-
-/* ── THÈME FORÊT ── */
-body.theme-forest {
-  --bg:      #0a140d;
-  --bg2:     #111e14;
-  --surface: #162819;
-  --card:    #132016;
-  --border:  rgba(34,197,94,.12);
-  --border2: rgba(34,197,94,.22);
-  --text:    #d4f0dc;
-  --muted:   #5a8c68;
-  --muted2:  #3d6649;
-  --soufflage:   #4ade80;
-  --remplissage: #22d3ee;
-  --etiquette:   #fbbf24;
-  --emballage:   #fb923c;
-  --b19:         #c084fc;
-  --ok:      #4ade80;
-  --warn:    #fbbf24;
-  --danger:  #f87171;
+/* ── THÈME 4 : LAVANDE ── */
+body.theme-lavender {
+  --bg:#f5f0ff; --bg2:#ffffff; --surface:#ede5ff; --card:rgba(255,255,255,.93);
+  --border:rgba(139,92,246,.2); --border2:rgba(139,92,246,.35);
+  --text:#1e0a3c; --muted:#7055a0; --muted2:#a085c8;
+  --soufflage:#7c3aed; --remplissage:#0ea5e9; --etiquette:#d97706; --emballage:#db2777; --b19:#6366f1;
+  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
+  --bg-image:linear-gradient(160deg,#f3e8ff 0%,#e9d5ff 35%,#ddd6fe 65%,#f5f0ff 100%);
+}
+/* ── THÈME 5 : MENTHE FRAÎCHE ── */
+body.theme-mint {
+  --bg:#f0fdf4; --bg2:#ffffff; --surface:#dcfce7; --card:rgba(255,255,255,.93);
+  --border:rgba(16,185,129,.2); --border2:rgba(16,185,129,.35);
+  --text:#052e16; --muted:#3a7d55; --muted2:#6aab85;
+  --soufflage:#0ea5e9; --remplissage:#059669; --etiquette:#ca8a04; --emballage:#ea580c; --b19:#7c3aed;
+  --ok:#059669; --warn:#ca8a04; --danger:#dc2626;
+  --bg-image:linear-gradient(160deg,#f0fdf4 0%,#dcfce7 35%,#bbf7d0 65%,#f0fdf4 100%);
+}
+/* ── THÈME 6 : SOLEIL D'OR ── */
+body.theme-gold {
+  --bg:#fffbeb; --bg2:#ffffff; --surface:#fef3c7; --card:rgba(255,255,255,.93);
+  --border:rgba(245,158,11,.25); --border2:rgba(245,158,11,.4);
+  --text:#292203; --muted:#926f0a; --muted2:#c8a030;
+  --soufflage:#0ea5e9; --remplissage:#10b981; --etiquette:#d97706; --emballage:#ef4444; --b19:#7c3aed;
+  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
+  --bg-image:linear-gradient(160deg,#fffbeb 0%,#fef3c7 35%,#fde68a 65%,#fffbeb 100%);
+}
+/* ── THÈME 7 : CORAIL TROPICAL ── */
+body.theme-coral {
+  --bg:#fff1f2; --bg2:#ffffff; --surface:#ffe4e6; --card:rgba(255,255,255,.93);
+  --border:rgba(244,63,94,.2); --border2:rgba(244,63,94,.35);
+  --text:#3b0a14; --muted:#9f4055; --muted2:#c87080;
+  --soufflage:#f43f5e; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#8b5cf6;
+  --ok:#10b981; --warn:#f59e0b; --danger:#dc2626;
+  --bg-image:linear-gradient(160deg,#fff1f2 0%,#fecdd3 35%,#fda4af 55%,#ffe4e6 100%);
+}
+/* ── THÈME 8 : ARDOISE BLEUE ── */
+body.theme-slate {
+  --bg:#f1f5f9; --bg2:#ffffff; --surface:#e2e8f0; --card:rgba(255,255,255,.94);
+  --border:rgba(100,116,139,.2); --border2:rgba(100,116,139,.35);
+  --text:#0f172a; --muted:#475569; --muted2:#94a3b8;
+  --soufflage:#0ea5e9; --remplissage:#10b981; --etiquette:#f59e0b; --emballage:#f97316; --b19:#6366f1;
+  --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
+  --bg-image:linear-gradient(160deg,#f8fafc 0%,#e2e8f0 40%,#cbd5e1 70%,#f1f5f9 100%);
+}
+/* ── THÈME 9 : AURORE ROSE-VIOLET ── */
+body.theme-aurora {
+  --bg:#fdf2f8; --bg2:#ffffff; --surface:#fce7f3; --card:rgba(255,255,255,.93);
+  --border:rgba(219,39,119,.18); --border2:rgba(219,39,119,.3);
+  --text:#3b0a28; --muted:#9d3873; --muted2:#c868a0;
+  --soufflage:#db2777; --remplissage:#0ea5e9; --etiquette:#d97706; --emballage:#f97316; --b19:#7c3aed;
+  --ok:#10b981; --warn:#d97706; --danger:#ef4444;
+  --bg-image:linear-gradient(135deg,#fdf2f8 0%,#fce7f3 25%,#f3e8ff 55%,#ede9fe 80%,#fdf2f8 100%);
+}
+/* ── THÈME 10 : NATURE PRINTANIÈRE ── */
+body.theme-spring {
+  --bg:#f7fef4; --bg2:#ffffff; --surface:#ecfccb; --card:rgba(255,255,255,.93);
+  --border:rgba(132,204,22,.22); --border2:rgba(132,204,22,.38);
+  --text:#1a2e05; --muted:#4d7c0f; --muted2:#84a840;
+  --soufflage:#0ea5e9; --remplissage:#16a34a; --etiquette:#ca8a04; --emballage:#ea580c; --b19:#7c3aed;
+  --ok:#16a34a; --warn:#ca8a04; --danger:#dc2626;
+  --bg-image:linear-gradient(160deg,#f7fef4 0%,#ecfccb 35%,#d9f99d 65%,#f7fef4 100%);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
-body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
+body {
+  font-family:var(--font-body);
+  background:var(--bg);
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color:var(--text);
+  font-size:15px;
+}
 
 /* ══ FORCER MODE DESKTOP SUR MOBILE ══
    Le viewport meta width=1024 est ignoré par Chrome Android.
@@ -938,7 +967,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
-      <div id="dashCounter" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
+      <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.08);pointer-events:none"></div>
 
         <!-- En-tête mois -->
@@ -974,7 +1003,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
         </div>
       </div>
-      <div id="dashStats" class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-box s1"><div class="slabel">🫧 Soufflage</div><div class="sval" id="gs1">—</div><div class="ssub" id="gs1date">—</div></div>
         <div class="stat-box s2"><div class="slabel">🧴 Remplissage</div><div class="sval" id="gs2">—</div><div class="ssub" id="gs2date">—</div></div>
         <div class="stat-box s3"><div class="slabel">🏷️ Étiquette</div><div class="sval" id="gs3">—</div><div class="ssub" id="gs3date">—</div></div>
@@ -983,7 +1012,13 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
       <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
 
-      <div class="card" id="dashReportsCard">
+      <!-- TABLEAU CARTONS EMBALLAGE -->
+      <div class="card" id="emballageCartonsCard">
+        <div class="card-title" style="color:var(--emballage)">📦 Détail Emballage — Cartons</div>
+        <div id="emballageCartonsTable"><div class="empty"><div class="eico">📦</div><p>Aucun rapport Emballage</p></div></div>
+      </div>
+
+      <div class="card">
         <div class="card-title">📋 Rapports du <span id="dashReportDateLabel">jour sélectionné</span></div>
         <div class="table-wrap" id="allReportsTable"><div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div></div>
       </div>
@@ -1363,157 +1398,162 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
 
       <!-- 🎨 THÈME DE L'APPLICATION -->
-      <div class="card" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04);margin-bottom:16px">
-        <div class="card-title" style="color:var(--b19)">🎨 Thème de l'application</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le thème visuel pour tous les utilisateurs.</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
+      <div class="card" style="border-color:rgba(14,165,233,.25);background:rgba(14,165,233,.03);margin-bottom:16px">
+        <div class="card-title" style="color:var(--soufflage)">🎨 Thème de l'application</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">10 thèmes modernes — choisissez le fond visuel pour tous les utilisateurs.</p>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
 
-          <!-- Sombre -->
-          <div onclick="applyTheme('dark')" id="theme-dark" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid var(--b19);box-shadow:0 0 0 3px rgba(168,85,247,.2)">
-            <div style="background:linear-gradient(135deg,#0f1117,#161b25);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+          <div onclick="applyTheme('default')" id="theme-default" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#eef1f6,#f5f7fa);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
               </div>
-              <div style="height:4px;background:#1e2535;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#1a2030;border-radius:2px;width:70%"></div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
             </div>
-            <div style="background:#161b25;padding:8px 12px;font-size:12px;font-weight:700;color:#a855f7;display:flex;align-items:center;justify-content:space-between">
-              🌙 Sombre <span id="check-dark" style="color:#22c55e">✓</span>
+            <div style="background:#f5f7fa;padding:7px 10px;font-size:11px;font-weight:700;color:#0ea5e9;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🤍 Épuré <span id="check-default" style="color:#10b981;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Clair -->
-          <div onclick="applyTheme('light')" id="theme-light" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#f0f4f8,#ffffff);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+          <div onclick="applyTheme('azure')" id="theme-azure" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#bae6fd,#e0f2fe);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0284c7"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#059669"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
               </div>
-              <div style="height:4px;background:#e2e6ed;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#f8f9fb;border-radius:2px;width:70%;border:1px solid #e2e6ed"></div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
             </div>
-            <div style="background:#f0f4f8;padding:8px 12px;font-size:12px;font-weight:700;color:#0099cc;display:flex;align-items:center;justify-content:space-between">
-              ☀️ Clair <span id="check-light" style="color:#22c55e;display:none">✓</span>
+            <div style="background:#e0f2fe;padding:7px 10px;font-size:11px;font-weight:700;color:#0284c7;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              💙 Ciel Azur <span id="check-azure" style="color:#059669;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Océan -->
-          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#071a2e,#0d2540);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ffd166"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#00e5a0"></div>
+          <div onclick="applyTheme('peach')" id="theme-peach" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#ffd6c8,#fff5f0);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#ef4444"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
               </div>
-              <div style="height:4px;background:#0f2d4a;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#0d2640;border-radius:2px;width:70%"></div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
             </div>
-            <div style="background:#071a2e;padding:8px 12px;font-size:12px;font-weight:700;color:#00d4ff;display:flex;align-items:center;justify-content:space-between">
-              🌊 Océan <span id="check-ocean" style="color:#00e5a0;display:none">✓</span>
+            <div style="background:#fff5f0;padding:7px 10px;font-size:11px;font-weight:700;color:#ea580c;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🍑 Pêche Rosée <span id="check-peach" style="color:#10b981;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Forêt -->
-          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#0a140d,#111e14);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#f87171"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#4ade80"></div>
+          <div onclick="applyTheme('lavender')" id="theme-lavender" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#ddd6fe,#f5f0ff);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#7c3aed"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
               </div>
-              <div style="height:4px;background:#162819;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#132016;border-radius:2px;width:70%"></div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
             </div>
-            <div style="background:#0a140d;padding:8px 12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;justify-content:space-between">
-              🌿 Forêt <span id="check-forest" style="color:#4ade80;display:none">✓</span>
+            <div style="background:#f5f0ff;padding:7px 10px;font-size:11px;font-weight:700;color:#7c3aed;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              💜 Lavande <span id="check-lavender" style="color:#10b981;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('mint')" id="theme-mint" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#bbf7d0,#f0fdf4);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#059669"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#ca8a04"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#f0fdf4;padding:7px 10px;font-size:11px;font-weight:700;color:#059669;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🌿 Menthe <span id="check-mint" style="color:#16a34a;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('gold')" id="theme-gold" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#fde68a,#fffbeb);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#fffbeb;padding:7px 10px;font-size:11px;font-weight:700;color:#d97706;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              ☀️ Soleil d'Or <span id="check-gold" style="color:#10b981;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('coral')" id="theme-coral" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#fda4af,#fff1f2);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#f43f5e"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#fff1f2;padding:7px 10px;font-size:11px;font-weight:700;color:#f43f5e;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🪸 Corail <span id="check-coral" style="color:#10b981;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('slate')" id="theme-slate" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#cbd5e1,#f1f5f9);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#10b981"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#f59e0b"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#f1f5f9;padding:7px 10px;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🩶 Ardoise <span id="check-slate" style="color:#10b981;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('aurora')" id="theme-aurora" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#e9d5ff,#fdf2f8);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#db2777"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#d97706"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#fdf2f8;padding:7px 10px;font-size:11px;font-weight:700;color:#db2777;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🌸 Aurore <span id="check-aurora" style="color:#10b981;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('spring')" id="theme-spring" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+            <div style="height:52px;background:linear-gradient(135deg,#d9f99d,#f7fef4);position:relative">
+              <div style="position:absolute;top:8px;left:8px;display:flex;gap:3px">
+                <div style="width:7px;height:7px;border-radius:50%;background:#0ea5e9"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#16a34a"></div>
+                <div style="width:7px;height:7px;border-radius:50%;background:#ca8a04"></div>
+              </div>
+              <div style="position:absolute;bottom:8px;left:8px;right:8px;height:3px;background:rgba(0,0,0,.1);border-radius:2px"></div>
+              <div style="position:absolute;bottom:8px;left:8px;width:55%;height:3px;background:rgba(0,0,0,.15);border-radius:2px"></div>
+            </div>
+            <div style="background:#f7fef4;padding:7px 10px;font-size:11px;font-weight:700;color:#4d7c0f;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(0,0,0,.07)">
+              🌱 Printemps <span id="check-spring" style="color:#16a34a;display:none">✓</span>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- ══ SECTIONS VISIBLES SUR LE TABLEAU DE BORD ══ -->
-      <div class="card" style="border-color:rgba(0,184,230,.25);background:rgba(0,184,230,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--soufflage)">📊 Sections visibles sur le Tableau de Bord</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Activez ou désactivez les sections affichées à tous les utilisateurs.</p>
-        <div style="display:flex;flex-direction:column;gap:10px">
-
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
-            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📊 Compteur mensuel B19 + Emballage</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Widget foncé avec les totaux du mois</div></div>
-            <button onclick="toggleDashSection('showCounter')" id="toggle-showCounter" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
-              <div id="knob-showCounter" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-            </button>
-          </div>
-
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
-            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📈 Statistiques des 5 machines</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Ligne de stats Soufflage, Remplissage, etc.</div></div>
-            <button onclick="toggleDashSection('showStats')" id="toggle-showStats" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
-              <div id="knob-showStats" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-            </button>
-          </div>
-
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
-            <div><div style="font-weight:600;font-size:13px;color:var(--text)">🏭 Cartes machines détaillées</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Soufflage, Remplissage, Étiquette, Emballage, B19</div></div>
-            <button onclick="toggleDashSection('showMachines')" id="toggle-showMachines" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
-              <div id="knob-showMachines" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-            </button>
-          </div>
-
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 16px">
-            <div><div style="font-weight:600;font-size:13px;color:var(--text)">📋 Tableau des rapports du jour</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Liste de tous les rapports soumis</div></div>
-            <button onclick="toggleDashSection('showReports')" id="toggle-showReports" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
-              <div id="knob-showReports" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ══ DATE DES RAPPORTS PAR MACHINE ══ -->
-      <div class="card" style="border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.03);margin-bottom:16px">
-        <div class="card-title" style="color:#a5b4fc">📅 Date des rapports par machine</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez la date affichée pour chaque machine sur le tableau de bord. Par défaut : <strong style="color:var(--text)">hier</strong>.</p>
-
-        <!-- Toutes les machines en même temps -->
-        <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;margin-bottom:12px">
-          <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">🌍 Appliquer une date à toutes les machines</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input type="date" id="globalMachineDate" class="form-input" style="width:auto;padding:7px 10px;font-size:13px;flex:1;min-width:140px">
-            <button onclick="applyGlobalMachineDate()" class="btn btn-primary btn-sm">✓ Appliquer tout</button>
-            <button onclick="resetAllMachineDates()" class="btn btn-ghost btn-sm">🔄 Tout remettre à hier</button>
-          </div>
-        </div>
-
-        <!-- Par machine -->
-        <div style="display:flex;flex-direction:column;gap:8px">
-
-          ${[
-            {id:'Soufflage',   icon:'🫧', color:'#00b8e6'},
-            {id:'Remplissage', icon:'🧴', color:'#00d97e'},
-            {id:'Étiquette',   icon:'🏷️', color:'#f59e0b'},
-            {id:'Emballage',   icon:'📦', color:'#f97316'},
-            {id:'B19',         icon:'⚙️', color:'#a855f7'}
-          ].map(m => `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;flex-wrap:wrap;gap:8px">
-            <div style="display:flex;align-items:center;gap:8px;min-width:110px">
-              <span style="font-size:16px">${m.icon}</span>
-              <div>
-                <div style="font-weight:600;font-size:13px;color:var(--text)">${m.id}</div>
-                <div id="machdate-label-${m.id}" style="font-size:11px;color:var(--muted)">📅 hier</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-              <input type="date" id="machdate-${m.id}" class="form-input" style="width:auto;padding:6px 10px;font-size:12px">
-              <button onclick="applyMachineDate('${m.id}')" style="background:${m.color};border:none;color:#000;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700">✓ OK</button>
-              <button onclick="resetMachineDate('${m.id}')" style="background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12px">🔄</button>
-            </div>
-          </div>`).join('')}
-
-        </div>
-      </div>
-
       <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.03);margin-bottom:16px">
         <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera immédiatement en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.</p>
@@ -2318,6 +2358,7 @@ function getYesterday() {
 
 function renderDashboard() {
   const picker = document.getElementById('dashDatePicker');
+  // Toujours recalculer hier si aucune sélection manuelle récente
   if (!picker.dataset.manuallySet) {
     picker.value = getYesterday();
   }
@@ -2325,11 +2366,9 @@ function renderDashboard() {
   const allReps = Object.values(allReports);
   const selReps = allReps.filter(r => r.date === selDate);
 
-  // getBest utilise la date spécifique à chaque machine si définie par l'admin
+  // Stats haut — uniquement la date sélectionnée, pas de fallback sur d'autres dates
   function getBest(machine) {
-    const date = getMachineDate(machine); // date fixée par admin ou hier
-    const reps = allReps.filter(r => r.machine === machine && r.date === date);
-    return reps.sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
+    return selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
   }
 
   const soufR = getBest('Soufflage');
@@ -3545,119 +3584,38 @@ function renderAnnounceBanner(data) {
     </div>`;
 }
 
-// ══════════ SECTIONS DASHBOARD ══════════
-const DASH_SECTIONS = ['showCounter','showStats','showMachines','showReports'];
-let dashSettings = {showCounter:true,showStats:true,showMachines:true,showReports:true};
-
-function applyDashSettings(s) {
-  dashSettings = {...dashSettings,...s};
-  const elC = document.getElementById('dashCounter');
-  const elS = document.getElementById('dashStats');
-  const elM = document.getElementById('machineCards');
-  const elR = document.getElementById('dashReportsCard');
-  if (elC) elC.style.display = dashSettings.showCounter  ? '' : 'none';
-  if (elS) elS.style.display = dashSettings.showStats    ? '' : 'none';
-  if (elM) elM.style.display = dashSettings.showMachines ? '' : 'none';
-  if (elR) elR.style.display = dashSettings.showReports  ? '' : 'none';
-  DASH_SECTIONS.forEach(k => {
-    const btn  = document.getElementById('toggle-'+k);
-    const knob = document.getElementById('knob-'+k);
-    if (!btn) return;
-    const on = dashSettings[k];
-    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
-    if (knob) { knob.style.right = on?'3px':''; knob.style.left = on?'':'3px'; }
-  });
-}
-window.toggleDashSection = async function(k) {
-  dashSettings[k] = !dashSettings[k];
-  applyDashSettings(dashSettings);
-  try { await update(ref(db,'system/dashSettings'), dashSettings); } catch(e){}
-};
-onValue(ref(db,'system/dashSettings'), snap => { if(snap.val()) applyDashSettings(snap.val()); });
-
-// ══════════ DATES PAR MACHINE ══════════
-let machineDates = {};
-
-function getMachineDate(machine) {
-  return machineDates[machine] || getYesterday();
-}
-
-function updateMachineDateLabels() {
-  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
-    const lbl = document.getElementById('machdate-label-'+m);
-    const inp = document.getElementById('machdate-'+m);
-    const d = machineDates[m];
-    if (lbl) { lbl.textContent = d ? '📌 '+formatDate(d) : '📅 hier'; lbl.style.color = d ? 'var(--warn)' : 'var(--muted)'; }
-    if (inp && d && !inp.value) inp.value = d;
-  });
-}
-
-window.applyMachineDate = async function(machine) {
-  const inp = document.getElementById('machdate-'+machine);
-  if (!inp || !inp.value) return;
-  machineDates[machine] = inp.value;
-  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
-  updateMachineDateLabels();
-  renderDashboard();
-};
-window.resetMachineDate = async function(machine) {
-  machineDates[machine] = null;
-  const inp = document.getElementById('machdate-'+machine);
-  if (inp) inp.value = '';
-  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
-  updateMachineDateLabels();
-  renderDashboard();
-};
-window.applyGlobalMachineDate = async function() {
-  const inp = document.getElementById('globalMachineDate');
-  if (!inp || !inp.value) return;
-  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
-    machineDates[m] = inp.value;
-    const mi = document.getElementById('machdate-'+m);
-    if (mi) mi.value = inp.value;
-  });
-  try { await update(ref(db,'system/machineDates'), machineDates); } catch(e){}
-  updateMachineDateLabels();
-  renderDashboard();
-};
-window.resetAllMachineDates = async function() {
-  ['Soufflage','Remplissage','Étiquette','Emballage','B19'].forEach(m => {
-    machineDates[m] = null;
-    const mi = document.getElementById('machdate-'+m);
-    if (mi) mi.value = '';
-  });
-  const gi = document.getElementById('globalMachineDate');
-  if (gi) gi.value = '';
-  try { await set(ref(db,'system/machineDates'), null); } catch(e){}
-  updateMachineDateLabels();
-  renderDashboard();
-};
-onValue(ref(db,'system/machineDates'), snap => {
-  machineDates = snap.val() || {};
-  updateMachineDateLabels();
-  if (currentUser) renderDashboard();
-});
-
 // ══════════ GESTION DES THÈMES ══════════
-const THEMES = ['dark','light','ocean','forest'];
+const THEMES = ['default','azure','peach','lavender','mint','gold','coral','slate','aurora','spring'];
+
+const THEME_ACCENTS = {
+  default:  '#0ea5e9',
+  azure:    '#0284c7',
+  peach:    '#ea580c',
+  lavender: '#7c3aed',
+  mint:     '#059669',
+  gold:     '#d97706',
+  coral:    '#f43f5e',
+  slate:    '#475569',
+  aurora:   '#db2777',
+  spring:   '#4d7c0f',
+};
 
 function applyThemeUI(theme) {
-  // Retirer tous les thèmes
   THEMES.forEach(t => {
     document.body.classList.remove('theme-'+t);
-    const card = document.getElementById('theme-'+t);
+    const card  = document.getElementById('theme-'+t);
     const check = document.getElementById('check-'+t);
-    if (card) card.style.border = '2px solid transparent';
+    if (card)  { card.style.border = '2px solid transparent'; card.style.boxShadow = '0 2px 8px rgba(0,0,0,.08)'; }
     if (check) check.style.display = 'none';
   });
-  // Appliquer le thème sélectionné (dark = défaut = pas de classe)
-  if (theme !== 'dark') document.body.classList.add('theme-'+theme);
-  const activeCard = document.getElementById('theme-'+theme);
+  // 'default' = :root = pas de classe
+  if (theme !== 'default') document.body.classList.add('theme-'+theme);
+  const activeCard  = document.getElementById('theme-'+theme);
   const activeCheck = document.getElementById('check-'+theme);
+  const accent = THEME_ACCENTS[theme] || '#0ea5e9';
   if (activeCard) {
-    const colors = { dark:'rgba(168,85,247,.8)', light:'rgba(0,153,204,.8)', ocean:'rgba(0,212,255,.8)', forest:'rgba(74,222,128,.8)' };
-    activeCard.style.border = `2px solid ${colors[theme]||'rgba(168,85,247,.8)'}`;
-    activeCard.style.boxShadow = `0 0 0 3px ${colors[theme]||'rgba(168,85,247,.2)'}44`;
+    activeCard.style.border = `2px solid ${accent}`;
+    activeCard.style.boxShadow = `0 0 0 3px ${accent}33, 0 4px 12px rgba(0,0,0,.12)`;
   }
   if (activeCheck) activeCheck.style.display = 'inline';
 }
@@ -3665,7 +3623,6 @@ function applyThemeUI(theme) {
 window.applyTheme = async function(theme) {
   applyThemeUI(theme);
   localStorage.setItem('tev_theme', theme);
-  // Sauvegarder dans Firebase pour tous les utilisateurs
   try { await set(ref(db, 'system/theme'), theme); } catch(e) {}
 };
 
@@ -3673,9 +3630,8 @@ window.applyTheme = async function(theme) {
 function loadSavedTheme() {
   const local = localStorage.getItem('tev_theme');
   if (local) applyThemeUI(local);
-  // Écouter les changements en temps réel
   onValue(ref(db, 'system/theme'), snap => {
-    const theme = snap.val() || 'dark';
+    const theme = snap.val() || 'default';
     localStorage.setItem('tev_theme', theme);
     applyThemeUI(theme);
   });
