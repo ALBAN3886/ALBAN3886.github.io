@@ -1146,6 +1146,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
               <option value="arret">⏸️ Arrêt planifié</option>
             </select>
           </div>
+          <div class="form-group">
+            <div class="form-label">📐 Format bouteille</div>
+            <select class="form-select" id="f-format">
+              <option value="">— Sélectionner —</option>
+              <option value="0.35">🔹 0,35 L</option>
+              <option value="0.5">🔸 0,5 L</option>
+              <option value="1.5">🔷 1,5 L</option>
+              <option value="1.6">🔶 1,6 L</option>
+            </select>
+          </div>
         </div>
         <div id="dynamicFields"></div>
         <div class="form-row">
@@ -1434,7 +1444,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div style="padding:20px">
           <input type="hidden" id="editReportId">
 
-          <!-- Date + Poste + Statut -->
+          <!-- Date + Poste + Statut + Format -->
           <div class="form-row" style="margin-bottom:14px">
             <div class="form-group">
               <div class="form-label">Date</div>
@@ -1455,6 +1465,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
                 <option value="warn">⚠️ Ralentissement</option>
                 <option value="panne">🔴 En panne</option>
                 <option value="arret">⏸️ Arrêt</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="form-label">📐 Format</div>
+              <select class="form-select" id="edit-format">
+                <option value="">— Sélectionner —</option>
+                <option value="0.35">🔹 0,35 L</option>
+                <option value="0.5">🔸 0,5 L</option>
+                <option value="1.5">🔷 1,5 L</option>
+                <option value="1.6">🔶 1,6 L</option>
               </select>
             </div>
           </div>
@@ -2651,7 +2671,7 @@ function renderDashboard() {
   const sorted = selReps.sort((a,b)=>(b.ts||0)-(a.ts||0));
   if (sorted.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport ce jour</p></div>'; return; }
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
-  tbl.innerHTML = `<table><thead><tr><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+  tbl.innerHTML = `<table><thead><tr><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Format</th><th>Production</th><th>Statut</th><th>Note</th><th></th></tr></thead>
   <tbody>${sorted.map(r=>{
     const m=MACHINES.find(x=>x.id===r.machine);
     const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
@@ -2662,6 +2682,7 @@ function renderDashboard() {
       <td><span style="color:${m?.color||'#fff'};font-weight:700">${m?.icon||''} ${r.machine}</span></td>
       <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td>${r.shift}</td>
+      <td><span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">${r.format ? r.format+' L' : '—'}</span></td>
       <td class="td-num" style="color:${m?.color||'#fff'}">${num(r.fields?.prod)}</td>
       <td><span class="status-badge ${sc}" style="font-size:10px">${st}</span></td>
       <td style="color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.note)}">${r.note||'—'}</td>
@@ -2726,11 +2747,12 @@ window.saveReport = async function() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Enregistrement...';
 
+  const format = document.getElementById('f-format')?.value || '';
   const reportKey = `${machine}_${date}_${shift}_${currentUser.uid}`;
   await set(ref(db, `reports/${reportKey}`), {
     id: reportKey, ts: serverTimestamp(),
     userId: currentUser.uid, operatorName: currentUConf.name,
-    machine, date, shift, status, fields, note,
+    machine, date, shift, status, fields, note, format,
   });
 
   // ── Statut ≠ OK : alerte spécifique panne/ralentissement/arrêt ──
@@ -2794,6 +2816,7 @@ window.saveReport = async function() {
       `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
       `Un nouveau rapport a été soumis.\n\n` +
       `Machine : ${machine}\n` +
+      `Format : ${format ? format + ' L' : 'Non renseigné'}\n` +
       `Opérateur : ${currentUConf.name}\n` +
       `Date : ${date} — Poste : ${shift}\n` +
       `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
@@ -2814,6 +2837,7 @@ window.clearForm = function() {
   document.querySelectorAll('.form-input').forEach(i => { if(i.type!=='date') i.value=''; });
   document.getElementById('f-note').value='';
   document.getElementById('f-status').value='ok';
+  const fmtEl = document.getElementById('f-format'); if(fmtEl) fmtEl.value='';
   panneSwitchOn=false;
   document.getElementById('panneSwitch').classList.remove('on');
 };
@@ -2831,7 +2855,7 @@ window.renderHistory = function() {
   if (!tbl) return;
   if (filtered.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div>'; return; }
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
-  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Poste</th><th>Opérateur</th><th>Production</th><th>🗑️ Déchets</th><th>Consommables</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+  tbl.innerHTML = `<table><thead><tr><th>Date</th><th>Machine</th><th>Poste</th><th>Format</th><th>Opérateur</th><th>Production</th><th>🗑️ Déchets</th><th>Consommables</th><th>Statut</th><th>Note</th><th></th></tr></thead>
   <tbody>${filtered.map(r=>{
     const m=MACHINES.find(x=>x.id===r.machine);
     const sc={ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[r.status]||'ok';
@@ -2844,6 +2868,7 @@ window.renderHistory = function() {
       <td>${formatDate(r.date)}</td>
       <td><span style="color:${m?.color};font-weight:700">${m?.icon} ${r.machine}</span></td>
       <td>${r.shift}</td>
+      <td><span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${r.format ? r.format+' L' : '—'}</span></td>
       <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td class="td-num" style="color:${m?.color}">${num(r.fields?.prod)}</td>
       <td style="font-weight:600;color:#f87171">${dechets !== undefined && dechets !== '' ? num(dechets)+' kg' : '<span style="color:var(--muted)">—</span>'}</td>
@@ -2882,6 +2907,7 @@ window.editReport = function(id) {
   document.getElementById('edit-status').value = r.status || 'ok';
   document.getElementById('edit-note').value   = r.note || '';
   document.getElementById('edit-dechets').value = r.fields?.dechets !== undefined ? r.fields.dechets : '';
+  const editFmtEl = document.getElementById('edit-format'); if(editFmtEl) editFmtEl.value = r.format || '';
 
   // Champs dynamiques de la machine
   const dynFields = document.getElementById('editDynamicFields');
@@ -2940,6 +2966,7 @@ window.saveEditReport = async function() {
     shift:  document.getElementById('edit-shift').value  || r.shift,
     status: document.getElementById('edit-status').value || r.status,
     note:   document.getElementById('edit-note').value.trim(),
+    format: document.getElementById('edit-format')?.value || r.format || '',
     fields,
     editedAt: Date.now(),
     editedBy: currentUConf?.name || '',
