@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* ── THÈME SOMBRE ÉTOILÉ (défaut) ── */
+  /* ── THÈME SOMBRE (défaut) ── */
   --bg:      #0f1117;
   --bg2:     #161b25;
   --surface: #1e2535;
@@ -38,64 +38,61 @@
   --danger:  #ef4444;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
-  --bg-image: none;
 }
 
-/* ── THÈME FLEURS ROSES (style iOS) ── */
+/* ── THÈME CLAIR ── */
 body.theme-light {
-  --bg:      #fdf0f5;
-  --bg2:     rgba(255,255,255,.85);
-  --surface: rgba(255,240,248,.8);
-  --card:    rgba(255,255,255,.82);
-  --border:  rgba(219,112,147,.2);
-  --border2: rgba(219,112,147,.35);
-  --text:    #3d1a2e;
-  --muted:   #a0607a;
-  --muted2:  #c490a8;
-  --soufflage:   #e91e8c;
-  --remplissage: #00b860;
-  --etiquette:   #e07000;
-  --emballage:   #d44000;
-  --b19:         #9333ea;
+  --bg:      #f0f4f8;
+  --bg2:     #ffffff;
+  --surface: #f8f9fb;
+  --card:    #ffffff;
+  --border:  #e2e6ed;
+  --border2: #c8d0dc;
+  --text:    #1a2030;
+  --muted:   #7a8599;
+  --muted2:  #9aa3b5;
+  --soufflage:   #0099cc;
+  --remplissage: #00aa66;
+  --etiquette:   #cc8800;
+  --emballage:   #e05520;
+  --b19:         #8833cc;
   --ok:      #16a34a;
   --warn:    #d97706;
   --danger:  #dc2626;
-  --bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='50%25'%3E%3Cstop offset='0%25' stop-color='%23fce4ec'/%3E%3Cstop offset='100%25' stop-color='%23f8bbd0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='url(%23bg)' width='400' height='400'/%3E%3Cg opacity='.35'%3E%3Ccircle cx='60' cy='80' r='18' fill='%23f06292'/%3E%3Ccircle cx='55' cy='80' r='8' fill='%23fff'/%3E%3Ccircle cx='65' cy='72' r='8' fill='%23f48fb1'/%3E%3Ccircle cx='73' cy='82' r='8' fill='%23f48fb1'/%3E%3Ccircle cx='65' cy='90' r='8' fill='%23f48fb1'/%3E%3Ccircle cx='55' cy='88' r='8' fill='%23f48fb1'/%3E%3Cellipse cx='60' cy='80' rx='5' ry='5' fill='%23ffca28'/%3E%3C/g%3E%3Cg opacity='.3' transform='translate(200,50)'%3E%3Ccircle cx='0' cy='0' r='16' fill='%23ec407a'/%3E%3Ccircle cx='-7' cy='0' r='7' fill='%23fff'/%3E%3Ccircle cx='4' cy='-8' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='11' cy='2' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='4' cy='9' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='-5' cy='8' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='0' cy='0' r='4' fill='%23ffca28'/%3E%3C/g%3E%3Cg opacity='.25' transform='translate(320,180)'%3E%3Ccircle cx='0' cy='0' r='14' fill='%23e91e63'/%3E%3Ccircle cx='-6' cy='0' r='6' fill='%23fff'/%3E%3Ccircle cx='3' cy='-7' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='9' cy='1' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='3' cy='8' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='-4' cy='7' r='6' fill='%23f48fb1'/%3E%3Ccircle cx='0' cy='0' r='4' fill='%23fff176'/%3E%3C/g%3E%3Cg opacity='.2' transform='translate(100,280)'%3E%3Ccircle cx='0' cy='0' r='20' fill='%23f06292'/%3E%3Ccircle cx='-8' cy='0' r='9' fill='%23fff'/%3E%3Ccircle cx='5' cy='-10' r='9' fill='%23f48fb1'/%3E%3Ccircle cx='13' cy='2' r='9' fill='%23f48fb1'/%3E%3Ccircle cx='5' cy='12' r='9' fill='%23f48fb1'/%3E%3Ccircle cx='-6' cy='10' r='9' fill='%23f48fb1'/%3E%3Ccircle cx='0' cy='0' r='5' fill='%23ffd54f'/%3E%3C/g%3E%3Cg opacity='.15' transform='translate(280,340)'%3E%3Ccircle cx='0' cy='0' r='16' fill='%23ad1457'/%3E%3Ccircle cx='-7' cy='0' r='7' fill='%23fff'/%3E%3Ccircle cx='4' cy='-8' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='11' cy='2' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='4' cy='9' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='-5' cy='8' r='7' fill='%23f48fb1'/%3E%3Ccircle cx='0' cy='0' r='4' fill='%23ffee58'/%3E%3C/g%3E%3Cpath d='M40 120 Q50 100 60 120 Q70 140 80 120' stroke='%23a5d6a7' stroke-width='3' fill='none' opacity='.4'/%3E%3Cpath d='M150 300 Q165 275 180 300 Q195 325 210 300' stroke='%23c8e6c9' stroke-width='2.5' fill='none' opacity='.35'/%3E%3Cpath d='M300 80 Q310 60 320 80 Q330 100 340 80' stroke='%23a5d6a7' stroke-width='2' fill='none' opacity='.3'/%3E%3C/svg%3E");
 }
 
-/* ── THÈME COUCHER DE SOLEIL ── */
+/* ── THÈME OCEAN ── */
 body.theme-ocean {
-  --bg:      #1a0a1e;
-  --bg2:     rgba(40,15,55,.88);
-  --surface: rgba(60,20,80,.75);
-  --card:    rgba(45,18,62,.85);
-  --border:  rgba(255,100,200,.15);
-  --border2: rgba(255,100,200,.28);
-  --text:    #ffe8f5;
-  --muted:   #c080b0;
-  --muted2:  #8a5070;
-  --soufflage:   #ff6eb4;
-  --remplissage: #ff9f50;
-  --etiquette:   #ffd700;
-  --emballage:   #ff6040;
+  --bg:      #071a2e;
+  --bg2:     #0d2540;
+  --surface: #0f2d4a;
+  --card:    #0d2640;
+  --border:  rgba(0,180,255,.15);
+  --border2: rgba(0,180,255,.25);
+  --text:    #d0eaff;
+  --muted:   #5b8db8;
+  --muted2:  #3d6e99;
+  --soufflage:   #00d4ff;
+  --remplissage: #00e5a0;
+  --etiquette:   #ffd166;
+  --emballage:   #ff8c42;
   --b19:         #c084fc;
-  --ok:      #a0e080;
+  --ok:      #00e5a0;
   --warn:    #ffd166;
   --danger:  #ff4d6d;
-  --bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%232d0040'/%3E%3Cstop offset='40%25' stop-color='%23800080'/%3E%3Cstop offset='70%25' stop-color='%23ff4500'/%3E%3Cstop offset='100%25' stop-color='%23ff8c00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23sky)' width='400' height='400'/%3E%3Ccircle cx='200' cy='260' r='55' fill='%23ffcc00' opacity='.7'/%3E%3Ccircle cx='200' cy='260' r='42' fill='%23ffdd44' opacity='.8'/%3E%3Cpath d='M0 350 Q100 300 200 340 Q300 380 400 320 L400 400 L0 400Z' fill='%231a0030' opacity='.7'/%3E%3Cpath d='M0 370 Q80 340 160 360 Q240 380 320 350 Q360 335 400 355 L400 400 L0 400Z' fill='%230d0020' opacity='.9'/%3E%3Ccircle cx='50' cy='60' r='2' fill='%23fff' opacity='.8'/%3E%3Ccircle cx='120' cy='30' r='1.5' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='300' cy='50' r='2' fill='%23fff' opacity='.6'/%3E%3Ccircle cx='370' cy='90' r='1.5' fill='%23fff' opacity='.8'/%3E%3Ccircle cx='180' cy='20' r='1' fill='%23fff' opacity='.5'/%3E%3Ccircle cx='340' cy='25' r='1.5' fill='%23fff' opacity='.7'/%3E%3C/svg%3E");
 }
 
-/* ── THÈME NATURE VERTE (fleurs blanches) ── */
+/* ── THÈME FORÊT ── */
 body.theme-forest {
-  --bg:      #0d1f0f;
-  --bg2:     rgba(15,35,18,.88);
-  --surface: rgba(20,50,25,.78);
-  --card:    rgba(16,42,20,.86);
-  --border:  rgba(100,220,130,.15);
-  --border2: rgba(100,220,130,.28);
-  --text:    #e0f5e5;
-  --muted:   #70aa80;
-  --muted2:  #4a7a58;
+  --bg:      #0a140d;
+  --bg2:     #111e14;
+  --surface: #162819;
+  --card:    #132016;
+  --border:  rgba(34,197,94,.12);
+  --border2: rgba(34,197,94,.22);
+  --text:    #d4f0dc;
+  --muted:   #5a8c68;
+  --muted2:  #3d6649;
   --soufflage:   #4ade80;
   --remplissage: #22d3ee;
   --etiquette:   #fbbf24;
@@ -104,38 +101,10 @@ body.theme-forest {
   --ok:      #4ade80;
   --warn:    #fbbf24;
   --danger:  #f87171;
-  --bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='60%25'%3E%3Cstop offset='0%25' stop-color='%23143d18'/%3E%3Cstop offset='100%25' stop-color='%230a1a0c'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='400' height='400'/%3E%3Cg opacity='.45' transform='translate(80,120)'%3E%3Ccircle cx='0' cy='-18' r='10' fill='white'/%3E%3Ccircle cx='17' cy='-6' r='10' fill='white'/%3E%3Ccircle cx='11' cy='15' r='10' fill='white'/%3E%3Ccircle cx='-11' cy='15' r='10' fill='white'/%3E%3Ccircle cx='-17' cy='-6' r='10' fill='white'/%3E%3Ccircle cx='0' cy='0' r='6' fill='%23ffd700'/%3E%3C/g%3E%3Cg opacity='.35' transform='translate(280,80)'%3E%3Ccircle cx='0' cy='-15' r='8' fill='white'/%3E%3Ccircle cx='14' cy='-5' r='8' fill='white'/%3E%3Ccircle cx='9' cy='12' r='8' fill='white'/%3E%3Ccircle cx='-9' cy='12' r='8' fill='white'/%3E%3Ccircle cx='-14' cy='-5' r='8' fill='white'/%3E%3Ccircle cx='0' cy='0' r='5' fill='%23ffc107'/%3E%3C/g%3E%3Cg opacity='.3' transform='translate(180,300)'%3E%3Ccircle cx='0' cy='-20' r='11' fill='%23e8f5e9'/%3E%3Ccircle cx='19' cy='-7' r='11' fill='%23e8f5e9'/%3E%3Ccircle cx='12' cy='16' r='11' fill='%23e8f5e9'/%3E%3Ccircle cx='-12' cy='16' r='11' fill='%23e8f5e9'/%3E%3Ccircle cx='-19' cy='-7' r='11' fill='%23e8f5e9'/%3E%3Ccircle cx='0' cy='0' r='7' fill='%23ffeb3b'/%3E%3C/g%3E%3Cg opacity='.25' transform='translate(350,250)'%3E%3Ccircle cx='0' cy='-13' r='7' fill='white'/%3E%3Ccircle cx='12' cy='-4' r='7' fill='white'/%3E%3Ccircle cx='8' cy='10' r='7' fill='white'/%3E%3Ccircle cx='-8' cy='10' r='7' fill='white'/%3E%3Ccircle cx='-12' cy='-4' r='7' fill='white'/%3E%3Ccircle cx='0' cy='0' r='4' fill='%23ffd54f'/%3E%3C/g%3E%3Cpath d='M50 380 Q60 340 55 300 Q52 270 65 240' stroke='%2366bb6a' stroke-width='3' fill='none' opacity='.5'/%3E%3Cpath d='M55 300 Q80 290 90 275' stroke='%2366bb6a' stroke-width='2' fill='none' opacity='.4'/%3E%3Cpath d='M320 380 Q315 350 325 310 Q330 280 318 250' stroke='%2356ab64' stroke-width='3' fill='none' opacity='.45'/%3E%3Cpath d='M325 310 Q350 300 360 285' stroke='%2356ab64' stroke-width='2' fill='none' opacity='.4'/%3E%3C/svg%3E");
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
-body {
-  font-family:var(--font-body);
-  background:var(--bg);
-  color:var(--text);
-  font-size:15px;
-}
-/* Fond avec image thématique */
-body.theme-light,
-body.theme-ocean,
-body.theme-forest {
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-/* Glassmorphisme sur sidebar, topbar, icon-bar pour les thèmes avec image */
-body.theme-light .sidebar,
-body.theme-ocean .sidebar,
-body.theme-forest .sidebar { backdrop-filter:blur(12px) !important; }
-body.theme-light .topbar,
-body.theme-ocean .topbar,
-body.theme-forest .topbar { backdrop-filter:blur(12px) !important; }
-body.theme-light .icon-bar,
-body.theme-ocean .icon-bar,
-body.theme-forest .icon-bar { backdrop-filter:blur(12px) !important; }
-body.theme-light .card,
-body.theme-ocean .card,
-body.theme-forest .card { backdrop-filter:blur(8px) !important; }
+body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
 
 /* ══ FORCER MODE DESKTOP SUR MOBILE ══
    Le viewport meta width=1024 est ignoré par Chrome Android.
@@ -969,7 +938,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
-      <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
+      <div id="dashCounter" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.08);pointer-events:none"></div>
 
         <!-- En-tête mois -->
@@ -1014,13 +983,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
       <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
 
-      <!-- TABLEAU CARTONS EMBALLAGE -->
-      <div class="card" id="emballageCartonsCard">
-        <div class="card-title" style="color:var(--emballage)">📦 Détail Emballage — Cartons</div>
-        <div id="emballageCartonsTable"><div class="empty"><div class="eico">📦</div><p>Aucun rapport Emballage</p></div></div>
-      </div>
-
-      <div class="card">
+      <div class="card" id="dashReportsCard">
         <div class="card-title">📋 Rapports du <span id="dashReportDateLabel">jour sélectionné</span></div>
         <div class="table-wrap" id="allReportsTable"><div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div></div>
       </div>
@@ -1402,104 +1365,130 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <!-- 🎨 THÈME DE L'APPLICATION -->
       <div class="card" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04);margin-bottom:16px">
         <div class="card-title" style="color:var(--b19)">🎨 Thème de l'application</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le fond visuel pour tous les utilisateurs.</p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le thème visuel pour tous les utilisateurs.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
 
-          <!-- Sombre étoilé -->
-          <div onclick="applyTheme('dark')" id="theme-dark" style="border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid var(--b19);box-shadow:0 0 0 3px rgba(168,85,247,.2);transition:all .2s">
-            <div style="height:70px;background:linear-gradient(135deg,#0f1117 0%,#161b25 50%,#1e2535 100%);position:relative;overflow:hidden">
-              <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.8;top:15%;left:20%"></div>
-              <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.6;top:30%;left:60%"></div>
-              <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.7;top:60%;left:35%"></div>
-              <div style="position:absolute;width:2px;height:2px;background:#a855f7;border-radius:50%;opacity:.9;top:45%;left:80%;box-shadow:0 0 4px #a855f7"></div>
-              <div style="position:absolute;width:2px;height:2px;background:#00b8e6;border-radius:50%;opacity:.8;top:20%;left:75%;box-shadow:0 0 4px #00b8e6"></div>
+          <!-- Sombre -->
+          <div onclick="applyTheme('dark')" id="theme-dark" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid var(--b19);box-shadow:0 0 0 3px rgba(168,85,247,.2)">
+            <div style="background:linear-gradient(135deg,#0f1117,#161b25);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+              </div>
+              <div style="height:4px;background:#1e2535;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#1a2030;border-radius:2px;width:70%"></div>
             </div>
             <div style="background:#161b25;padding:8px 12px;font-size:12px;font-weight:700;color:#a855f7;display:flex;align-items:center;justify-content:space-between">
-              🌙 Sombre étoilé <span id="check-dark" style="color:#22c55e">✓</span>
+              🌙 Sombre <span id="check-dark" style="color:#22c55e">✓</span>
             </div>
           </div>
 
-          <!-- Fleurs roses -->
-          <div onclick="applyTheme('light')" id="theme-light" style="border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s">
-            <div style="height:70px;background:linear-gradient(135deg,#fce4ec,#f8bbd0,#fce4ec);position:relative;overflow:hidden">
-              <!-- Fleur 1 -->
-              <div style="position:absolute;top:10px;left:15px;width:22px;height:22px">
-                <div style="position:absolute;width:10px;height:10px;background:#f06292;border-radius:50%;top:0;left:6px"></div>
-                <div style="position:absolute;width:10px;height:10px;background:#f48fb1;border-radius:50%;top:6px;left:12px"></div>
-                <div style="position:absolute;width:10px;height:10px;background:#f48fb1;border-radius:50%;bottom:0;left:8px"></div>
-                <div style="position:absolute;width:10px;height:10px;background:#f48fb1;border-radius:50%;top:6px;left:0px"></div>
-                <div style="position:absolute;width:6px;height:6px;background:#ffd700;border-radius:50%;top:8px;left:8px"></div>
+          <!-- Clair -->
+          <div onclick="applyTheme('light')" id="theme-light" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#f0f4f8,#ffffff);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
               </div>
-              <!-- Fleur 2 -->
-              <div style="position:absolute;top:5px;right:20px;width:18px;height:18px">
-                <div style="position:absolute;width:8px;height:8px;background:#ec407a;border-radius:50%;top:0;left:5px"></div>
-                <div style="position:absolute;width:8px;height:8px;background:#f48fb1;border-radius:50%;top:5px;left:10px"></div>
-                <div style="position:absolute;width:8px;height:8px;background:#f48fb1;border-radius:50%;bottom:0;left:5px"></div>
-                <div style="position:absolute;width:8px;height:8px;background:#f48fb1;border-radius:50%;top:5px;left:0"></div>
-                <div style="position:absolute;width:5px;height:5px;background:#fff176;border-radius:50%;top:6px;left:6px"></div>
-              </div>
-              <!-- Fleur 3 -->
-              <div style="position:absolute;bottom:5px;right:40px;width:16px;height:16px">
-                <div style="position:absolute;width:7px;height:7px;background:#ad1457;border-radius:50%;top:0;left:4px"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#f06292;border-radius:50%;top:4px;left:9px"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#f06292;border-radius:50%;bottom:0;left:4px"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#f06292;border-radius:50%;top:4px;left:-1px"></div>
-                <div style="position:absolute;width:4px;height:4px;background:#ffee58;border-radius:50%;top:5px;left:5px"></div>
-              </div>
-              <div style="position:absolute;bottom:8px;left:45px;width:2px;height:12px;background:#a5d6a7;border-radius:1px;transform:rotate(15deg)"></div>
+              <div style="height:4px;background:#e2e6ed;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#f8f9fb;border-radius:2px;width:70%;border:1px solid #e2e6ed"></div>
             </div>
-            <div style="background:#fce4ec;padding:8px 12px;font-size:12px;font-weight:700;color:#e91e8c;display:flex;align-items:center;justify-content:space-between">
-              🌸 Fleurs roses <span id="check-light" style="color:#22c55e;display:none">✓</span>
+            <div style="background:#f0f4f8;padding:8px 12px;font-size:12px;font-weight:700;color:#0099cc;display:flex;align-items:center;justify-content:space-between">
+              ☀️ Clair <span id="check-light" style="color:#22c55e;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Coucher de soleil -->
-          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s">
-            <div style="height:70px;background:linear-gradient(180deg,#2d0040 0%,#800080 35%,#ff4500 70%,#ff8c00 100%);position:relative;overflow:hidden">
-              <div style="position:absolute;bottom:8px;left:0;right:0;height:20px;background:linear-gradient(90deg,transparent,#1a0030 20%,#0d0020 50%,#1a0030 80%,transparent);clip-path:polygon(0% 100%,5% 60%,15% 80%,25% 40%,35% 70%,45% 30%,55% 65%,65% 35%,75% 60%,85% 25%,95% 55%,100% 40%,100% 100%)"></div>
-              <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:22px;height:22px;background:radial-gradient(circle,#ffdd44,#ffcc00);border-radius:50%;box-shadow:0 0 12px #ff8c00,0 0 24px rgba(255,140,0,.4)"></div>
-              <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.8;top:10%;left:15%"></div>
-              <div style="position:absolute;width:1.5px;height:1.5px;background:#fff;border-radius:50%;opacity:.7;top:20%;right:20%"></div>
+          <!-- Océan -->
+          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#071a2e,#0d2540);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffd166"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#00e5a0"></div>
+              </div>
+              <div style="height:4px;background:#0f2d4a;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#0d2640;border-radius:2px;width:70%"></div>
             </div>
-            <div style="background:#2d0040;padding:8px 12px;font-size:12px;font-weight:700;color:#ff6eb4;display:flex;align-items:center;justify-content:space-between">
-              🌅 Coucher de soleil <span id="check-ocean" style="color:#a0e080;display:none">✓</span>
+            <div style="background:#071a2e;padding:8px 12px;font-size:12px;font-weight:700;color:#00d4ff;display:flex;align-items:center;justify-content:space-between">
+              🌊 Océan <span id="check-ocean" style="color:#00e5a0;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Nature fleurs blanches -->
-          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .2s">
-            <div style="height:70px;background:radial-gradient(ellipse at 50% 60%,#143d18,#0a1a0c);position:relative;overflow:hidden">
-              <!-- Fleur blanche 1 -->
-              <div style="position:absolute;top:8px;left:20px">
-                <div style="position:absolute;width:9px;height:9px;background:white;border-radius:50%;top:-9px;left:3px;opacity:.9"></div>
-                <div style="position:absolute;width:9px;height:9px;background:white;border-radius:50%;top:3px;left:12px;opacity:.9"></div>
-                <div style="position:absolute;width:9px;height:9px;background:white;border-radius:50%;top:12px;left:5px;opacity:.9"></div>
-                <div style="position:absolute;width:9px;height:9px;background:white;border-radius:50%;top:12px;left:-5px;opacity:.9"></div>
-                <div style="position:absolute;width:9px;height:9px;background:white;border-radius:50%;top:3px;left:-5px;opacity:.9"></div>
-                <div style="width:6px;height:6px;background:#ffd700;border-radius:50%;margin-top:3px;margin-left:3px"></div>
+          <!-- Forêt -->
+          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0a140d,#111e14);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#f87171"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#4ade80"></div>
               </div>
-              <!-- Fleur blanche 2 -->
-              <div style="position:absolute;top:5px;right:25px">
-                <div style="position:absolute;width:7px;height:7px;background:#e8f5e9;border-radius:50%;top:-7px;left:2px;opacity:.85"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#e8f5e9;border-radius:50%;top:2px;left:9px;opacity:.85"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#e8f5e9;border-radius:50%;top:9px;left:4px;opacity:.85"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#e8f5e9;border-radius:50%;top:9px;left:-4px;opacity:.85"></div>
-                <div style="position:absolute;width:7px;height:7px;background:#e8f5e9;border-radius:50%;top:2px;left:-4px;opacity:.85"></div>
-                <div style="width:5px;height:5px;background:#ffc107;border-radius:50%;margin-top:3px;margin-left:2px"></div>
-              </div>
-              <!-- Tiges -->
-              <div style="position:absolute;bottom:0;left:28px;width:2px;height:25px;background:#4caf50;opacity:.6;border-radius:1px"></div>
-              <div style="position:absolute;bottom:0;right:32px;width:2px;height:20px;background:#4caf50;opacity:.5;border-radius:1px"></div>
-              <!-- Feuille -->
-              <div style="position:absolute;bottom:12px;left:30px;width:12px;height:7px;background:#66bb6a;border-radius:50% 0;transform:rotate(-30deg);opacity:.7"></div>
+              <div style="height:4px;background:#162819;border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:#132016;border-radius:2px;width:70%"></div>
             </div>
-            <div style="background:#0a1a0c;padding:8px 12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;justify-content:space-between">
-              🌿 Nature & fleurs <span id="check-forest" style="color:#4ade80;display:none">✓</span>
+            <div style="background:#0a140d;padding:8px 12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;justify-content:space-between">
+              🌿 Forêt <span id="check-forest" style="color:#4ade80;display:none">✓</span>
             </div>
           </div>
 
         </div>
       </div>
+
+      <!-- 📊 OPTIONS D'AFFICHAGE DU TABLEAU DE BORD -->
+      <div class="card" style="border-color:rgba(0,153,204,.25);background:rgba(0,153,204,.03);margin-bottom:16px">
+        <div class="card-title" style="color:var(--soufflage)">📊 Sections visibles sur le Tableau de Bord</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Activez ou désactivez les sections que vous souhaitez afficher à tous les utilisateurs.</p>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+
+          <!-- Compteur B19+Emballage -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text)">📊 Compteur mensuel B19 + Emballage</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Widget foncé avec les totaux du mois</div>
+            </div>
+            <button onclick="toggleDashSection('showCounter')" id="toggle-showCounter" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage)">
+              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <!-- Stats machines -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text)">📈 Statistiques des 5 machines</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Ligne de stats Soufflage, Remplissage, etc.</div>
+            </div>
+            <button onclick="toggleDashSection('showStats')" id="toggle-showStats" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage)">
+              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <!-- Cartes machines -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text)">🏭 Cartes machines détaillées</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Soufflage, Remplissage, Étiquette, Emballage, B19</div>
+            </div>
+            <button onclick="toggleDashSection('showMachines')" id="toggle-showMachines" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage)">
+              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+          <!-- Tableau rapports -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text)">📋 Tableau des rapports du jour</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Liste de tous les rapports soumis</div>
+            </div>
+            <button onclick="toggleDashSection('showReports')" id="toggle-showReports" style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage)">
+              <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
       <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.03);margin-bottom:16px">
         <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera immédiatement en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.</p>
@@ -3529,6 +3518,52 @@ function renderAnnounceBanner(data) {
       </div>
     </div>`;
 }
+
+// ══════════ SECTIONS DASHBOARD ══════════
+const DASH_SECTIONS = ['showCounter','showStats','showMachines','showReports'];
+let dashSettings = { showCounter:true, showStats:true, showMachines:true, showReports:true };
+
+function applyDashSettings(settings) {
+  dashSettings = { ...dashSettings, ...settings };
+
+  const elCounter  = document.getElementById('dashCounter');
+  const elStats    = document.querySelector('#page-dashboard .stats-row');
+  const elMachines = document.getElementById('machineCards');
+  const elReports  = document.getElementById('dashReportsCard');
+
+  if (elCounter)  elCounter.style.display  = dashSettings.showCounter  ? '' : 'none';
+  if (elStats)    elStats.style.display    = dashSettings.showStats    ? '' : 'none';
+  if (elMachines) elMachines.style.display = dashSettings.showMachines ? '' : 'none';
+  if (elReports)  elReports.style.display  = dashSettings.showReports  ? '' : 'none';
+
+  // Mettre à jour les toggles dans Admin
+  DASH_SECTIONS.forEach(key => {
+    const btn = document.getElementById('toggle-'+key);
+    if (!btn) return;
+    const isOn = dashSettings[key];
+    btn.style.background = isOn ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
+    const knob = btn.querySelector('div');
+    if (knob) {
+      knob.style.right = isOn ? '3px' : '';
+      knob.style.left  = isOn ? '' : '3px';
+    }
+  });
+}
+
+window.toggleDashSection = async function(key) {
+  dashSettings[key] = !dashSettings[key];
+  applyDashSettings(dashSettings);
+  // Sauvegarder dans Firebase pour tous
+  try { await update(ref(db,'system/dashSettings'), dashSettings); } catch(e) {}
+};
+
+function loadDashSettings() {
+  onValue(ref(db,'system/dashSettings'), snap => {
+    const saved = snap.val();
+    if (saved) applyDashSettings(saved);
+  });
+}
+loadDashSettings();
 
 // ══════════ GESTION DES THÈMES ══════════
 const THEMES = ['dark','light','ocean','forest'];
