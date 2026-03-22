@@ -3653,8 +3653,8 @@ const EMAILJS_PUBLIC_KEY  = 'WekufjELkayuIsf19YC0g';
 
 // Initialiser EmailJS — retry jusqu'à ce que le script soit chargé
 function initEmailJS() {
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  if (typeof window.emailjs !== 'undefined') {
+    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
     console.log('✅ EmailJS initialisé');
   } else {
     setTimeout(initEmailJS, 300);
@@ -3668,14 +3668,14 @@ let emailSettings = { panne: true, annonce: true, rapport: true };
 // ── Envoyer un email à une adresse ──
 async function sendEmail(toEmail, toName, subject, message) {
   // S'assurer qu'EmailJS est initialisé
-  if (typeof emailjs === 'undefined') {
+  if (typeof window.emailjs === 'undefined') {
     console.warn('EmailJS non chargé — email non envoyé à', toEmail);
     return false;
   }
   try {
     // Ré-initialiser au cas où
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    const result = await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
       to_email: toEmail,
       to_name:  toName || 'Utilisateur',
       subject,
