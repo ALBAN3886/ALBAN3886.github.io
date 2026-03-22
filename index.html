@@ -223,6 +223,20 @@ body.theme-volcanic {
   --danger:  #ff2000;
 }
 
+/* ══ ACCORDÉON ADMIN ══ */
+.admin-accordion { margin-bottom:10px; border-radius:14px; border:1px solid var(--border); overflow:hidden; transition:all .3s; }
+.admin-accordion-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; cursor:pointer; background:var(--card);
+  user-select:none; transition:background .2s;
+}
+.admin-accordion-header:hover { background:var(--surface); }
+.admin-accordion-header .acc-title { font-family:var(--font-display); font-size:15px; font-weight:700; display:flex; align-items:center; gap:10px; }
+.admin-accordion-header .acc-arrow { font-size:12px; color:var(--muted); transition:transform .3s; }
+.admin-accordion-header.open .acc-arrow { transform:rotate(180deg); }
+.admin-accordion-body { display:none; padding:0 20px 20px; background:var(--card); border-top:1px solid var(--border); }
+.admin-accordion-body.open { display:block; animation:fadeIn .2s ease; }
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
@@ -1514,8 +1528,14 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       </div>
 
       <!-- 📐 FORMAT DE PRODUCTION -->
-      <div class="card" style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.04);margin-bottom:16px">
-        <div class="card-title" style="color:#a5b4fc">📐 Format de Production</div>
+      <div class="admin-accordion" id="acc-format">
+        <div class="admin-accordion-header" onclick="toggleAccordion('format')">
+          <div class="acc-title" style="color:#a5b4fc">📐 Format de Production</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-format">
+        <div style="padding-top:16px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Sélectionnez le format actif. Il s'affichera <strong style="color:var(--text)">en grand sur le tableau de bord</strong> pour tous.</p>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Sélectionnez le format de bouteille en cours de production. Il s'affichera <strong style="color:var(--text)">en grand sur le tableau de bord</strong> pour tous les utilisateurs.</p>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
           <div onclick="setProductionFormat('0.35')" id="fmt-035" style="border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;padding:16px 10px;text-align:center;transition:all .2s">
@@ -1543,11 +1563,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <div id="currentFormatLabel" style="font-size:13px;color:var(--muted)">Aucun format sélectionné</div>
           <button onclick="setProductionFormat('')" class="btn btn-ghost btn-sm" style="border-color:rgba(239,68,68,.3);color:var(--danger)">✕ Désactiver</button>
         </div>
-      </div>
+        </div></div></div>
 
-      <!-- 🎨 THÈME DE L'APPLICATION -->
-      <div class="card" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04);margin-bottom:16px">
-        <div class="card-title" style="color:var(--b19)">🎨 Thème de l'application</div>
+      <!-- 🎨 THÈME -->
+      <div class="admin-accordion" id="acc-theme">
+        <div class="admin-accordion-header" onclick="toggleAccordion('theme')">
+          <div class="acc-title" style="color:var(--b19)">🎨 Thème de l'application</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-theme">
+        <div style="padding-top:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le thème visuel pour tous les utilisateurs.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
 
@@ -1712,11 +1737,17 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
 
         </div>
-      </div>
+        </div></div></div>
 
-      <!-- 📧 NOTIFICATIONS PAR EMAIL -->
-      <div class="card" style="border-color:rgba(14,165,233,.3);background:rgba(14,165,233,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--soufflage)">📧 Notifications par Email</div>
+      <!-- 📧 EMAILS -->
+      <div class="admin-accordion" id="acc-emails">
+        <div class="admin-accordion-header" onclick="toggleAccordion('emails')">
+          <div class="acc-title" style="color:var(--soufflage)">📧 Notifications par Email</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-emails">
+        <div style="padding-top:16px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:0">
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
           Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">rapports avec anomalie</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
         </p>
@@ -1770,10 +1801,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
           <div id="emailSendStatus" style="display:none;font-size:12px;font-weight:600;margin-top:8px"></div>
         </div>
-      </div>
+        </div></div></div>
 
-      <div class="card" style="border-color:rgba(0,153,204,.3);background:rgba(0,153,204,.03);margin-bottom:16px">
-        <div class="card-title" style="color:var(--soufflage)">📢 Publier une annonce sur le tableau de bord</div>
+      <div class="admin-accordion" id="acc-annonce">
+        <div class="admin-accordion-header" onclick="toggleAccordion('annonce')">
+          <div class="acc-title" style="color:var(--soufflage)">📢 Publier une annonce</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-annonce">
+        <div style="padding-top:16px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera en haut du tableau de bord pour tous.</p>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ce message s'affichera immédiatement en haut du tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.</p>
 
         <!-- Type -->
@@ -1814,17 +1851,27 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           <button class="btn btn-ghost btn-sm" onclick="deleteAnnouncement()" style="border-color:rgba(239,68,68,.3);color:var(--danger)">🗑️ Supprimer l'annonce</button>
           <div id="announceOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600">✓ Annonce publiée !</div>
         </div>
-      </div>
+        </div></div></div>
 
-      <!-- UTILISATEURS ENREGISTRÉS -->
-      <div class="card">
-        <div class="card-title">👥 Comptes utilisateurs enregistrés</div>
+      <!-- UTILISATEURS -->
+      <div class="admin-accordion" id="acc-users">
+        <div class="admin-accordion-header" onclick="toggleAccordion('users')">
+          <div class="acc-title">👥 Comptes utilisateurs enregistrés</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-users">
+        <div style="padding-top:16px">
         <div id="adminUserList"><div class="empty"><div class="eico">👥</div><p>Chargement...</p></div></div>
-      </div>
+        </div></div></div>
 
-      <!-- NETTOYAGE SÉLECTIF -->
-      <div class="card" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04)">
-        <div class="card-title" style="color:var(--warn)">⚠️ Nettoyage sélectif des données</div>
+      <!-- NETTOYAGE -->
+      <div class="admin-accordion" id="acc-clean">
+        <div class="admin-accordion-header" onclick="toggleAccordion('clean')">
+          <div class="acc-title" style="color:var(--warn)">⚠️ Nettoyage sélectif des données</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-clean">
+        <div style="padding-top:16px">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center">
             <div style="font-size:28px;margin-bottom:8px">📋</div>
@@ -1851,11 +1898,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
             <button class="btn btn-ghost btn-sm" style="border-color:rgba(245,158,11,.4);color:var(--warn);width:100%" onclick="resetSection('userProfiles','les profils utilisateurs')">🗑️ Effacer</button>
           </div>
         </div>
-      </div>
+        </div></div></div>
 
-      <!-- RESET TOTAL DONNÉES -->
-      <div class="card" style="border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)">
-        <div class="card-title" style="color:var(--danger)">🚨 Réinitialisation complète des données</div>
+      <!-- RESET -->
+      <div class="admin-accordion" id="acc-reset">
+        <div class="admin-accordion-header" onclick="toggleAccordion('reset')">
+          <div class="acc-title" style="color:var(--danger)">🚨 Réinitialisation complète</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-reset">
+        <div style="padding-top:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7">
           Supprime <strong style="color:var(--text)">TOUT</strong> : rapports, discussions, alertes, profils et présences.<br>
           <span style="color:var(--danger)">⚠️ Irréversible.</span> Les comptes (email/mot de passe) restent — les techniciens devront recréer leur profil à la prochaine connexion.
@@ -1870,11 +1922,16 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </button>
         </div>
         <div id="resetMsg" style="font-size:13px;min-height:20px"></div>
-      </div>
+        </div></div></div>
 
-      <!-- GUIDE SUPPRESSION COMPTES FIREBASE -->
-      <div class="card" style="border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.03)">
-        <div class="card-title" style="color:var(--soufflage)">📖 Supprimer les comptes Firebase (étapes)</div>
+      <!-- FIREBASE -->
+      <div class="admin-accordion" id="acc-firebase">
+        <div class="admin-accordion-header" onclick="toggleAccordion('firebase')">
+          <div class="acc-title" style="color:var(--soufflage)">📖 Supprimer les comptes Firebase</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-firebase">
+        <div style="padding-top:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.7">
           Pour supprimer les comptes email/mot de passe (pas possible depuis l'app), suis ces étapes sur <strong style="color:var(--text)">Firebase Console</strong> :
         </p>
@@ -1920,7 +1977,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
             🔗 Ouvrir directement la page Authentication →
           </a>
         </div>
-      </div>
+        </div></div></div>
 
     </div>
 
@@ -4122,6 +4179,24 @@ onValue(ref(db, 'system/emailSettings'), snap => {
   if (snap.val()) { emailSettings = { ...emailSettings, ...snap.val() }; }
   updateEmailToggles();
 });
+
+// ══════════ ACCORDÉON ADMIN ══════════
+window.toggleAccordion = function(id) {
+  const body   = document.getElementById('acc-body-'+id);
+  const header = document.querySelector('#acc-'+id+' .admin-accordion-header');
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  // Fermer tous
+  document.querySelectorAll('.admin-accordion-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.admin-accordion-header').forEach(h => h.classList.remove('open'));
+  // Ouvrir celui cliqué si pas déjà ouvert
+  if (!isOpen) {
+    body.classList.add('open');
+    if (header) header.classList.add('open');
+    // Scroll smooth vers la section
+    setTimeout(() => body.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+  }
+};
 
 // ══════════ FORMAT DE PRODUCTION ══════════
 const FORMAT_LABELS = { '0.35':'0,35 L', '0.5':'0,5 L', '1.5':'1,5 L', '1.6':'1,6 L' };
