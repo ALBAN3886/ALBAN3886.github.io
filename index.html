@@ -1764,8 +1764,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getMessaging, getToken, onMessage }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
 
 // ══════════ FIREBASE CONFIG ══════════
 const firebaseConfig = {
@@ -1781,8 +1780,7 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
-let messaging = null;
-try { messaging = getMessaging(app); } catch(e) { console.warn('FCM not available:', e); }
+// Notifications: Web Notifications API (no FCM needed)
 
 // ══════════ SAFETY TIMEOUT ══════════
 setTimeout(() => {
@@ -2532,8 +2530,7 @@ window.saveReport = async function() {
     // 🔔 Notification Push à tous
     await sendPushToAll(
       `🚨 PANNE — ${machine}`,
-      `Signalée par ${currentUConf.name}. ${note||'Vérifier immédiatement.'}`,
-      { type: 'panne', machine }
+      `Signalée par ${currentUConf.name}. ${note||'Vérifier immédiatement.'}`
     );
   }
 
@@ -3505,8 +3502,7 @@ window.publishAnnouncement = async function() {
     const icons = { info:'ℹ️', urgent:'🚨', rapport:'📋', succes:'✅' };
     await sendPushToAll(
       `${icons[currentAnnounceType]||'📢'} ${title || 'Nouvelle annonce'}`,
-      msg || 'Consultez le tableau de bord',
-      '📢'
+      msg || 'Consultez le tableau de bord'
     );
     const ok = document.getElementById('announceOk');
     ok.style.display='block';
@@ -3544,79 +3540,39 @@ function renderAnnounceBanner(data) {
     </div>`;
 }
 
-// ══════════ NOTIFICATIONS PUSH (FCM) ══════════
-const VAPID_KEY = 'BGxLTxYTuXqnYl3CuNkioi2wOj4MYqPdnX-x6qpm6lyHxAOlO8Gvpz5L4OKxGPf_k5NIU3-uJ2OOkJwIedyOITE';
+// ══════════ NOTIFICATIONS PUSH (Web API) ══════════
+// Utilise l'API native du navigateur + Firebase Database
+// Fonctionne sur GitHub Pages sans serveur backend
 
 let pushEnabled = false;
-let fcmToken    = null;
+let pushCheckInterval = null;
 
-// ── Enregistrer le token FCM de cet appareil ──
-async function registerFCMToken() {
-  if (!messaging) return null;
+// ── Afficher une notification native du navigateur ──
+function showBrowserNotif(title, body, icon) {
+  if (Notification.permission !== 'granted') return;
   try {
-    const swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: swReg
+    const n = new Notification(title, {
+      body,
+      icon: icon || '/icône-192.png',
+      badge: '/icône-192.png',
+      tag: 'tev-' + Date.now(),
+      requireInteraction: false,
     });
-    return token || null;
-  } catch(e) {
-    console.warn('FCM token error:', e);
-    return null;
-  }
+    n.onclick = () => { window.focus(); n.close(); };
+    setTimeout(() => n.close(), 6000);
+  } catch(e) { console.warn('Notif error:', e); }
 }
 
-// ── Activer les notifications sur CET appareil ──
-async function activatePushOnThisDevice() {
-  if (!messaging) {
-    alert('Les notifications ne sont pas supportées sur ce navigateur.');
-    return false;
-  }
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      alert('❌ Vous avez refusé les notifications. Allez dans les paramètres de votre navigateur pour les autoriser.');
-      return false;
-    }
-    const token = await registerFCMToken();
-    if (!token) { console.warn('No FCM token'); return false; }
-    fcmToken = token;
-    pushEnabled = true;
-
-    // Sauvegarder le token lié à cet utilisateur dans Firebase
-    if (currentUser) {
-      await update(ref(db, `fcmTokens/${currentUser.uid}`), {
-        token,
-        name: currentUConf?.name || '',
-        role: currentUConf?.role || '',
-        updatedAt: Date.now()
-      });
-    }
-
-    // Écouter les messages quand l'app est ouverte (foreground)
-    onMessage(messaging, payload => {
-      const title = payload.notification?.title || 'TEV';
-      const body  = payload.notification?.body  || '';
-      showInAppNotification(title, body);
-    });
-
-    return true;
-  } catch(e) {
-    console.warn('Push activation error:', e);
-    return false;
-  }
-}
-
-// ── Notification visuelle dans l'app (quand app ouverte) ──
+// ── Notification visuelle dans l'app ──
 function showInAppNotification(title, body) {
   const el = document.createElement('div');
   el.style.cssText = `
     position:fixed;top:70px;right:16px;z-index:99999;
     background:var(--card);border:1px solid var(--border2);
     border-radius:14px;padding:14px 16px;max-width:300px;
-    box-shadow:0 8px 30px rgba(0,0,0,.2);
+    box-shadow:0 8px 30px rgba(0,0,0,.25);
     display:flex;align-items:flex-start;gap:12px;
-    animation:fadeIn .3s ease;cursor:pointer;
+    animation:fadeIn .3s ease;
   `;
   el.innerHTML = `
     <div style="font-size:22px;flex-shrink:0">🔔</div>
@@ -3624,98 +3580,152 @@ function showInAppNotification(title, body) {
       <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px">${title}</div>
       <div style="font-size:12px;color:var(--muted);line-height:1.4">${body}</div>
     </div>
-    <div onclick="this.parentElement.remove()" style="font-size:18px;color:var(--muted);cursor:pointer;flex-shrink:0;margin-top:-2px">×</div>
+    <div onclick="this.parentElement.remove()" style="font-size:20px;color:var(--muted);cursor:pointer;flex-shrink:0">×</div>
   `;
   document.body.appendChild(el);
-  setTimeout(() => { if (el.parentNode) el.remove(); }, 5000);
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 6000);
 }
 
-// ── Envoyer une notification push via Firebase Database ──
-// Le service worker lit /pushQueue et affiche la notif
-async function sendPushToAll(title, body, icon = '🔔') {
+// ── Envoyer une notification à tous via Firebase Database ──
+async function sendPushToAll(title, body) {
   try {
     await push(ref(db, 'pushQueue'), {
-      title, body, icon,
+      title, body,
       ts: Date.now(),
       sentBy: currentUser?.uid || 'system'
     });
   } catch(e) { console.warn('Push send error:', e); }
 }
 
-// ── Écouter la file de notifications push ──
-let lastPushTs = Date.now();
-function listenPushQueue() {
+// ── Écouter les nouvelles notifications depuis Firebase ──
+let lastNotifTs = Date.now();
+function startListeningNotifs() {
   onValue(ref(db, 'pushQueue'), snap => {
+    if (!pushEnabled) return;
     const queue = snap.val();
-    if (!queue || !pushEnabled) return;
-    // Afficher les nouvelles notifications in-app
+    if (!queue) return;
     Object.values(queue).forEach(n => {
-      if (n.ts > lastPushTs && n.sentBy !== currentUser?.uid) {
+      if ((n.ts || 0) > lastNotifTs && n.sentBy !== currentUser?.uid) {
+        showBrowserNotif(n.title, n.body);
         showInAppNotification(n.title, n.body);
-        lastPushTs = n.ts;
+        lastNotifTs = n.ts;
       }
     });
   });
 }
 
-// ── Bouton admin : activer pour tous ──
+// ── Admin : activer les notifications ──
 window.adminActivatePush = async function() {
-  const btn = document.getElementById('adminPushBtn');
+  const btn  = document.getElementById('adminPushBtn');
   const stat = document.getElementById('adminPushStatus');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Activation...'; }
+  const dot  = document.getElementById('adminPushDot');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Demande de permission...'; }
 
-  const ok = await activatePushOnThisDevice();
-  if (ok) {
-    // Sauver dans Firebase que les notifications sont activées globalement
-    await update(ref(db, 'system/push'), { enabled: true, activatedBy: currentUConf?.name, activatedAt: Date.now() });
-    if (stat) { stat.textContent = '✅ Notifications activées ! Les utilisateurs qui ouvrent l\'app recevront les alertes.'; stat.style.color = 'var(--ok)'; }
-    if (btn) { btn.textContent = '🔕 Désactiver les notifications'; btn.disabled = false; btn.style.background = 'rgba(239,68,68,.12)'; btn.style.borderColor = 'rgba(239,68,68,.3)'; btn.style.color = 'var(--danger)'; }
-    // Changer la fonction du bouton
+  if (!('Notification' in window)) {
+    if (stat) { stat.textContent = '❌ Votre navigateur ne supporte pas les notifications.'; stat.style.color = 'var(--danger)'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications pour tous'; }
+    return;
+  }
+
+  let permission = Notification.permission;
+  if (permission === 'default') {
+    permission = await Notification.requestPermission();
+  }
+
+  if (permission !== 'granted') {
+    if (stat) {
+      stat.innerHTML = '❌ Permission refusée.<br><span style="font-size:11px;font-weight:400">Allez dans Chrome → ⋮ → Paramètres → Paramètres du site → Notifications → alban3886.github.io → Autoriser</span>';
+      stat.style.color = 'var(--danger)';
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications pour tous'; }
+    return;
+  }
+
+  // Permission accordée !
+  pushEnabled = true;
+  lastNotifTs = Date.now();
+  startListeningNotifs();
+
+  // Sauvegarder dans Firebase
+  await update(ref(db, 'system/push'), {
+    enabled: true,
+    activatedBy: currentUConf?.name || 'Admin',
+    activatedAt: Date.now()
+  });
+
+  updateAdminPushUI(true);
+
+  // Test de notification
+  setTimeout(() => {
+    showBrowserNotif('✅ TEV — Notifications activées !', 'Vous recevrez les alertes de pannes et annonces.');
+  }, 500);
+};
+
+// ── Admin : désactiver ──
+window.adminDeactivatePush = async function() {
+  pushEnabled = false;
+  await update(ref(db, 'system/push'), { enabled: false });
+  updateAdminPushUI(false);
+};
+
+function updateAdminPushUI(enabled) {
+  const btn  = document.getElementById('adminPushBtn');
+  const stat = document.getElementById('adminPushStatus');
+  const dot  = document.getElementById('adminPushDot');
+  if (!btn) return;
+  if (enabled) {
+    if (stat) { stat.textContent = '✅ Activées — vous recevrez toutes les alertes sur cet appareil.'; stat.style.color = 'var(--ok)'; }
+    if (dot)  { dot.style.background = 'var(--ok)'; dot.style.boxShadow = '0 0 6px var(--ok)'; }
+    btn.textContent = '🔕 Désactiver les notifications';
+    btn.style.background = 'rgba(239,68,68,.12)';
+    btn.style.borderColor = 'rgba(239,68,68,.3)';
+    btn.style.color = 'var(--danger)';
+    btn.disabled = false;
     btn.onclick = adminDeactivatePush;
   } else {
-    if (stat) { stat.textContent = '❌ Échec — autorisez les notifications dans votre navigateur.'; stat.style.color = 'var(--danger)'; }
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 Activer les notifications'; }
+    if (stat) { stat.textContent = '❌ Notifications désactivées.'; stat.style.color = 'var(--danger)'; }
+    if (dot)  { dot.style.background = 'var(--danger)'; dot.style.boxShadow = 'none'; }
+    btn.textContent = '🔔 Activer les notifications pour tous';
+    btn.style.background = 'rgba(34,197,94,.12)';
+    btn.style.borderColor = 'rgba(34,197,94,.3)';
+    btn.style.color = 'var(--ok)';
+    btn.disabled = false;
+    btn.onclick = adminActivatePush;
   }
-};
-
-window.adminDeactivatePush = async function() {
-  await update(ref(db, 'system/push'), { enabled: false });
-  if (currentUser) await remove(ref(db, `fcmTokens/${currentUser.uid}`));
-  pushEnabled = false; fcmToken = null;
-  const btn = document.getElementById('adminPushBtn');
-  const stat = document.getElementById('adminPushStatus');
-  if (btn) { btn.textContent = '🔔 Activer les notifications'; btn.style.background = 'rgba(34,197,94,.12)'; btn.style.borderColor = 'rgba(34,197,94,.3)'; btn.style.color = 'var(--ok)'; btn.onclick = adminActivatePush; }
-  if (stat) { stat.textContent = '❌ Notifications désactivées.'; stat.style.color = 'var(--danger)'; }
-};
-
-// ── Les utilisateurs activent automatiquement quand push est activé par admin ──
-function listenPushActivation() {
-  onValue(ref(db, 'system/push'), async snap => {
-    const data = snap.val();
-    if (!data?.enabled || pushEnabled) return;
-    // Auto-activer si permission déjà accordée
-    if (Notification.permission === 'granted') {
-      await activatePushOnThisDevice();
-      listenPushQueue();
-    }
-  });
 }
-listenPushActivation();
 
-// ── Utilisateur individuel active sur son appareil ──
+// ── Utilisateur individuel : activer sur son appareil ──
 window.userActivatePush = async function() {
-  const btn = document.getElementById('pushToggleBtn');
+  const btn  = document.getElementById('pushToggleBtn');
   const stat = document.getElementById('pushStatusText');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Activation...'; }
-  const ok = await activatePushOnThisDevice();
-  if (ok) {
-    listenPushQueue();
-    if (stat) { stat.textContent = '✅ Notifications activées sur cet appareil !'; stat.style.color = 'var(--ok)'; }
-    if (btn) { btn.textContent = '✅ Notifications activées'; btn.style.background = 'rgba(34,197,94,.08)'; btn.disabled = false; }
-  } else {
-    if (stat) { stat.textContent = '❌ Échec — autorisez les notifications dans votre navigateur.'; stat.style.color = 'var(--danger)'; }
-    if (btn) { btn.disabled = false; btn.textContent = '🔔 Recevoir les notifications sur ce téléphone'; }
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Demande de permission...'; }
+
+  if (!('Notification' in window)) {
+    if (stat) { stat.textContent = '❌ Navigateur non compatible.'; stat.style.color = 'var(--danger)'; }
+    if (btn)  { btn.disabled = false; }
+    return;
   }
+
+  let perm = Notification.permission;
+  if (perm === 'default') perm = await Notification.requestPermission();
+
+  if (perm !== 'granted') {
+    if (stat) {
+      stat.innerHTML = '❌ Refusé.<br><small>Chrome → ⋮ → Paramètres → Paramètres du site → Notifications → alban3886.github.io → Autoriser</small>';
+      stat.style.color = 'var(--danger)';
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '🔔 Recevoir les notifications'; }
+    return;
+  }
+
+  pushEnabled = true;
+  lastNotifTs = Date.now();
+  startListeningNotifs();
+
+  if (stat) { stat.textContent = '✅ Notifications activées sur cet appareil !'; stat.style.color = 'var(--ok)'; }
+  if (btn)  { btn.textContent = '✅ Activées'; btn.style.opacity = '.7'; btn.disabled = true; }
+
+  setTimeout(() => showBrowserNotif('✅ TEV', 'Vous recevrez maintenant les alertes !'), 400);
 };
 
 // ── Envoi manuel depuis admin ──
@@ -3723,43 +3733,26 @@ window.sendManualPush = async function() {
   const title = document.getElementById('pushTitle')?.value.trim();
   const body  = document.getElementById('pushBody')?.value.trim();
   if (!title || !body) { alert('Entrez un titre et un message.'); return; }
-  await sendPushToAll(title, body, '📢');
+  await sendPushToAll(title, body);
+  // Notif in-app pour l'admin lui-même
+  showBrowserNotif(title, body);
   document.getElementById('pushTitle').value = '';
   document.getElementById('pushBody').value  = '';
   const ok = document.getElementById('pushSendOk');
   if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
 };
 
-// ── Écouter le statut push dans Firebase pour mettre à jour l'UI admin ──
+// ── Écouter statut push Firebase pour UI admin ──
 function listenAdminPushStatus() {
   onValue(ref(db, 'system/push'), snap => {
     const data = snap.val();
-    const enabled = data?.enabled === true;
-    const btn  = document.getElementById('adminPushBtn');
-    const stat = document.getElementById('adminPushStatus');
-    const dot  = document.getElementById('adminPushDot');
-    if (!btn || !stat) return;
-    if (enabled) {
-      stat.textContent = `✅ Notifications activées${data.activatedBy ? ' par ' + data.activatedBy : ''}`;
-      stat.style.color = 'var(--ok)';
-      dot.style.background = 'var(--ok)';
-      dot.style.boxShadow = '0 0 6px var(--ok)';
-      btn.textContent = '🔕 Désactiver les notifications';
-      btn.style.background = 'rgba(239,68,68,.12)';
-      btn.style.borderColor = 'rgba(239,68,68,.3)';
-      btn.style.color = 'var(--danger)';
-      btn.onclick = adminDeactivatePush;
-    } else {
-      stat.textContent = '❌ Notifications désactivées';
-      stat.style.color = 'var(--danger)';
-      dot.style.background = 'var(--danger)';
-      dot.style.boxShadow = 'none';
-      btn.textContent = '🔔 Activer les notifications pour tous';
-      btn.style.background = 'rgba(34,197,94,.12)';
-      btn.style.borderColor = 'rgba(34,197,94,.3)';
-      btn.style.color = 'var(--ok)';
-      btn.onclick = adminActivatePush;
+    // Si l'admin avait activé et la page se recharge → réactiver auto
+    if (data?.enabled && Notification.permission === 'granted' && !pushEnabled) {
+      pushEnabled = true;
+      lastNotifTs = Date.now();
+      startListeningNotifs();
     }
+    updateAdminPushUI(data?.enabled === true);
   });
 }
 listenAdminPushStatus();
