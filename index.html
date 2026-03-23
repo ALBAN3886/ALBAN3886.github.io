@@ -1065,6 +1065,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div><h2>🏭 Tableau de Bord</h2><p>Vue en temps réel — <span id="dashDate"></span></p></div>
         <div class="btn-row">
           <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="this.dataset.manuallySet='1';renderDashboard()">
+          <button class="btn btn-ghost btn-sm" onclick="goToToday()" id="btnToday" style="background:rgba(0,184,230,.15);border:1px solid rgba(0,184,230,.4);color:var(--soufflage);font-weight:700">📅 Aujourd'hui</button>
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Export Excel</button>
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
@@ -2630,6 +2631,18 @@ function getYesterday() {
   d.setDate(d.getDate() - 1);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+window.goToToday = function() {
+  const picker = document.getElementById('dashDatePicker');
+  picker.value = getToday();
+  picker.dataset.manuallySet = '1';
+  renderDashboard();
+};
 
 function renderDashboard() {
   const picker = document.getElementById('dashDatePicker');
