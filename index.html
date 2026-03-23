@@ -1065,7 +1065,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div><h2>🏭 Tableau de Bord</h2><p>Vue en temps réel — <span id="dashDate"></span></p></div>
         <div class="btn-row">
           <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="this.dataset.manuallySet='1';renderDashboard()">
-          <button class="btn btn-ghost btn-sm" onclick="goToToday()" style="background:rgba(0,184,230,.15);border:1px solid rgba(0,184,230,.4);color:var(--soufflage);font-weight:700">📅 Aujourd'hui</button>
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Export Excel</button>
           <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
@@ -1738,45 +1737,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
 
         </div>
-        </div></div></div>
-
-      <!-- DATE DES RAPPORTS -->
-      <div class="admin-accordion" id="acc-datemode">
-        <div class="admin-accordion-header" onclick="toggleAccordion('datemode')">
-          <div class="acc-title" style="color:var(--remplissage)">📅 Date des rapports affichés</div>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="admin-accordion-body" id="acc-body-datemode">
-        <div style="padding-top:16px">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-            Choisissez la date dont les rapports seront affichés sur le tableau de bord pour <strong style="color:var(--text)">tous les utilisateurs</strong>.
-            Par exemple sélectionnez <em>vendredi dernier</em> pour que tout le monde voit les rapports de ce jour.
-          </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
-            <button id="btn-mode-auto" onclick="setDashDateMode('auto')"
-              style="padding:10px 20px;border-radius:24px;border:2px solid var(--remplissage);background:var(--remplissage);color:#fff;font-weight:700;font-size:13px;cursor:pointer">
-              📅 Automatique (aujourd'hui)
-            </button>
-            <button id="btn-mode-fixed" onclick="setDashDateMode('fixed')"
-              style="padding:10px 20px;border-radius:24px;border:2px solid var(--border2);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">
-              📌 Date fixe
-            </button>
-          </div>
-          <div id="fixedDatePicker" style="display:none;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">
-            <div class="form-label" style="margin-bottom:8px">Choisir la date à afficher pour tous</div>
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <input type="date" id="adminFixedDate" class="form-input" style="width:auto;padding:9px 13px;font-size:14px" onchange="saveFixedDate()">
-              <button onclick="setFixedDateToday()" class="btn btn-ghost btn-sm" style="color:var(--remplissage);border-color:rgba(0,217,126,.4)">⚡ Aujourd'hui</button>
-              <button onclick="setFixedDateYesterday()" class="btn btn-ghost btn-sm">⏮️ Hier</button>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-            <span style="font-size:18px">📋</span>
-            <div>
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px">Date actuellement affichée sur le tableau de bord :</div>
-              <div id="adminDateStatus" style="font-weight:700;font-size:13px;color:var(--remplissage)">—</div>
-            </div>
-          </div>
         </div></div></div>
 
       <!-- 📧 EMAILS -->
@@ -2542,8 +2502,7 @@ function setupListeners() {
   const rRef = ref(db,'reports');
   const rL = onValue(rRef, snap => {
     allReports = snap.val() || {};
-    await loadDashDateSettings();
-  renderDashboard();
+    renderDashboard();
     renderHistory();
     // Refresh suivi emballage si page active
     const embPage = document.getElementById('page-emballage');
@@ -2643,7 +2602,7 @@ window.navigate = function(page) {
   if (page==='dashboard') {
     // Réinitialiser la date à hier à chaque fois qu'on ouvre le dashboard
     const picker = document.getElementById('dashDatePicker');
-    if (picker) { delete picker.dataset.manuallySet; applyDashDateMode(); }
+    if (picker) { delete picker.dataset.manuallySet; picker.value = getYesterday(); }
   }
   if (page==='chat') { unreadChat=0; unreadGroup=0; updateBadges(); listenGroupChat(); renderContacts(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
@@ -2672,78 +2631,11 @@ function getYesterday() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function getToday() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-// === GESTION DATE DASHBOARD ===
-let dashDateMode = 'auto';
-let dashFixedDate = '';
-
-async function loadDashDateSettings() {
-  try {
-    const s1 = await get(ref(db,'settings/dashDateMode'));
-    dashDateMode = s1.val() || 'auto';
-    const s2 = await get(ref(db,'settings/dashFixedDate'));
-    dashFixedDate = s2.val() || '';
-  } catch(e) { dashDateMode='auto'; }
-  applyDashDateMode();
-}
-
-function applyDashDateMode() {
-  const picker = document.getElementById('dashDatePicker');
-  if (!picker) return;
-  picker.value = (dashDateMode==='fixed' && dashFixedDate) ? dashFixedDate : getToday();
-  delete picker.dataset.manuallySet;
-  updateAdminDateUI();
-}
-
-function updateAdminDateUI() {
-  const bA = document.getElementById('btn-mode-auto');
-  const bF = document.getElementById('btn-mode-fixed');
-  const fp = document.getElementById('fixedDatePicker');
-  const st = document.getElementById('adminDateStatus');
-  if (!bA) return;
-  const ON  = 'padding:10px 20px;border-radius:24px;font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--remplissage);background:var(--remplissage);color:#fff';
-  const OFF = 'padding:10px 20px;border-radius:24px;font-weight:700;font-size:13px;cursor:pointer;border:2px solid var(--border2);background:none;color:var(--muted)';
-  if (dashDateMode==='fixed') {
-    bA.style.cssText=OFF; bF.style.cssText=ON;
-    if (fp) fp.style.display='block';
-    const fi=document.getElementById('adminFixedDate'); if(fi&&dashFixedDate) fi.value=dashFixedDate;
-    if (st) st.textContent = 'Date fixe — ' + (dashFixedDate ? formatDate(dashFixedDate) : '(non definie)');
-  } else {
-    bA.style.cssText=ON; bF.style.cssText=OFF;
-    if (fp) fp.style.display='none';
-    if (st) st.textContent = "Automatique — " + formatDate(getToday()) + " (aujourd'hui)";
-  }
-}
-
-window.setDashDateMode = async function(mode) {
-  dashDateMode=mode;
-  try { await set(ref(db,'settings/dashDateMode'),mode); } catch(e){}
-  applyDashDateMode(); renderDashboard();
-};
-
-window.saveFixedDate = async function() {
-  const val=document.getElementById('adminFixedDate')?.value; if(!val) return;
-  dashFixedDate=val;
-  try { await set(ref(db,'settings/dashFixedDate'),val); } catch(e){}
-  applyDashDateMode(); renderDashboard();
-};
-
-window.setFixedDateToday     = function(){ const fi=document.getElementById('adminFixedDate'); if(fi){fi.value=getToday();    window.saveFixedDate();} };
-window.setFixedDateYesterday = function(){ const fi=document.getElementById('adminFixedDate'); if(fi){fi.value=getYesterday(); window.saveFixedDate();} };
-
-window.goToToday = function() {
-  const picker=document.getElementById('dashDatePicker');
-  picker.value=getToday(); picker.dataset.manuallySet='1'; renderDashboard();
-};
-
 function renderDashboard() {
   const picker = document.getElementById('dashDatePicker');
+  // Toujours recalculer hier si aucune sélection manuelle récente
   if (!picker.dataset.manuallySet) {
-    picker.value = (dashDateMode==='fixed' && dashFixedDate) ? dashFixedDate : getToday();
+    picker.value = getYesterday();
   }
   const selDate = picker.value;
   const allReps = Object.values(allReports);
