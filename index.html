@@ -1780,7 +1780,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div style="padding-top:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:0">
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">rapports avec anomalie</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
+          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">tous les rapports</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
         </p>
 
         <!-- Statut auto-emails -->
@@ -1797,8 +1797,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
             <div>
-              <div style="font-weight:600;font-size:13px;color:var(--text)">📋 Email lors d'un rapport anomalie (warn/arrêt)</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand un rapport non-OK est soumis ou modifié</div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">📋 Email lors d'un rapport (tous statuts)</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand un rapport est soumis ou modifié</div>
             </div>
             <button onclick="toggleEmailAuto('rapport')" id="toggle-email-rapport"
               style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
@@ -3220,8 +3220,8 @@ window.saveEditReport = async function() {
       });
     }
 
-    // ── Email si statut ≠ OK et toggle rapport activé ──
-    if (updated.status !== 'ok' && emailSettings.rapport) {
+    // ── Email pour TOUS les rapports modifiés (toggle rapport activé) ──
+    if (emailSettings.rapport) {
       sendEmailForReport(
         `✏️ Rapport modifié — ${statusLabel} — Machine ${updated.machine}`,
         `Un rapport a été modifié.\n\n` +
