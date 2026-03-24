@@ -2999,8 +2999,8 @@ window.saveReport = async function() {
     isReport: true,
   });
 
-  // ── Email à tous : toujours pour Emballage et B19, sinon seulement si statut ≠ OK ──
-  if (emailSettings.rapport && (machine === 'Emballage' || machine === 'B19' || status !== 'ok')) {
+  // ── Email à tous : pour TOUS les rapports de toutes les machines ──
+  if (emailSettings.rapport) {
     sendEmailToAllUsers(
       `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
       `Un nouveau rapport a été soumis.\n\n` +
