@@ -5266,10 +5266,22 @@ window.exportTotalCSV = function() {
 
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
-// Enregistrement Service Worker
+// ── Forcer mise à jour du Service Worker et vider le cache ──
 if ('serviceWorker' in navigator) {
+  // Désinscrire tous les SW existants pour forcer rechargement propre
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    for (const reg of regs) reg.unregister();
+  });
+  // Vider tous les caches
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      keys.forEach(key => caches.delete(key));
+    });
+  }
+  // Réenregistrer le SW normalement
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.update(); // forcer vérification de mise à jour
       console.log('Service Worker enregistré', reg.scope);
     }).catch(err => {
       console.log('SW erreur:', err);
