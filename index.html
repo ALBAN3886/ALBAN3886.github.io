@@ -1780,7 +1780,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         <div style="padding-top:16px">
         <p style="font-size:13px;color:var(--muted);margin-bottom:0">
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">rapports avec anomalie</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
+          Envoyez un email à tous les utilisateurs enregistrés. Les emails sont envoyés automatiquement lors des <strong style="color:var(--text)">pannes</strong>, <strong style="color:var(--text)">tous les rapports</strong> et <strong style="color:var(--text)">annonces importantes</strong>.
         </p>
 
         <!-- Statut auto-emails -->
@@ -1797,8 +1797,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
             <div>
-              <div style="font-weight:600;font-size:13px;color:var(--text)">📋 Email lors d'un rapport anomalie (warn/arrêt)</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand un rapport non-OK est soumis ou modifié</div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">📋 Email lors d'un rapport (tous statuts)</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Envoie un email à tous quand un rapport est soumis ou modifié</div>
             </div>
             <button onclick="toggleEmailAuto('rapport')" id="toggle-email-rapport"
               style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
@@ -1814,6 +1814,21 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
               style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:var(--soufflage);flex-shrink:0">
               <div id="knob-email-annonce" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;right:3px;transition:all .3s"></div>
             </button>
+          </div>
+        </div>
+
+        <!-- Statistiques emails par rapport -->
+        <div style="margin-bottom:16px">
+          <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">📊 Emails envoyés par rapport (ce mois)</div>
+          <div id="emailStatsContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+            <div style="text-align:center;color:var(--muted);font-size:12px;padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border)">
+              ⏳ Chargement...
+            </div>
+          </div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <select id="emailStatsMonth" onchange="loadEmailStats()" class="form-input" style="font-size:12px;padding:6px 10px;width:auto">
+            </select>
+            <button onclick="loadEmailStats()" class="btn btn-ghost btn-sm" style="font-size:12px;padding:6px 12px">🔄 Actualiser</button>
           </div>
         </div>
 
@@ -2436,10 +2451,15 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('loginScreen').style.display = 'none';
 
-    // Montrer le splash 30s AVANT d'accéder à l'app
-    // L'app se charge en arrière-plan pendant ce temps
+    // Montrer le splash uniquement à la toute première visite
     initApp();
-    showSplash('app');
+    const splashSeen = localStorage.getItem('splashSeen');
+    if (!splashSeen) {
+      localStorage.setItem('splashSeen', '1');
+      showSplash('app');
+    } else {
+      document.getElementById('app')?.classList.add('show');
+    }
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
@@ -2671,20 +2691,41 @@ let dashDateMode = 'auto';
 let dashFixedDate = '';
 
 async function loadDashDateSettings() {
-  try {
-    const s1 = await get(ref(db,'settings/dashDateMode'));
-    dashDateMode = s1.val() || 'auto';
-    const s2 = await get(ref(db,'settings/dashFixedDate'));
-    dashFixedDate = s2.val() || '';
-  } catch(e) { dashDateMode='auto'; }
-  applyDashDateMode();
+  // Écoute en temps réel — se déclenche aussi chez les autres quand l'admin change la date
+  onValue(ref(db, 'settings/dashDateMode'), snap => {
+    const mode = snap.val() || 'auto';
+    if (mode !== dashDateMode) {
+      dashDateMode = mode;
+      applyDashDateMode();
+      const picker = document.getElementById('dashDatePicker');
+      if (picker && !picker.dataset.manuallySet) renderDashboard();
+    } else {
+      dashDateMode = mode;
+    }
+  });
+  onValue(ref(db, 'settings/dashFixedDate'), snap => {
+    const date = snap.val() || '';
+    if (date !== dashFixedDate) {
+      dashFixedDate = date;
+      applyDashDateMode();
+      const picker = document.getElementById('dashDatePicker');
+      if (picker && !picker.dataset.manuallySet) renderDashboard();
+    } else {
+      dashFixedDate = date;
+    }
+  });
 }
 
 function applyDashDateMode() {
   const picker = document.getElementById('dashDatePicker');
   if (!picker) return;
-  picker.value = (dashDateMode==='fixed' && dashFixedDate) ? dashFixedDate : getToday();
-  delete picker.dataset.manuallySet;
+  if (dashDateMode === 'fixed' && dashFixedDate) {
+    // La date fixe de l'admin prime TOUJOURS sur le choix local
+    picker.value = dashFixedDate;
+    delete picker.dataset.manuallySet;
+  } else if (!picker.dataset.manuallySet) {
+    picker.value = getToday();
+  }
   updateAdminDateUI();
 }
 
@@ -2958,14 +2999,15 @@ window.saveReport = async function() {
       text: `🚨 ALERTE PANNE — Machine ${machine} — ${note||'Vérifier immédiatement'}`,
     });
     if (emailSettings.panne) {
-      sendEmailToAllUsers(
+      sendEmailForReport(
         `🚨 PANNE — Machine ${machine}`,
         `Une panne a été signalée !\n\n` +
         `Machine : ${machine}\n` +
         `Signalée par : ${currentUConf.name}\n` +
         `Date : ${date} — Poste : ${shift}\n` +
         `Détail : ${note || 'Aucun détail fourni'}\n\n` +
-        `Connectez-vous sur l'application TEV pour plus d'informations.`
+        `Connectez-vous sur l'application TEV pour plus d'informations.`,
+        machine, 'panne'
       );
     }
   } else if (status === 'warn') {
@@ -3001,7 +3043,7 @@ window.saveReport = async function() {
 
   // ── Email à tous : pour TOUS les rapports de toutes les machines ──
   if (emailSettings.rapport) {
-    sendEmailToAllUsers(
+    sendEmailForReport(
       `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
       `Un nouveau rapport a été soumis.\n\n` +
       `Machine : ${machine}\n` +
@@ -3011,7 +3053,8 @@ window.saveReport = async function() {
       `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
       `Statut : ${statusLabel}\n` +
       `Détail : ${note || 'Aucun commentaire'}\n\n` +
-      `Connectez-vous sur l'application TEV pour plus d'informations.`
+      `Connectez-vous sur l'application TEV pour plus d'informations.`,
+      machine, 'rapport'
     );
   }
 
@@ -3203,9 +3246,9 @@ window.saveEditReport = async function() {
       });
     }
 
-    // ── Email si statut ≠ OK et toggle rapport activé ──
-    if (updated.status !== 'ok' && emailSettings.rapport) {
-      sendEmailToAllUsers(
+    // ── Email pour TOUS les rapports modifiés (toggle rapport activé) ──
+    if (emailSettings.rapport) {
+      sendEmailForReport(
         `✏️ Rapport modifié — ${statusLabel} — Machine ${updated.machine}`,
         `Un rapport a été modifié.\n\n` +
         `Machine : ${updated.machine}\n` +
@@ -3214,7 +3257,8 @@ window.saveEditReport = async function() {
         `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
         `Statut : ${statusLabel}\n` +
         `Détail : ${updated.note || 'Aucun commentaire'}\n\n` +
-        `Connectez-vous sur l'application TEV pour plus d'informations.`
+        `Connectez-vous sur l'application TEV pour plus d'informations.`,
+        updated.machine, 'rapport'
       );
     }
 
@@ -4144,6 +4188,31 @@ function showToast(msg, type) {
   toast._t = setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display='none', 400); }, 4000);
 }
 
+// ── Incrémenter le compteur d'emails par rapport ──
+async function incrementEmailCounter(machine, type) {
+  try {
+    const today = new Date().toISOString().slice(0,10);
+    const month = today.slice(0,7);
+    const counterRef = ref(db, `system/emailCounters/${month}/${type}_${machine || 'global'}`);
+    const snap = await get(counterRef);
+    const current = snap.val() || 0;
+    await set(counterRef, current + 1);
+    // Compteur global du mois
+    const globalRef = ref(db, `system/emailCounters/${month}/total`);
+    const gSnap = await get(globalRef);
+    await set(globalRef, (gSnap.val() || 0) + 1);
+  } catch(e) { console.warn('Counter error:', e); }
+}
+
+// ── Envoyer un email lié à un rapport (avec comptage) ──
+async function sendEmailForReport(subject, message, machine, type) {
+  const sent = await sendEmailToAllUsers(subject, message);
+  if (sent > 0) {
+    await incrementEmailCounter(machine, type || 'rapport');
+  }
+  return sent;
+}
+
 // ── Envoyer un email à TOUS les utilisateurs ──
 async function sendEmailToAllUsers(subject, message) {
   try {
@@ -4271,7 +4340,80 @@ function updateEmailToggles() {
   });
 }
 
-// Charger les paramètres email depuis Firebase
+// ── Charger et afficher les stats d'emails par rapport ──
+window.loadEmailStats = async function() {
+  const container = document.getElementById('emailStatsContainer');
+  const monthSel  = document.getElementById('emailStatsMonth');
+  if (!container) return;
+
+  // Remplir le sélecteur de mois si vide
+  if (monthSel && !monthSel.options.length) {
+    const now = new Date();
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const val = d.toISOString().slice(0, 7);
+      const label = d.toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+      const opt = document.createElement('option');
+      opt.value = val; opt.textContent = label;
+      if (i === 0) opt.selected = true;
+      monthSel.appendChild(opt);
+    }
+  }
+
+  const month = monthSel?.value || new Date().toISOString().slice(0, 7);
+  container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:12px;background:var(--surface);border-radius:8px;border:1px solid var(--border)">⏳ Chargement...</div>';
+
+  try {
+    const snap = await get(ref(db, `system/emailCounters/${month}`));
+    const data = snap.val() || {};
+
+    // Machines connues + types
+    const machines = ['Soufflage','Remplissage','Etiquetage','Emballage','B19'];
+    const typeConfig = {
+      rapport: { label:'Rapport',  emoji:'📋', color:'var(--soufflage)' },
+      panne:   { label:'Panne',    emoji:'🚨', color:'var(--danger)' },
+    };
+
+    // Construire les cartes
+    let cards = '';
+    let grandTotal = 0;
+
+    for (const machine of machines) {
+      for (const [type, cfg] of Object.entries(typeConfig)) {
+        const key = `${type}_${machine}`;
+        const count = data[key] || 0;
+        grandTotal += count;
+        if (count === 0) continue; // Masquer les zéros
+        cards += `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px">
+              ${cfg.emoji} <span style="font-weight:600;color:var(--text)">${machine}</span>
+              <span style="background:rgba(255,255,255,.08);border-radius:4px;padding:1px 6px;font-size:10px">${cfg.label}</span>
+            </div>
+            <div style="font-family:var(--font-display);font-size:26px;font-weight:900;color:${cfg.color};line-height:1">${count}</div>
+            <div style="font-size:10px;color:var(--muted)">email${count>1?'s':''} envoyé${count>1?'s':''}</div>
+          </div>`;
+      }
+    }
+
+    // Carte total
+    const totalCard = `
+      <div style="background:var(--surface);border:2px solid var(--soufflage);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:11px;color:var(--muted)">📧 <span style="font-weight:600;color:var(--text)">Total du mois</span></div>
+        <div style="font-family:var(--font-display);font-size:30px;font-weight:900;color:var(--soufflage);line-height:1">${grandTotal}</div>
+        <div style="font-size:10px;color:var(--muted)">email${grandTotal>1?'s':''} envoyé${grandTotal>1?'s':''}</div>
+      </div>`;
+
+    container.innerHTML = grandTotal === 0
+      ? `<div style="text-align:center;color:var(--muted);font-size:12px;padding:16px;background:var(--surface);border-radius:8px;border:1px dashed var(--border);grid-column:1/-1">Aucun email de rapport envoyé ce mois</div>`
+      : totalCard + cards;
+
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--danger);font-size:12px;padding:8px">❌ Erreur : ${e.message}</div>`;
+  }
+};
+
+// Charger les paramètres email depuis Firebase (temps réel)
 onValue(ref(db, 'system/emailSettings'), snap => {
   if (snap.val()) { emailSettings = { ...emailSettings, ...snap.val() }; }
   updateEmailToggles();
@@ -4292,6 +4434,8 @@ window.toggleAccordion = function(id) {
     if (header) header.classList.add('open');
     // Scroll smooth vers la section
     setTimeout(() => body.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+    // Charger les stats email à l'ouverture
+    if (id === 'emails') setTimeout(loadEmailStats, 150);
   }
 };
 
@@ -5141,10 +5285,22 @@ window.exportTotalCSV = function() {
 
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
-// Enregistrement Service Worker
+// ── Forcer mise à jour du Service Worker et vider le cache ──
 if ('serviceWorker' in navigator) {
+  // Désinscrire tous les SW existants pour forcer rechargement propre
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    for (const reg of regs) reg.unregister();
+  });
+  // Vider tous les caches
+  if ('caches' in window) {
+    caches.keys().then(keys => {
+      keys.forEach(key => caches.delete(key));
+    });
+  }
+  // Réenregistrer le SW normalement
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.update(); // forcer vérification de mise à jour
       console.log('Service Worker enregistré', reg.scope);
     }).catch(err => {
       console.log('SW erreur:', err);
