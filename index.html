@@ -834,7 +834,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <div class="login-err" id="loginErr" style="color:#dc2626;font-size:12px;text-align:center;min-height:16px"></div>
 
     <!-- Lien admin discret -->
-    <div id="adminLoginLink" style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px;display:none">
+    <div style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px">
       <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
     </div>
 
@@ -845,9 +845,8 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div class="login-label" style="color:#7a8599">Mot de passe</div>
       <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
       <button class="btn-login" id="loginBtn" onclick="doLogin()" style="margin-top:4px">CONNEXION →</button>
-      <div style="display:flex;justify-content:space-between;margin-top:8px;align-items:center">
+      <div style="text-align:right;margin-top:8px">
         <span onclick="switchMode('forgot')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
-        <span id="registerLink" onclick="switchMode('register')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline;display:none">➕ Créer un compte</span>
       </div>
     </div>
 
@@ -1853,42 +1852,6 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         </div></div></div>
 
       <!-- UTILISATEURS -->
-      <!-- ACCÈS CONNEXION -->
-      <div class="admin-accordion" id="acc-access">
-        <div class="admin-accordion-header" onclick="toggleAccordion('access')">
-          <div class="acc-title" style="color:var(--soufflage)">🔐 Accès &amp; Connexion</div>
-          <span class="acc-arrow">▼</span>
-        </div>
-        <div class="admin-accordion-body" id="acc-body-access">
-        <div style="padding-top:16px;display:flex;flex-direction:column;gap:10px">
-
-          <!-- Toggle : Connexion Admin -->
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-            <div>
-              <div style="font-weight:600;font-size:13px;color:var(--text)">⚙️ Afficher "Connexion administrateur"</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px">Lien discret sous la liste des utilisateurs</div>
-            </div>
-            <button onclick="toggleAccessOption('showAdminLogin')" id="toggle-showAdminLogin"
-              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:rgba(255,255,255,.15);flex-shrink:0">
-              <div id="knob-showAdminLogin" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:all .3s"></div>
-            </button>
-          </div>
-
-          <!-- Toggle : Création de compte -->
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-            <div>
-              <div style="font-weight:600;font-size:13px;color:var(--text)">➕ Autoriser la création de compte</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px">Visible depuis la connexion administrateur</div>
-            </div>
-            <button onclick="toggleAccessOption('showRegister')" id="toggle-showRegister"
-              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:rgba(255,255,255,.15);flex-shrink:0">
-              <div id="knob-showRegister" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:all .3s"></div>
-            </button>
-          </div>
-
-        </div>
-        </div></div>
-
       <div class="admin-accordion" id="acc-users">
         <div class="admin-accordion-header" onclick="toggleAccordion('users')">
           <div class="acc-title">👥 Comptes utilisateurs enregistrés</div>
@@ -4469,54 +4432,6 @@ window.loadEmailStats = async function() {
     container.innerHTML = `<div style="color:var(--danger);font-size:12px;padding:8px">❌ Erreur : ${e.message}</div>`;
   }
 };
-
-// ══════════ ACCÈS & CONNEXION ══════════
-let accessSettings = { showAdminLogin: false, showRegister: false };
-
-function applyAccessSettings() {
-  // Lien connexion admin
-  const adminLink = document.getElementById('adminLoginLink');
-  if (adminLink) adminLink.style.display = accessSettings.showAdminLogin ? '' : 'none';
-  // Lien créer un compte
-  const regLink = document.getElementById('registerLink');
-  if (regLink) regLink.style.display = accessSettings.showRegister ? '' : 'none';
-  // Mettre à jour les toggles admin
-  updateAccessToggles();
-}
-
-function updateAccessToggles() {
-  ['showAdminLogin','showRegister'].forEach(key => {
-    const btn  = document.getElementById('toggle-'+key);
-    const knob = document.getElementById('knob-'+key);
-    if (!btn) return;
-    const on = accessSettings[key];
-    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
-    if (knob) { knob.style.left = on ? '' : '3px'; knob.style.right = on ? '3px' : ''; }
-  });
-}
-
-window.toggleAccessOption = async function(key) {
-  accessSettings[key] = !accessSettings[key];
-  applyAccessSettings();
-  try { await update(ref(db, 'system/accessSettings'), accessSettings); } catch(e) {}
-};
-
-// Charger les paramètres d'accès depuis Firebase en temps réel
-onValue(ref(db, 'system/accessSettings'), snap => {
-  if (snap.val()) accessSettings = { ...accessSettings, ...snap.val() };
-  applyAccessSettings();
-});
-
-function updateAccessToggles() {
-  ['showAdminLogin','showRegister'].forEach(key => {
-    const btn  = document.getElementById('toggle-'+key);
-    const knob = document.getElementById('knob-'+key);
-    if (!btn) return;
-    const on = accessSettings[key];
-    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
-    if (knob) { knob.style.left = on ? '' : '3px'; knob.style.right = on ? '3px' : ''; }
-  });
-}
 
 // Charger les paramètres email depuis Firebase (temps réel)
 onValue(ref(db, 'system/emailSettings'), snap => {
