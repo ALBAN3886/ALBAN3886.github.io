@@ -311,35 +311,42 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 #loginScreen {
   position:fixed; inset:0; display:none;
   align-items:center; justify-content:center;
-  background:var(--bg); z-index:1000;
+  background:#000; z-index:1000;
+  overflow-y:auto; padding:20px;
 }
 #loginScreen.show { display:flex; }
+#loginSlides {
+  position:absolute; inset:0; z-index:0;
+}
+#loginSlides img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:contain; object-position:center;
+  background:#000;
+}
 #loginScreen::before {
-  content:''; position:absolute; inset:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 20% 50%, rgba(0,212,255,.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(0,255,148,.05) 0%, transparent 60%);
+  content:''; position:absolute; inset:0; z-index:1;
+  background:rgba(0,0,0,.55);
 }
 .login-box {
-  position:relative; width:440px;
-  background:var(--card); border:1px solid var(--border2);
+  position:relative; width:440px; z-index:2;
+  background:rgba(255,255,255,.95); border:1px solid rgba(255,255,255,.3);
   border-radius:16px; padding:44px 40px;
   box-shadow:0 32px 80px rgba(0,0,0,.6);
   animation:fadeUp .4s ease;
 }
 .login-logo { text-align:center; margin-bottom:32px; }
-.login-logo .brand { font-family:var(--font-display); font-size:44px; font-weight:900; letter-spacing:2px; }
+.login-logo .brand { font-family:var(--font-display); font-size:44px; font-weight:900; letter-spacing:2px; color:#1a2030; }
 .login-logo .brand span { color:var(--soufflage); }
-.login-logo .sub { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+.login-logo .sub { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#7a8599; margin-top:4px; }
 
-.login-label { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:8px; }
+.login-label { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:#7a8599; margin-bottom:8px; }
 .login-input {
-  width:100%; background:var(--surface); border:1px solid var(--border);
+  width:100%; background:#f0f4f8; border:1px solid #e2e6ed;
   border-radius:8px; padding:12px 16px;
-  font-family:var(--font-body); font-size:15px; color:var(--text);
+  font-family:var(--font-body); font-size:15px; color:#1a2030;
   outline:none; transition:border-color .2s, box-shadow .2s; margin-bottom:16px;
 }
-.login-input:focus { border-color:var(--soufflage); box-shadow:0 0 0 3px rgba(0,212,255,.1); }
+.login-input:focus { border-color:var(--soufflage); box-shadow:0 0 0 3px rgba(0,153,204,.1); }
 
 .user-select { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
 .user-chip {
@@ -709,122 +716,42 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 </div>
 
 <!-- SPLASH MESSAGE -->
-<div id="splashScreen" style="
-  position:fixed; inset:0; z-index:9999;
-  background:linear-gradient(160deg, #0a0f1e 0%, #0d1a2e 50%, #0a1520 100%);
-  display:flex; align-items:center; justify-content:center;
-  padding:28px;
-  animation:fadeIn .6s ease;
-">
-  <!-- Étoiles décoratives -->
-  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none">
-    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.6;top:8%;left:12%"></div>
-    <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.4;top:15%;left:75%"></div>
-    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.5;top:22%;left:45%"></div>
-    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3;top:70%;left:20%"></div>
-    <div style="position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.5;top:80%;left:85%"></div>
-    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.4;top:40%;left:90%"></div>
-    <div style="position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3;top:60%;left:5%"></div>
-    <div style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;opacity:.7;top:5%;left:55%;box-shadow:0 0 8px #ffd700"></div>
-    <div style="position:absolute;width:3px;height:3px;background:#ffd700;border-radius:50%;opacity:.5;top:88%;left:40%;box-shadow:0 0 6px #ffd700"></div>
-  </div>
+<!-- Overlay sombre pour lisibilité -->
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,.35)"></div>
 
+  <!-- Contenu centré -->
   <div style="
-    max-width:480px; width:100%;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:20px;
-    padding:36px 32px 28px;
+    position:relative; z-index:1;
+    width:100%; max-width:400px;
+    padding:32px 28px;
     text-align:center;
-    backdrop-filter:blur(10px);
-    box-shadow:0 20px 60px rgba(0,0,0,.5);
-    position:relative;
   ">
-    <!-- Croix dorée -->
-    <div style="font-size:38px;margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(255,215,0,.5))">✝️</div>
-
-    <!-- Message -->
-    <p style="
-      font-family:'Barlow',sans-serif;
-      font-size:16px;
-      line-height:1.85;
-      color:rgba(255,255,255,.88);
-      margin:0 0 10px;
-      letter-spacing:.01em;
-    ">
-      Cher amis, ceci n'est qu'une idée simple.<br>
-      Entre frères, <em style="color:#ffd700">apprendre ensemble</em>, grandir,<br>
-      se comprendre, aimer et aller loin ensemble.
-    </p>
-    <p style="
-      font-family:'Barlow',sans-serif;
-      font-size:15px;
-      line-height:1.8;
-      color:rgba(255,255,255,.7);
-      margin:0 0 10px;
-    ">
-      Ceci n'est qu'une idée, car on avance dans un monde professionnel<br>
-      et on a besoin de nous tous chaque jour.
-    </p>
-    <p style="
-      font-family:'Barlow',sans-serif;
-      font-size:15px;
-      line-height:1.8;
-      color:rgba(255,255,255,.7);
-      margin:0 0 22px;
-    ">
-      Ceci n'est pas une idée de l'administration,<br>
-      ni une imposition ou une chose pour mettre son prochain en danger.<br>
-      <em style="color:rgba(255,255,255,.9)">C'est entre nous et ça reste entre nous.</em>
-    </p>
-
-    <!-- Signature -->
-    <div style="
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:20px;
-      font-weight:700;
-      letter-spacing:.1em;
-      color:#ffd700;
-      text-shadow:0 0 16px rgba(255,215,0,.5);
-      margin-bottom:28px;
-    ">✨ Soyez bénis. CHRIST ROI DES ROIS ✨</div>
+    <!-- Espace logo (remplacé par photos) -->
+    <div style="margin-bottom:40px"></div>
 
     <!-- Barre de progression -->
-    <div style="position:relative;margin-bottom:14px">
-      <div style="
-        width:100%; height:4px;
-        background:rgba(255,255,255,.1);
-        border-radius:2px; overflow:hidden;
-      ">
-        <div id="splashProgress" style="
-          height:100%;
-          background:linear-gradient(90deg,#ffd700,#ffaa00);
-          border-radius:2px;
-          width:0%;
-          transition:width .1s linear;
-          box-shadow:0 0 8px rgba(255,215,0,.4);
-        "></div>
-      </div>
-      <div id="splashCountdown" style="
-        font-family:'Barlow',sans-serif;
-        font-size:12px;
-        color:var(--muted);
-        margin-top:8px;
-        letter-spacing:.05em;
-      ">Patientez 10 secondes...</div>
+    <div style="width:100%;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;margin-bottom:12px">
+      <div id="splashProgress" style="
+        height:100%;
+        background:#fff;
+        border-radius:2px;
+        width:0%;
+        transition:width .1s linear;
+      "></div>
     </div>
+    <div id="splashCountdown" style="display:none"></div>
 
     <!-- Bouton Continuer -->
-    <button id="splashBtn" onclick="goToWelcome()" disabled style="
+    <button id="splashBtn" onclick="goToWelcome()" style="
       width:100%; padding:13px;
-      background:rgba(255,215,0,.15);
-      border:1.5px solid rgba(255,215,0,.3);
-      color:rgba(255,215,0,.4);
+      background:rgba(255,255,255,.25);
+      border:1.5px solid rgba(255,255,255,.6);
+      color:#fff;
       border-radius:10px;
       font-family:'Barlow Condensed',sans-serif;
       font-size:16px; font-weight:700;
       letter-spacing:.05em;
-      cursor:not-allowed;
+      cursor:pointer;
       transition:all .4s;
     ">CONTINUER →</button>
   </div>
@@ -874,6 +801,12 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 </div>
 
 <div id="loginScreen" class="show" style="display:none">
+  <!-- Diaporama arrière-plan (même slides que splash) -->
+  <div id="loginSlides">
+    <img id="loginSlide0" src="" style="opacity:1;transition:opacity 1s ease">
+    <img id="loginSlide1" src="" style="opacity:0;transition:opacity 1s ease">
+    <img id="loginSlide2" src="" style="opacity:0;transition:opacity 1s ease">
+  </div>
   <div class="login-box">
     <div class="login-logo">
       <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px">EAU VITALE</span></div>
@@ -894,7 +827,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <div style="text-align:right;margin-bottom:14px;margin-top:-8px">
         <span onclick="switchMode('forgot')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
       </div>
-      <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
+      <button class="btn-login" onclick="loginUser()" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
     </div>
 
     <!-- MODE CRÉER COMPTE -->
@@ -915,7 +848,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères">
       <div class="login-label">Confirmer le mot de passe</div>
       <input type="password" class="login-input" id="regPwd2" placeholder="Répéter le mot de passe">
-      <button class="btn-login" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
+      <button class="btn-login" onclick="loginUser()" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
     </div>
 
     <!-- MODE MOT DE PASSE OUBLIÉ -->
@@ -931,7 +864,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
       <input type="password" class="login-input" id="newPwd" placeholder="Minimum 6 caractères">
       <div class="login-label">Confirmer le nouveau mot de passe</div>
       <input type="password" class="login-input" id="newPwd2" placeholder="Répéter le mot de passe">
-      <button class="btn-login" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
+      <button class="btn-login" onclick="loginUser()" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
       <div style="text-align:center;margin-top:14px">
         <span onclick="switchMode('login')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">← Retour connexion</span>
       </div>
@@ -2430,11 +2363,19 @@ onAuthStateChanged(auth, async user => {
         }
       } catch(e) { console.warn('Profile load error', e); }
     }
-    if (!conf) { await signOut(auth); return; }
+    if (!conf) {
+      await signOut(auth);
+      // Réactiver le bouton et afficher un message d'erreur clair
+      const btn = document.getElementById('loginBtn');
+      if (btn) { btn.disabled = false; btn.textContent = 'CONNEXION →'; }
+      const err = document.getElementById('loginErr');
+      if (err) { err.style.color = 'var(--danger)'; err.textContent = '❌ Profil introuvable. Contactez l\'administrateur.'; }
+      return;
+    }
     currentUConf = conf;
 
-    // Load extra profile data (phone, photoURL)
     try {
+      // Load extra profile data (phone, photoURL)
       const snap2 = await get(ref(db, `userProfiles/${user.uid}`));
       if (snap2.exists()) {
         const p = snap2.val();
@@ -2443,8 +2384,10 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) {}
 
-    // Charger le cache de photos de tous les utilisateurs
-    await loadPhotosCache();
+    try {
+      // Charger le cache de photos EN ARRIÈRE-PLAN (ne bloque pas la connexion)
+      loadPhotosCache().catch(()=>{});
+    } catch(e) {}
     // Ajouter soi-même au cache
     photosCache[user.uid] = { photoURL: currentUConf.photoURL||null, color: currentUConf.color, name: currentUConf.name };
 
@@ -2452,7 +2395,7 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('loginScreen').style.display = 'none';
 
     // Montrer le splash uniquement à la toute première visite
-    initApp();
+    try { initApp(); } catch(e) { console.warn('initApp error', e); }
     const splashSeen = localStorage.getItem('splashSeen');
     if (!splashSeen) {
       localStorage.setItem('splashSeen', '1');
@@ -2463,6 +2406,9 @@ onAuthStateChanged(auth, async user => {
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
+    // Toujours réactiver le bouton de connexion
+    const btn = document.getElementById('loginBtn');
+    if (btn) { btn.disabled = false; btn.textContent = 'CONNEXION →'; }
     loadDynamicUsers();
   }
 });
@@ -3750,7 +3696,40 @@ window.exportPDF = function() {
       <td><b>${r.fields?.prod||0}</b></td>
       <td class="${r.status}">${{ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||''}</td>
       <td>${r.note||''}</td></tr>`).join('')}</tbody></table>
-  </body></html>`;
+  
+<script>
+window.addEventListener("load", function() {
+  document.getElementById("loginScreen").classList.add("show");
+});
+
+function loginUser() {
+  const email = document.querySelector('input[type="email"]').value;
+  const password = document.querySelector('input[type="password"]').value;
+
+  if (!email || !password) {
+    alert("Veuillez remplir les champs");
+    return;
+  }
+
+  const btn = document.querySelector(".btn-login");
+  if(btn){
+    btn.disabled = true;
+    btn.innerText = "Connexion...";
+  }
+
+  setTimeout(() => {
+    document.getElementById("loginScreen").classList.remove("show");
+    document.getElementById("app").classList.add("show");
+
+    if(btn){
+      btn.disabled = false;
+      btn.innerText = "Connexion";
+    }
+  }, 800);
+}
+</script>
+
+</body></html>`;
   const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),500);
 };
 // ══════════ PROFIL ══════════
@@ -4539,8 +4518,46 @@ function loadSavedTheme() {
 }
 loadSavedTheme();
 
+// ══════════ SPLASH DIAPORAMA ══════════
+(function() {
+  let _slideIdx = 0;
+
+  function initLoginSlides() {
+    // Copier les src des slides du splash vers login
+    const splashSlides = document.querySelectorAll('#splashSlides img');
+    const loginSlides  = document.querySelectorAll('#loginSlides img');
+    splashSlides.forEach((img, i) => {
+      if (loginSlides[i]) loginSlides[i].src = img.src;
+    });
+  }
+
+  function nextSlide() {
+    // Splash slides
+    const sSlides = document.querySelectorAll('#splashSlides img');
+    // Login slides
+    const lSlides = document.querySelectorAll('#loginSlides img');
+
+    if (sSlides.length) sSlides[_slideIdx].style.opacity = '0';
+    if (lSlides.length) lSlides[_slideIdx].style.opacity = '0';
+
+    _slideIdx = (_slideIdx + 1) % Math.max(sSlides.length, lSlides.length, 1);
+
+    if (sSlides.length) sSlides[_slideIdx].style.opacity = '1';
+    if (lSlides.length) lSlides[_slideIdx].style.opacity = '1';
+  }
+
+  // Démarrer dès que le DOM est prêt
+  const _obs = setInterval(() => {
+    if (document.getElementById('splashSlides') && document.getElementById('loginSlides')) {
+      clearInterval(_obs);
+      initLoginSlides();
+      setInterval(nextSlide, 3000);
+    }
+  }, 200);
+})();
+
 // ══════════ SPLASH SCREEN ══════════
-const SPLASH_DURATION = 10;
+const SPLASH_DURATION = 0;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
 
@@ -5373,5 +5390,38 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+
+<script>
+window.addEventListener("load", function() {
+  document.getElementById("loginScreen").classList.add("show");
+});
+
+function loginUser() {
+  const email = document.querySelector('input[type="email"]').value;
+  const password = document.querySelector('input[type="password"]').value;
+
+  if (!email || !password) {
+    alert("Veuillez remplir les champs");
+    return;
+  }
+
+  const btn = document.querySelector(".btn-login");
+  if(btn){
+    btn.disabled = true;
+    btn.innerText = "Connexion...";
+  }
+
+  setTimeout(() => {
+    document.getElementById("loginScreen").classList.remove("show");
+    document.getElementById("app").classList.add("show");
+
+    if(btn){
+      btn.disabled = false;
+      btn.innerText = "Connexion";
+    }
+  }, 800);
+}
+</script>
+
 </body>
 </html>
