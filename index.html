@@ -20,212 +20,151 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet"></noscript>
 <style>
+
 :root {
-  /* ── THÈME SOMBRE (défaut) ── */
-  --bg:      #0f1117;
-  --bg2:     #161b25;
-  --surface: #1e2535;
-  --card:    #1a2030;
-  --border:  rgba(255,255,255,.08);
-  --border2: rgba(255,255,255,.14);
-  --text:    #e8edf5;
-  --muted:   #7a8caa;
-  --muted2:  #5a6b85;
-  --soufflage:   #00b8e6;
-  --remplissage: #00d97e;
-  --etiquette:   #f59e0b;
-  --emballage:   #f97316;
-  --b19:         #a855f7;
-  --admin:       #7c3aed;
-  --ok:      #22c55e;
-  --warn:    #f59e0b;
-  --danger:  #ef4444;
+  /* ── THÈMES CLAIRS TRANSPARENTS (défaut) ── */
+  --bg:      #eef6fb;
+  --bg2:     rgba(255,255,255,.58);
+  --surface: rgba(255,255,255,.68);
+  --card:    rgba(255,255,255,.78);
+  --border:  rgba(133,166,204,.28);
+  --border2: rgba(122,156,198,.42);
+  --text:    #163047;
+  --muted:   #5f7690;
+  --muted2:  #7b90a7;
+  --soufflage:   #00a7d6;
+  --remplissage: #17b97b;
+  --etiquette:   #e29a2f;
+  --emballage:   #f27c57;
+  --b19:         #7c6cff;
+  --admin:       #7c6cff;
+  --ok:      #14b86a;
+  --warn:    #e59b2f;
+  --danger:  #e35d6a;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
   --dashboard-bg-image: url('https://www.genspark.ai/api/files/s/SQEvmg2r');
+  --wallpaper-overlay-from: rgba(255,255,255,.26);
+  --wallpaper-overlay-mid:  rgba(255,255,255,.14);
+  --wallpaper-overlay-to:   rgba(255,255,255,.30);
+  --panel-blur: 16px;
+  --shell-shadow: 0 10px 34px rgba(31,62,96,.12);
+  --card-shadow: 0 12px 32px rgba(31,62,96,.10);
 }
 
-/* ── THÈME CLAIR ── */
 body.theme-light {
-  --bg:      #f0f4f8;
-  --bg2:     #ffffff;
-  --surface: #f8f9fb;
-  --card:    #ffffff;
-  --border:  #e2e6ed;
-  --border2: #c8d0dc;
-  --text:    #1a2030;
-  --muted:   #7a8599;
-  --muted2:  #9aa3b5;
-  --soufflage:   #0099cc;
-  --remplissage: #00aa66;
-  --etiquette:   #cc8800;
-  --emballage:   #e05520;
-  --b19:         #8833cc;
-  --ok:      #16a34a;
-  --warn:    #d97706;
-  --danger:  #dc2626;
+  --bg:      #eef6fb;
+  --bg2:     rgba(255,255,255,.58);
+  --surface: rgba(255,255,255,.68);
+  --card:    rgba(255,255,255,.78);
+  --border:  rgba(133,166,204,.28);
+  --border2: rgba(122,156,198,.42);
+  --text:    #163047;
+  --muted:   #5f7690;
+  --muted2:  #7b90a7;
+  --soufflage:   #00a7d6;
+  --remplissage: #17b97b;
+  --etiquette:   #e29a2f;
+  --emballage:   #f27c57;
+  --b19:         #7c6cff;
+  --ok:      #14b86a;
+  --warn:    #e59b2f;
+  --danger:  #e35d6a;
+  --wallpaper-overlay-from: rgba(255,255,255,.26);
+  --wallpaper-overlay-mid:  rgba(255,255,255,.14);
+  --wallpaper-overlay-to:   rgba(255,255,255,.30);
 }
 
-/* ── THÈME OCEAN ── */
-body.theme-ocean {
-  --bg:      #071a2e;
-  --bg2:     #0d2540;
-  --surface: #0f2d4a;
-  --card:    #0d2640;
-  --border:  rgba(0,180,255,.15);
-  --border2: rgba(0,180,255,.25);
-  --text:    #d0eaff;
-  --muted:   #5b8db8;
-  --muted2:  #3d6e99;
-  --soufflage:   #00d4ff;
-  --remplissage: #00e5a0;
-  --etiquette:   #ffd166;
-  --emballage:   #ff8c42;
-  --b19:         #c084fc;
-  --ok:      #00e5a0;
-  --warn:    #ffd166;
-  --danger:  #ff4d6d;
-}
-
-/* ── THÈME FORÊT ── */
-body.theme-forest {
-  --bg:      #0a140d;
-  --bg2:     #111e14;
-  --surface: #162819;
-  --card:    #132016;
-  --border:  rgba(34,197,94,.12);
-  --border2: rgba(34,197,94,.22);
-  --text:    #d4f0dc;
-  --muted:   #5a8c68;
-  --muted2:  #3d6649;
-  --soufflage:   #4ade80;
-  --remplissage: #22d3ee;
-  --etiquette:   #fbbf24;
-  --emballage:   #fb923c;
-  --b19:         #c084fc;
-  --ok:      #4ade80;
-  --warn:    #fbbf24;
-  --danger:  #f87171;
-}
-/* ── THÈME SUNSET ── */
-body.theme-sunset {
-  --bg:      #1a0a0a;
-  --bg2:     #2a1010;
-  --surface: #3a1818;
-  --card:    #2e1212;
-  --border:  rgba(255,100,50,.15);
-  --border2: rgba(255,100,50,.25);
-  --text:    #ffe4d0;
-  --muted:   #b87060;
-  --muted2:  #8a4a38;
-  --soufflage:   #ff6b35;
-  --remplissage: #ff9f1c;
-  --etiquette:   #ffbf69;
-  --emballage:   #ff4d6d;
-  --b19:         #c77dff;
-  --ok:      #06d6a0;
-  --warn:    #ff9f1c;
-  --danger:  #ef233c;
-}
-/* ── THÈME AURORA ── */
-body.theme-aurora {
-  --bg:      #050d1a;
-  --bg2:     #071525;
-  --surface: #0a1e30;
-  --card:    #081828;
-  --border:  rgba(0,255,180,.1);
-  --border2: rgba(0,255,180,.2);
-  --text:    #e0fff5;
-  --muted:   #4a9e8a;
-  --muted2:  #2e7a68;
-  --soufflage:   #00ffcc;
-  --remplissage: #00e5ff;
-  --etiquette:   #aaff00;
-  --emballage:   #ff6b9d;
-  --b19:         #bf5fff;
-  --ok:      #00ffcc;
-  --warn:    #aaff00;
-  --danger:  #ff4d6d;
-}
-/* ── THÈME ROSE GOLD ── */
-body.theme-rosegold {
-  --bg:      #fdf0f0;
-  --bg2:     #ffffff;
-  --surface: #fff5f5;
-  --card:    #ffffff;
-  --border:  #f0d0d0;
-  --border2: #e8b8b8;
-  --text:    #3d1f1f;
-  --muted:   #b07070;
-  --muted2:  #c89090;
-  --soufflage:   #e8748a;
-  --remplissage: #c0786e;
-  --etiquette:   #d4956a;
-  --emballage:   #b85c78;
-  --b19:         #9b59b6;
-  --ok:      #27ae60;
-  --warn:    #e67e22;
-  --danger:  #c0392b;
-}
-/* ── THÈME MIDNIGHT PURPLE ── */
-body.theme-midnight {
-  --bg:      #0d0618;
-  --bg2:     #150a28;
-  --surface: #1e1035;
-  --card:    #180c2e;
-  --border:  rgba(160,80,255,.15);
-  --border2: rgba(160,80,255,.25);
-  --text:    #ede0ff;
-  --muted:   #8060aa;
-  --muted2:  #604888;
-  --soufflage:   #b060ff;
-  --remplissage: #7c4dff;
-  --etiquette:   #e040fb;
-  --emballage:   #ff4081;
-  --b19:         #64ffda;
-  --ok:      #69f0ae;
-  --warn:    #ffd740;
-  --danger:  #ff5252;
-}
-/* ── THÈME ARCTIC ── */
 body.theme-arctic {
   --bg:      #f0f8ff;
-  --bg2:     #ffffff;
-  --surface: #f5fbff;
-  --card:    #ffffff;
-  --border:  #c8e8f8;
-  --border2: #a8d8f0;
-  --text:    #1a3040;
-  --muted:   #6090b0;
-  --muted2:  #88aac0;
-  --soufflage:   #0090d0;
-  --remplissage: #00b8a0;
-  --etiquette:   #0070c0;
-  --emballage:   #0050a0;
-  --b19:         #6040c0;
-  --ok:      #00a878;
-  --warn:    #f08030;
-  --danger:  #d03030;
+  --bg2:     rgba(255,255,255,.62);
+  --surface: rgba(247,252,255,.74);
+  --card:    rgba(255,255,255,.82);
+  --border:  rgba(136,198,231,.28);
+  --border2: rgba(86,162,214,.42);
+  --text:    #16354f;
+  --muted:   #5b84a4;
+  --muted2:  #7da2bf;
+  --soufflage:   #1a9fe0;
+  --remplissage: #14b8a6;
+  --etiquette:   #1d78c1;
+  --emballage:   #4f80e1;
+  --b19:         #6f7cff;
+  --ok:      #0f9f79;
+  --warn:    #f29e3d;
+  --danger:  #db5568;
+  --wallpaper-overlay-from: rgba(243,251,255,.28);
+  --wallpaper-overlay-mid:  rgba(229,245,255,.14);
+  --wallpaper-overlay-to:   rgba(240,248,255,.34);
 }
-/* ── THÈME VOLCANIC ── */
-body.theme-volcanic {
-  --bg:      #0e0800;
-  --bg2:     #1a1000;
-  --surface: #251800;
-  --card:    #201400;
-  --border:  rgba(255,120,0,.15);
-  --border2: rgba(255,120,0,.25);
-  --text:    #fff0d0;
-  --muted:   #aa7030;
-  --muted2:  #805020;
-  --soufflage:   #ff8c00;
-  --remplissage: #ff6000;
-  --etiquette:   #ffd000;
-  --emballage:   #ff3000;
-  --b19:         #ff00aa;
-  --ok:      #80ff40;
-  --warn:    #ffd000;
-  --danger:  #ff2000;
+
+body.theme-rosegold {
+  --bg:      #fff5f7;
+  --bg2:     rgba(255,255,255,.62);
+  --surface: rgba(255,248,249,.74);
+  --card:    rgba(255,255,255,.82);
+  --border:  rgba(226,156,176,.26);
+  --border2: rgba(211,126,158,.40);
+  --text:    #4b2433;
+  --muted:   #9a6677;
+  --muted2:  #bb8897;
+  --soufflage:   #db7aa5;
+  --remplissage: #50b89a;
+  --etiquette:   #d79b5a;
+  --emballage:   #c86c7d;
+  --b19:         #a36fe0;
+  --ok:      #2ca678;
+  --warn:    #db9640;
+  --danger:  #d34e6b;
+  --wallpaper-overlay-from: rgba(255,247,249,.30);
+  --wallpaper-overlay-mid:  rgba(255,238,243,.14);
+  --wallpaper-overlay-to:   rgba(255,244,247,.34);
+}
+
+body.theme-mint {
+  --bg:      #f3fbf7;
+  --bg2:     rgba(255,255,255,.60);
+  --surface: rgba(249,255,252,.74);
+  --card:    rgba(255,255,255,.82);
+  --border:  rgba(114,194,157,.24);
+  --border2: rgba(72,172,132,.38);
+  --text:    #184236;
+  --muted:   #5d8a7f;
+  --muted2:  #7aa79a;
+  --soufflage:   #1db9a6;
+  --remplissage: #1ea672;
+  --etiquette:   #d4a347;
+  --emballage:   #ec8b64;
+  --b19:         #6888f5;
+  --ok:      #149c62;
+  --warn:    #dd9a3b;
+  --danger:  #db6b6b;
+  --wallpaper-overlay-from: rgba(245,255,250,.28);
+  --wallpaper-overlay-mid:  rgba(232,249,240,.14);
+  --wallpaper-overlay-to:   rgba(240,253,246,.34);
+}
+
+body.theme-sand {
+  --bg:      #fff9f1;
+  --bg2:     rgba(255,255,255,.60);
+  --surface: rgba(255,252,246,.74);
+  --card:    rgba(255,255,255,.82);
+  --border:  rgba(214,179,116,.24);
+  --border2: rgba(205,154,78,.38);
+  --text:    #4a3620;
+  --muted:   #9a7b58;
+  --muted2:  #bc9872;
+  --soufflage:   #d79b39;
+  --remplissage: #37aa8d;
+  --etiquette:   #e9b24d;
+  --emballage:   #df8458;
+  --b19:         #8a78dd;
+  --ok:      #229b68;
+  --warn:    #d98d2c;
+  --danger:  #d96a57;
+  --wallpaper-overlay-from: rgba(255,250,242,.30);
+  --wallpaper-overlay-mid:  rgba(255,243,225,.16);
+  --wallpaper-overlay-to:   rgba(255,248,238,.34);
 }
 
 /* ══ ACCORDÉON ADMIN ══ */
@@ -316,7 +255,7 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 #loginScreen {
   position:fixed; inset:0; display:none;
   align-items:center; justify-content:center;
-  background:#000; z-index:1000;
+  background:linear-gradient(135deg,rgba(239,246,255,.52),rgba(255,255,255,.22)); z-index:1000;
   overflow-y:auto; padding:20px;
 }
 #loginScreen.show { display:flex; }
@@ -326,17 +265,17 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 #loginSlides img {
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:contain; object-position:center;
-  background:#000;
+  background:#eff6fb;
 }
 #loginScreen::before {
   content:''; position:absolute; inset:0; z-index:1;
-  background:rgba(0,0,0,.55);
+  background:linear-gradient(135deg,rgba(255,255,255,.30),rgba(230,244,255,.56));
 }
 .login-box {
   position:relative; width:440px; z-index:2;
-  background:rgba(255,255,255,.95); border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.78); border:1px solid rgba(255,255,255,.48); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
   border-radius:16px; padding:44px 40px;
-  box-shadow:0 32px 80px rgba(0,0,0,.6);
+  box-shadow:0 32px 80px rgba(31,62,96,.18);
   animation:fadeUp .4s ease;
 }
 .login-logo { text-align:center; margin-bottom:32px; }
@@ -387,9 +326,9 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
   background-image:
     linear-gradient(
       135deg,
-      rgba(5, 18, 35, 0.82) 0%,
-      rgba(7, 26, 46, 0.68) 42%,
-      rgba(4, 14, 28, 0.84) 100%
+      var(--wallpaper-overlay-from) 0%,
+      var(--wallpaper-overlay-mid) 42%,
+      var(--wallpaper-overlay-to) 100%
     ),
     var(--dashboard-bg-image);
   background-size:cover;
@@ -765,17 +704,18 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
    🌊 FOND EAU VITALE — TOUTE L'APPLICATION
    ══════════════════════════════════════════════════════ */
 
-/* Le fond personnalisé est maintenant visible sur toute l'application */
+/* Le fond personnalisé reste visible et le thème agit partout */
 .icon-bar,
 .topbar,
 .sidebar {
-  background: rgba(8, 18, 38, 0.72) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  background: var(--bg2) !important;
+  backdrop-filter: blur(var(--panel-blur)) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(145%) !important;
+  box-shadow: var(--shell-shadow) !important;
 }
 
 .main {
-  background: rgba(5, 18, 35, 0.32) !important;
+  background: rgba(255,255,255,.08) !important;
 }
 
 .page,
@@ -787,54 +727,45 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
 
 #chatContactsPanel,
 #chatConvPanel,
-#mobileMenuPanel {
-  background: rgba(9, 20, 40, 0.82) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+#mobileMenuPanel,
+.user-dropdown,
+#userProfileModal > div,
+#editReportModal > div {
+  background: var(--surface) !important;
+  backdrop-filter: blur(var(--panel-blur)) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(145%) !important;
+  border: 1px solid var(--border2) !important;
 }
 
-/* Effet glassmorphism renforcé pour le tableau de bord */
+/* Effet glassmorphism clair pour le tableau de bord */
 #page-dashboard .card,
 #page-dashboard .machine-card,
-#page-dashboard .stat-box {
-  background: rgba(15, 25, 45, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(0, 184, 230, 0.22) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30), 0 0 0 1px rgba(0,184,230,0.06) !important;
-}
-
-/* Barre du menu de style tableau de bord */
-#page-dashboard .dashboard-style-menu {
-  background: rgba(8, 18, 38, 0.80) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(0, 184, 230, 0.30) !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.20) !important;
-}
-
-/* Boîtes de statistiques */
-#page-dashboard .stat-box {
-  background: rgba(12, 22, 42, 0.78) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-/* Section rapport en bas */
+#page-dashboard .stat-box,
 #page-dashboard .reports-table-wrap,
-#page-dashboard table {
-  background: rgba(15, 25, 45, 0.80) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-/* Total consommé */
+#page-dashboard table,
+#page-dashboard .dashboard-style-menu,
 #page-dashboard .totals-bar,
 #page-dashboard [class*="total"],
 #page-dashboard [class*="kpi"] {
-  background: rgba(0, 184, 230, 0.10) !important;
-  backdrop-filter: blur(8px) !important;
-  border: 1px solid rgba(0, 184, 230, 0.20) !important;
+  background: var(--card) !important;
+  backdrop-filter: blur(calc(var(--panel-blur) - 2px)) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(calc(var(--panel-blur) - 2px)) saturate(145%) !important;
+  border: 1px solid var(--border2) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+#page-dashboard .dashboard-style-menu {
+  background: var(--surface) !important;
+}
+
+#page-dashboard .stat-box {
+  background: var(--card) !important;
+}
+
+#page-dashboard .totals-bar,
+#page-dashboard [class*="total"],
+#page-dashboard [class*="kpi"] {
+  background: var(--surface) !important;
 }
 
 </style>
@@ -870,7 +801,7 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
 <!-- SPLASH MESSAGE -->
 <div id="splashScreen" style="
   position:fixed; inset:0; z-index:9999;
-  background:#000;
+  background:#eff6fb;
   display:flex; align-items:center; justify-content:center;
   animation:fadeIn .4s ease;
 ">
@@ -1052,7 +983,7 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
 <div id="app">
 
   <!-- MENU MOBILE OVERLAY -->
-  <div id="mobileMenuOverlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
+  <div id="mobileMenuOverlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;background:rgba(122,156,198,.22); backdrop-filter:blur(4px);z-index:200"></div>
   <div id="mobileMenuPanel" style="display:none;position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:201;overflow-y:auto;padding:16px 0;transform:translateX(-100%);transition:transform .3s ease">
     <div style="padding:12px 18px 20px;border-bottom:1px solid var(--border);margin-bottom:8px">
       <div style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--text)">TECHNICIEN</div>
@@ -1526,7 +1457,7 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
     </div>
 
     <!-- MODAL PROFIL -->
-    <div id="userProfileModal" onclick="if(event.target===this){document.getElementById('userProfileModal').style.display='none';document.body.style.overflow=''}" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+    <div id="userProfileModal" onclick="if(event.target===this){document.getElementById('userProfileModal').style.display='none';document.body.style.overflow=''}" style="display:none;position:fixed;inset:0;z-index:2000;background:linear-gradient(135deg,rgba(255,255,255,.30),rgba(230,244,255,.56));backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
       <div style="background:var(--card);border-radius:20px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:fadeUp .3s ease" onclick="event.stopPropagation()">
         <div id="upHeader" style="height:90px;border-radius:20px 20px 0 0;position:relative">
           <button onclick="document.getElementById('userProfileModal').style.display='none';document.body.style.overflow=''" style="position:absolute;top:10px;right:12px;background:rgba(255,255,255,.3);border:none;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer;color:#fff;line-height:1">×</button>
@@ -1697,163 +1628,78 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez le thème visuel pour tous les utilisateurs.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
 
-          <!-- Sombre -->
-          <div onclick="applyTheme('dark')" id="theme-dark" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid var(--b19);box-shadow:0 0 0 3px rgba(168,85,247,.2)">
-            <div style="background:linear-gradient(135deg,#0f1117,#161b25);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
-              </div>
-              <div style="height:4px;background:#1e2535;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#1a2030;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#161b25;padding:8px 12px;font-size:12px;font-weight:700;color:#a855f7;display:flex;align-items:center;justify-content:space-between">
-              🌙 Sombre <span id="check-dark" style="color:#22c55e">✓</span>
-            </div>
-          </div>
-
-          <!-- Clair -->
           <div onclick="applyTheme('light')" id="theme-light" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#f0f4f8,#ffffff);padding:14px 12px">
+            <div style="background:linear-gradient(135deg,#eef6fb,#ffffff);padding:14px 12px">
               <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#e35d6a"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#e59b2f"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#14b86a"></div>
               </div>
-              <div style="height:4px;background:#e2e6ed;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#f8f9fb;border-radius:2px;width:70%;border:1px solid #e2e6ed"></div>
+              <div style="height:4px;background:rgba(122,156,198,.28);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(255,255,255,.82);border-radius:2px;width:70%;border:1px solid rgba(122,156,198,.18)"></div>
             </div>
-            <div style="background:#f0f4f8;padding:8px 12px;font-size:12px;font-weight:700;color:#0099cc;display:flex;align-items:center;justify-content:space-between">
-              ☀️ Clair <span id="check-light" style="color:#22c55e;display:none">✓</span>
+            <div style="background:#eef6fb;padding:8px 12px;font-size:12px;font-weight:700;color:#00a7d6;display:flex;align-items:center;justify-content:space-between">
+              ☀️ Verre clair <span id="check-light" style="color:#14b86a;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Océan -->
-          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#071a2e,#0d2540);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ffd166"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#00e5a0"></div>
-              </div>
-              <div style="height:4px;background:#0f2d4a;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#0d2640;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#071a2e;padding:8px 12px;font-size:12px;font-weight:700;color:#00d4ff;display:flex;align-items:center;justify-content:space-between">
-              🌊 Océan <span id="check-ocean" style="color:#00e5a0;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Forêt -->
-          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#0a140d,#111e14);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#f87171"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#4ade80"></div>
-              </div>
-              <div style="height:4px;background:#162819;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#132016;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#0a140d;padding:8px 12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;justify-content:space-between">
-              🌿 Forêt <span id="check-forest" style="color:#4ade80;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Sunset -->
-          <div onclick="applyTheme('sunset')" id="theme-sunset" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#1a0a0a,#3a1818);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff4d6d"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff9f1c"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#06d6a0"></div>
-              </div>
-              <div style="height:4px;background:#2e1212;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#2a1010;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#1a0a0a;padding:8px 12px;font-size:12px;font-weight:700;color:#ff6b35;display:flex;align-items:center;justify-content:space-between">
-              🌅 Sunset <span id="check-sunset" style="color:#22c55e;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Aurora -->
-          <div onclick="applyTheme('aurora')" id="theme-aurora" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#050d1a,#0a1e30);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff6b9d"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#aaff00"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#00ffcc"></div>
-              </div>
-              <div style="height:4px;background:#081828;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#071525;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#050d1a;padding:8px 12px;font-size:12px;font-weight:700;color:#00ffcc;display:flex;align-items:center;justify-content:space-between">
-              🌌 Aurora <span id="check-aurora" style="color:#22c55e;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Rose Gold -->
-          <div onclick="applyTheme('rosegold')" id="theme-rosegold" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#fdf0f0,#fff5f5);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#c0392b"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#e67e22"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#27ae60"></div>
-              </div>
-              <div style="height:4px;background:#f0d0d0;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#fff5f5;border-radius:2px;width:70%;border:1px solid #f0d0d0"></div>
-            </div>
-            <div style="background:#fdf0f0;padding:8px 12px;font-size:12px;font-weight:700;color:#e8748a;display:flex;align-items:center;justify-content:space-between">
-              🌸 Rose Gold <span id="check-rosegold" style="color:#27ae60;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Midnight -->
-          <div onclick="applyTheme('midnight')" id="theme-midnight" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#0d0618,#1e1035);padding:14px 12px">
-              <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff5252"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ffd740"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#69f0ae"></div>
-              </div>
-              <div style="height:4px;background:#180c2e;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#150a28;border-radius:2px;width:70%"></div>
-            </div>
-            <div style="background:#0d0618;padding:8px 12px;font-size:12px;font-weight:700;color:#b060ff;display:flex;align-items:center;justify-content:space-between">
-              🔮 Midnight <span id="check-midnight" style="color:#69f0ae;display:none">✓</span>
-            </div>
-          </div>
-
-          <!-- Arctic -->
           <div onclick="applyTheme('arctic')" id="theme-arctic" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#f0f8ff,#f5fbff);padding:14px 12px">
+            <div style="background:linear-gradient(135deg,#f0f8ff,#ffffff);padding:14px 12px">
               <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#d03030"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#f08030"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#00a878"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#db5568"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f29e3d"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#0f9f79"></div>
               </div>
-              <div style="height:4px;background:#c8e8f8;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#f5fbff;border-radius:2px;width:70%;border:1px solid #c8e8f8"></div>
+              <div style="height:4px;background:rgba(86,162,214,.24);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(255,255,255,.86);border-radius:2px;width:70%;border:1px solid rgba(86,162,214,.16)"></div>
             </div>
-            <div style="background:#f0f8ff;padding:8px 12px;font-size:12px;font-weight:700;color:#0090d0;display:flex;align-items:center;justify-content:space-between">
-              🧊 Arctic <span id="check-arctic" style="color:#00a878;display:none">✓</span>
+            <div style="background:#f0f8ff;padding:8px 12px;font-size:12px;font-weight:700;color:#1a9fe0;display:flex;align-items:center;justify-content:space-between">
+              🧊 Arctic transparent <span id="check-arctic" style="color:#0f9f79;display:none">✓</span>
             </div>
           </div>
 
-          <!-- Volcanic -->
-          <div onclick="applyTheme('volcanic')" id="theme-volcanic" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
-            <div style="background:linear-gradient(135deg,#0e0800,#251800);padding:14px 12px">
+          <div onclick="applyTheme('rosegold')" id="theme-rosegold" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#fff5f7,#ffffff);padding:14px 12px">
               <div style="display:flex;gap:4px;margin-bottom:8px">
-                <div style="width:8px;height:8px;border-radius:50%;background:#ff2000"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#ffd000"></div>
-                <div style="width:8px;height:8px;border-radius:50%;background:#80ff40"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#d34e6b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#db9640"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#2ca678"></div>
               </div>
-              <div style="height:4px;background:#201400;border-radius:2px;margin-bottom:4px"></div>
-              <div style="height:4px;background:#1a1000;border-radius:2px;width:70%"></div>
+              <div style="height:4px;background:rgba(211,126,158,.22);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(255,255,255,.86);border-radius:2px;width:70%;border:1px solid rgba(211,126,158,.14)"></div>
             </div>
-            <div style="background:#0e0800;padding:8px 12px;font-size:12px;font-weight:700;color:#ff8c00;display:flex;align-items:center;justify-content:space-between">
-              🌋 Volcanic <span id="check-volcanic" style="color:#80ff40;display:none">✓</span>
+            <div style="background:#fff5f7;padding:8px 12px;font-size:12px;font-weight:700;color:#db7aa5;display:flex;align-items:center;justify-content:space-between">
+              🌸 Rose clair <span id="check-rosegold" style="color:#2ca678;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('mint')" id="theme-mint" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#f3fbf7,#ffffff);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#db6b6b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#dd9a3b"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#149c62"></div>
+              </div>
+              <div style="height:4px;background:rgba(72,172,132,.22);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(255,255,255,.86);border-radius:2px;width:70%;border:1px solid rgba(72,172,132,.14)"></div>
+            </div>
+            <div style="background:#f3fbf7;padding:8px 12px;font-size:12px;font-weight:700;color:#1db9a6;display:flex;align-items:center;justify-content:space-between">
+              🌿 Menthe claire <span id="check-mint" style="color:#149c62;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('sand')" id="theme-sand" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#fff9f1,#ffffff);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#d96a57"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#d98d2c"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#229b68"></div>
+              </div>
+              <div style="height:4px;background:rgba(205,154,78,.22);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(255,255,255,.86);border-radius:2px;width:70%;border:1px solid rgba(205,154,78,.14)"></div>
+            </div>
+            <div style="background:#fff9f1;padding:8px 12px;font-size:12px;font-weight:700;color:#d79b39;display:flex;align-items:center;justify-content:space-between">
+              🏖️ Sable clair <span id="check-sand" style="color:#229b68;display:none">✓</span>
             </div>
           </div>
 
@@ -5081,43 +4927,65 @@ onValue(ref(db, 'system/productionFormat'), snap => {
 });
 
 // ══════════ GESTION DES THÈMES ══════════
-const THEMES = ['dark','light','ocean','forest','sunset','aurora','rosegold','midnight','arctic','volcanic'];
+const THEMES = ['light','arctic','rosegold','mint','sand'];
+
+function normalizeTheme(theme) {
+  if (THEMES.includes(theme)) return theme;
+  return 'light';
+}
 
 function applyThemeUI(theme) {
-  // Retirer tous les thèmes
+  const safeTheme = normalizeTheme(theme);
   THEMES.forEach(t => {
     document.body.classList.remove('theme-'+t);
     const card = document.getElementById('theme-'+t);
     const check = document.getElementById('check-'+t);
-    if (card) card.style.border = '2px solid transparent';
+    if (card) {
+      card.style.border = '2px solid transparent';
+      card.style.boxShadow = 'none';
+    }
     if (check) check.style.display = 'none';
   });
-  // Appliquer le thème sélectionné (dark = défaut = pas de classe)
-  if (theme !== 'dark') document.body.classList.add('theme-'+theme);
-  const activeCard = document.getElementById('theme-'+theme);
-  const activeCheck = document.getElementById('check-'+theme);
+
+  document.body.classList.add('theme-'+safeTheme);
+  const activeCard = document.getElementById('theme-'+safeTheme);
+  const activeCheck = document.getElementById('check-'+safeTheme);
   if (activeCard) {
-    const colors = { dark:'rgba(168,85,247,.8)', light:'rgba(0,153,204,.8)', ocean:'rgba(0,212,255,.8)', forest:'rgba(74,222,128,.8)', sunset:'rgba(255,107,53,.8)', aurora:'rgba(0,255,204,.8)', rosegold:'rgba(232,116,138,.8)', midnight:'rgba(176,96,255,.8)', arctic:'rgba(0,144,208,.8)', volcanic:'rgba(255,140,0,.8)' };
-    activeCard.style.border = `2px solid ${colors[theme]||'rgba(168,85,247,.8)'}`;
-    activeCard.style.boxShadow = `0 0 0 3px ${colors[theme]||'rgba(168,85,247,.2)'}44`;
+    const colors = {
+      light:'rgba(0,167,214,.85)',
+      arctic:'rgba(26,159,224,.85)',
+      rosegold:'rgba(219,122,165,.85)',
+      mint:'rgba(29,185,166,.85)',
+      sand:'rgba(215,155,57,.85)'
+    };
+    activeCard.style.border = `2px solid ${colors[safeTheme] || 'rgba(0,167,214,.85)'}`;
+    activeCard.style.boxShadow = `0 0 0 3px ${colors[safeTheme] || 'rgba(0,167,214,.24)'}33`;
   }
   if (activeCheck) activeCheck.style.display = 'inline';
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  const metaColors = {
+    light:'#00a7d6',
+    arctic:'#1a9fe0',
+    rosegold:'#db7aa5',
+    mint:'#1db9a6',
+    sand:'#d79b39'
+  };
+  if (metaTheme) metaTheme.setAttribute('content', metaColors[safeTheme] || '#00a7d6');
 }
 
 window.applyTheme = async function(theme) {
-  applyThemeUI(theme);
-  localStorage.setItem('tev_theme', theme);
-  // Sauvegarder dans Firebase pour tous les utilisateurs
-  try { await set(ref(db, 'system/theme'), theme); } catch(e) {}
+  const safeTheme = normalizeTheme(theme);
+  applyThemeUI(safeTheme);
+  localStorage.setItem('tev_theme', safeTheme);
+  try { await set(ref(db, 'system/theme'), safeTheme); } catch(e) {}
 };
 
-// Charger le thème sauvegardé
 function loadSavedTheme() {
-  const local = localStorage.getItem('tev_theme');
-  if (local) applyThemeUI(local);
-  // Écouter les changements en temps réel
+  const local = normalizeTheme(localStorage.getItem('tev_theme') || 'light');
+  applyThemeUI(local);
   onValue(ref(db, 'system/theme'), snap => {
-    const theme = snap.val() || 'dark';
+    const theme = normalizeTheme(snap.val() || local || 'light');
     localStorage.setItem('tev_theme', theme);
     applyThemeUI(theme);
   });
@@ -5988,6 +5856,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
