@@ -820,70 +820,76 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <img id="loginSlide1" src="" style="opacity:0;transition:opacity 1s ease">
     <img id="loginSlide2" src="" style="opacity:0;transition:opacity 1s ease">
   </div>
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px">EAU VITALE</span></div>
-      <div class="sub">Gestion de Ligne de Production</div>
-    </div>
-    <!-- ONGLETS MODE -->
-    <div style="display:flex;gap:6px;margin-bottom:20px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:4px;">
-      <button id="tabLogin" onclick="switchMode('login')" style="flex:1;padding:10px;border:none;border-radius:7px;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:var(--soufflage);color:#fff;transition:all .2s;letter-spacing:.03em">CONNEXION</button>
-      <button id="tabRegister" onclick="switchMode('register')" style="flex:1;padding:10px;border:none;border-radius:7px;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .2s;letter-spacing:.03em">CRÉER UN COMPTE</button>
+  <div class="login-box" style="width:100%;max-width:500px;padding:28px 24px">
+    <div class="login-logo" style="margin-bottom:20px">
+      <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3;color:#1a2030">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px;color:#0099cc">EAU VITALE</span></div>
+      <div class="sub" style="color:#7a8599">Choisissez votre nom pour continuer</div>
     </div>
 
-    <!-- MODE CONNEXION -->
-    <div id="modeLogin">
-      <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="emailInput" placeholder="prenom.nom@eauvitale.fr" onkeydown="if(event.key==='Enter')document.getElementById('pwdInput').focus()">
-      <div class="login-label">Mot de passe</div>
-      <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      <div style="text-align:right;margin-bottom:14px;margin-top:-8px">
-        <span onclick="switchMode('forgot')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
+    <!-- LISTE RAPIDE DES UTILISATEURS -->
+    <div id="quickUserList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:380px;overflow-y:auto">
+      <div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">⏳ Chargement des utilisateurs...</div>
+    </div>
+
+    <div class="login-err" id="loginErr" style="color:#dc2626;font-size:12px;text-align:center;min-height:16px"></div>
+
+    <!-- Lien admin discret -->
+    <div style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px">
+      <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
+    </div>
+
+    <!-- MODE AVANCÉ (caché par défaut) -->
+    <div id="modeAdvanced" style="display:none;margin-top:14px">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail</div>
+      <input type="email" class="login-input" id="emailInput" placeholder="admin@eauvitale.fr" onkeydown="if(event.key==='Enter')document.getElementById('pwdInput').focus()" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Mot de passe</div>
+      <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <button class="btn-login" id="loginBtn" onclick="doLogin()" style="margin-top:4px">CONNEXION →</button>
+      <div style="text-align:right;margin-top:8px">
+        <span onclick="switchMode('forgot')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
       </div>
-      <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
     </div>
 
-    <!-- MODE CRÉER COMPTE -->
-    <div id="modeRegister" style="display:none">
-      <div class="login-label">Prénom &amp; Nom</div>
-      <input type="text" class="login-input" id="regName" placeholder="Ex : Jean-Pierre Dupont">
-      <div class="login-label">Poste / Rôle</div>
-      <select class="login-input" id="regRole" style="cursor:pointer">
+    <!-- MODE MOT DE PASSE OUBLIÉ -->
+    <div id="modeForgot" style="display:none;margin-top:14px">
+      <div style="font-size:12px;color:#7a8599;margin-bottom:14px;line-height:1.6">
+        Entrez le <strong style="color:#0099cc">code secret</strong> fourni par votre administrateur.
+      </div>
+      <div class="login-label" style="color:#7a8599">Code secret</div>
+      <input type="password" class="login-input" id="resetCode" placeholder="Code secret" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail du compte</div>
+      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@eauvitale.fr" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Nouveau mot de passe</div>
+      <input type="password" class="login-input" id="newPwd" placeholder="Minimum 6 caractères" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Confirmer le nouveau mot de passe</div>
+      <input type="password" class="login-input" id="newPwd2" placeholder="Répéter le mot de passe" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <button class="btn-login" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
+      <div style="text-align:center;margin-top:12px">
+        <span onclick="switchMode('quick')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">← Retour</span>
+      </div>
+    </div>
+
+    <!-- MODE CRÉER COMPTE (admin seulement) -->
+    <div id="modeRegister" style="display:none;margin-top:14px">
+      <div class="login-label" style="color:#7a8599">Prénom &amp; Nom</div>
+      <input type="text" class="login-input" id="regName" placeholder="Ex : Jean-Pierre Dupont" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Poste / Rôle</div>
+      <select class="login-input" id="regRole" style="cursor:pointer;background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
         <option value="Technicien Soufflage">🫧 Technicien Soufflage</option>
         <option value="Technicien Remplissage">🧴 Technicien Remplissage</option>
         <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
         <option value="Technicien Emballage">📦 Technicien Emballage</option>
         <option value="Technicien B19">⚙️ Technicien B19</option>
       </select>
-      <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr">
-      <div class="login-label">Mot de passe</div>
-      <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères">
-      <div class="login-label">Confirmer le mot de passe</div>
-      <input type="password" class="login-input" id="regPwd2" placeholder="Répéter le mot de passe">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail</div>
+      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Mot de passe</div>
+      <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Confirmer le mot de passe</div>
+      <input type="password" class="login-input" id="regPwd2" placeholder="Répéter le mot de passe" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
       <button class="btn-login" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
     </div>
 
-    <!-- MODE MOT DE PASSE OUBLIÉ -->
-    <div id="modeForgot" style="display:none">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        Entrez le <strong style="color:var(--soufflage)">code secret</strong> fourni par votre administrateur, votre e-mail et choisissez un nouveau mot de passe.
-      </div>
-      <div class="login-label">Code secret</div>
-      <input type="password" class="login-input" id="resetCode" placeholder="Code secret administrateur">
-      <div class="login-label">Adresse e-mail du compte</div>
-      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@eauvitale.fr">
-      <div class="login-label">Nouveau mot de passe</div>
-      <input type="password" class="login-input" id="newPwd" placeholder="Minimum 6 caractères">
-      <div class="login-label">Confirmer le nouveau mot de passe</div>
-      <input type="password" class="login-input" id="newPwd2" placeholder="Répéter le mot de passe">
-      <button class="btn-login" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
-      <div style="text-align:center;margin-top:14px">
-        <span onclick="switchMode('login')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">← Retour connexion</span>
-      </div>
-    </div>
-
-    <div class="login-err" id="loginErr"></div>
   </div>
 </div>
 
@@ -2088,7 +2094,7 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged }
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -2107,6 +2113,39 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
+
+// Garder la session sur cet appareil même après fermeture / réouverture
+setPersistence(auth, browserLocalPersistence).catch(err => {
+  console.warn('Auth persistence error', err);
+});
+
+const USER_CREDS_KEY = 'userCreds';
+const LAST_LOGIN_EMAIL_KEY = 'lastLoginEmail';
+
+function getSavedCreds() {
+  try {
+    return JSON.parse(localStorage.getItem(USER_CREDS_KEY) || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+function saveCredential(email, pwd) {
+  if (!email || !pwd) return;
+  const creds = getSavedCreds();
+  creds[email] = pwd;
+  localStorage.setItem(USER_CREDS_KEY, JSON.stringify(creds));
+  localStorage.setItem(LAST_LOGIN_EMAIL_KEY, email);
+}
+function removeSavedCredential(email) {
+  if (!email) return;
+  const creds = getSavedCreds();
+  delete creds[email];
+  localStorage.setItem(USER_CREDS_KEY, JSON.stringify(creds));
+}
+function rememberLastEmail(email) {
+  if (!email) return;
+  localStorage.setItem(LAST_LOGIN_EMAIL_KEY, email);
+}
 
 // ══════════ SAFETY TIMEOUT ══════════
 setTimeout(() => {
@@ -2204,33 +2243,86 @@ function loadDynamicUsers() {
 }
 
 function buildLogin() {
-  const wrap = document.getElementById('userSelect');
+  const wrap = document.getElementById('quickUserList');
   if (!wrap) return;
+  if (dynamicUsers.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">Aucun utilisateur trouvé</div>';
+    return;
+  }
   wrap.innerHTML = dynamicUsers.map(u => {
-    const safeId = 'chip_' + u.email.replace(/[^a-zA-Z0-9]/g, '_');
-    return `<div class="user-chip" id="${safeId}" onclick="window._selectUser('${u.email}')">
-      <div class="chip-name"><span class="chip-dot" style="background:${u.color}"></span>${u.name}</div>
-      <div class="chip-role">${u.role}</div>
+    const initiale = (u.name||'?').charAt(0).toUpperCase();
+    const photo = photosCache[Object.keys(photosCache).find(k => photosCache[k].name === u.name)]?.photoURL;
+    const avatar = photo
+      ? `<img src="${photo}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${u.color}">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;font-weight:900;color:#fff;flex-shrink:0">${initiale}</div>`;
+    return `<div onclick="quickLogin('${u.email}')" style="
+      display:flex;align-items:center;gap:14px;
+      padding:12px 16px;border-radius:12px;cursor:pointer;
+      background:#f8fafc;border:1.5px solid #e2e6ed;
+      transition:all .15s;
+    " onmouseover="this.style.background='#e8f4fd';this.style.borderColor='#0099cc'" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e2e6ed'">
+      ${avatar}
+      <div>
+        <div style="font-weight:700;font-size:15px;color:#1a2030">${u.name}</div>
+        <div style="font-size:12px;color:#7a8599;margin-top:2px">${u.role}</div>
+      </div>
+      <div style="margin-left:auto;color:#0099cc;font-size:20px">→</div>
     </div>`;
   }).join('');
 }
 
-window.switchMode = function(mode) {
-  document.getElementById('modeLogin').style.display    = mode === 'login'    ? '' : 'none';
-  document.getElementById('modeRegister').style.display = mode === 'register' ? '' : 'none';
-  document.getElementById('modeForgot').style.display   = mode === 'forgot'   ? '' : 'none';
+// Connexion rapide par clic sur l'utilisateur
+const savedCredentials = {};
+window.quickLogin = async function(email) {
   const err = document.getElementById('loginErr');
-  err.textContent = ''; err.style.color = 'var(--danger)';
-  const tabL = document.getElementById('tabLogin');
-  const tabR = document.getElementById('tabRegister');
-  if (tabL) {
-    tabL.style.background = mode === 'login' ? 'var(--soufflage)' : 'none';
-    tabL.style.color = mode === 'login' ? '#fff' : 'var(--muted)';
+  err.textContent = '';
+
+  // Vérifier si on a les credentials sauvegardés
+  const creds = getSavedCreds();
+
+  if (creds[email]) {
+    // Connexion automatique avec credentials sauvegardés
+    err.textContent = '⏳ Connexion...';
+    try {
+      await signInWithEmailAndPassword(auth, email, creds[email]);
+      err.textContent = '';
+      return;
+    } catch(e) {
+      // Si le mot de passe sauvegardé ne fonctionne plus, demander
+      removeSavedCredential(email);
+    }
   }
-  if (tabR) {
-    tabR.style.background = mode === 'register' ? 'var(--soufflage)' : 'none';
-    tabR.style.color = mode === 'register' ? '#fff' : 'var(--muted)';
+
+  // Pas de credentials — demander le mot de passe la première fois
+  const pwd = prompt(`Première connexion pour ${email}\n\nEntrez votre mot de passe :`);
+  if (!pwd) return;
+
+  err.textContent = '⏳ Connexion...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pwd);
+    // Sauvegarder pour la prochaine fois
+    saveCredential(email, pwd);
+    err.textContent = '';
+  } catch(e) {
+    err.textContent = '❌ Mot de passe incorrect.';
   }
+};
+
+window.switchMode = function(mode) {
+  const adv  = document.getElementById('modeAdvanced');
+  const reg  = document.getElementById('modeRegister');
+  const forg = document.getElementById('modeForgot');
+  const list = document.getElementById('quickUserList');
+  const sub  = document.querySelector('.login-logo .sub');
+  if (adv)  adv.style.display  = mode === 'advanced'  ? '' : 'none';
+  if (reg)  reg.style.display  = mode === 'register'  ? '' : 'none';
+  if (forg) forg.style.display = mode === 'forgot'    ? '' : 'none';
+  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? '' : 'none';
+  if (sub)  sub.textContent    = (mode === 'quick' || mode === 'login')
+    ? 'Choisissez votre nom pour continuer'
+    : mode === 'advanced' ? 'Connexion administrateur' : '';
+  const err = document.getElementById('loginErr');
+  if (err) { err.textContent = ''; }
 };
 
 let selectedEmail = null;
@@ -2253,6 +2345,8 @@ window.doLogin = async function() {
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
     await signInWithEmailAndPassword(auth, email, pwd);
+    saveCredential(email, pwd);
+    rememberLastEmail(email);
     err.textContent = '';
   } catch(e) {
     err.textContent = 'Email ou mot de passe incorrect.';
@@ -2291,6 +2385,8 @@ window.doRegister = async function() {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pwd);
     await set(ref(db, `userProfiles/${cred.user.uid}`), { name, role, email, createdAt: Date.now() });
+    saveCredential(email, pwd);
+    rememberLastEmail(email);
     err.style.color = 'var(--ok)';
     err.textContent = '✅ Compte créé ! Connexion en cours...';
   } catch(e) {
@@ -2419,6 +2515,9 @@ onAuthStateChanged(auth, async user => {
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
+    const lastEmail = localStorage.getItem(LAST_LOGIN_EMAIL_KEY);
+    const emailEl = document.getElementById('emailInput');
+    if (emailEl && lastEmail && !emailEl.value) emailEl.value = lastEmail;
     // Toujours réactiver le bouton de connexion
     const btn = document.getElementById('loginBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'CONNEXION →'; }
@@ -5370,5 +5469,6 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
