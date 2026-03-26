@@ -42,6 +42,7 @@
   --danger:  #ef4444;
   --font-display: 'Barlow Condensed', sans-serif;
   --font-body:    'Barlow', sans-serif;
+  --dashboard-bg-image: url('https://www.genspark.ai/api/files/s/SQEvmg2r');
 }
 
 /* ── THÈME CLAIR ── */
@@ -750,7 +751,7 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
       rgba(7, 26, 46, 0.73) 40%,
       rgba(4, 14, 28, 0.82) 100%
     ),
-    url('https://www.genspark.ai/api/files/s/jL1PFLi1') !important;
+    var(--dashboard-bg-image) !important;
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
@@ -1825,6 +1826,43 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
         </div>
         </div></div></div>
 
+      <!-- 🖼️ FOND D'ÉCRAN DU TABLEAU DE BORD -->
+      <div class="admin-accordion" id="acc-wallpaper">
+        <div class="admin-accordion-header" onclick="toggleAccordion('wallpaper')">
+          <div class="acc-title" style="color:var(--soufflage)">🖼️ Fond d'écran du tableau de bord</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-wallpaper">
+        <div style="padding-top:16px">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez l'image affichée derrière le <strong style="color:var(--text)">tableau de bord</strong> pour tous les utilisateurs. Vous pouvez coller un lien image ou importer une photo depuis votre appareil.</p>
+          <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:14px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group" style="margin:0">
+                <div class="form-label">Lien de l'image</div>
+                <input type="text" id="dashboardWallpaperUrl" class="form-input" placeholder="https://..." style="font-size:13px">
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-primary btn-sm" onclick="saveDashboardWallpaperUrl()">💾 Appliquer ce fond</button>
+                <button class="btn btn-ghost btn-sm" onclick="useDefaultDashboardWallpaper()" style="border-color:rgba(0,184,230,.35);color:var(--soufflage)">🌊 Utiliser l'image Eau Vitale</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearDashboardWallpaperCustom()" style="border-color:rgba(239,68,68,.28);color:var(--danger)">↺ Réinitialiser</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <label style="padding:9px 16px;background:var(--surface);border:1.5px dashed var(--border2);border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted)">
+                  📎 Importer une photo
+                  <input type="file" id="dashboardWallpaperFile" accept="image/*" style="display:none" onchange="handleDashboardWallpaperUpload(event)">
+                </label>
+                <span style="font-size:12px;color:var(--muted)">Compression automatique en grand format pour le fond d'écran.</span>
+              </div>
+              <div id="dashboardWallpaperStatus" style="font-size:12px;color:var(--muted);line-height:1.6">Image Eau Vitale active par défaut.</div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px">Aperçu actuel</div>
+              <img id="dashboardWallpaperPreview" alt="Aperçu du fond du tableau de bord" style="width:100%;height:200px;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block">
+              <div style="margin-top:10px;font-size:11px;color:var(--muted)">Le fond est visible immédiatement sur le tableau de bord après l'enregistrement.</div>
+            </div>
+          </div>
+        </div></div></div>
+
       <!-- DATE DES RAPPORTS -->
       <div class="admin-accordion" id="acc-datemode">
         <div class="admin-accordion-header" onclick="toggleAccordion('datemode')">
@@ -2314,6 +2352,9 @@ const USERS_CONFIG = [
 let dynamicUsers = [...USERS_CONFIG];
 let registrationEnabled = true;
 let registrationSettingsInitialized = false;
+const DEFAULT_DASHBOARD_WALLPAPER = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
+let dashboardWallpaperUrl = DEFAULT_DASHBOARD_WALLPAPER;
+let dashboardWallpaperSettingsInitialized = false;
 
 const MACHINE_MAP = {
   'Technicien Soufflage':   { machine:'Soufflage',   color:'#00d4ff' },
@@ -2413,6 +2454,124 @@ function initDashboardMenu() {
   const variant = localStorage.getItem('tev_dash_variant') || 'modern';
   window.setDashboardVariant(variant);
 }
+
+function normalizeDashboardWallpaperUrl(value) {
+  const raw = String(value || '').trim();
+  return raw || DEFAULT_DASHBOARD_WALLPAPER;
+}
+
+function escapeCssUrl(url) {
+  return String(url || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function applyDashboardWallpaper(url, meta = {}) {
+  dashboardWallpaperUrl = normalizeDashboardWallpaperUrl(url);
+  document.documentElement.style.setProperty('--dashboard-bg-image', `url("${escapeCssUrl(dashboardWallpaperUrl)}")`);
+  updateDashboardWallpaperAdminUI(meta.status || '');
+}
+
+function updateDashboardWallpaperAdminUI(statusText = '') {
+  const input = document.getElementById('dashboardWallpaperUrl');
+  const preview = document.getElementById('dashboardWallpaperPreview');
+  const status = document.getElementById('dashboardWallpaperStatus');
+
+  if (input && document.activeElement !== input) input.value = dashboardWallpaperUrl;
+  if (preview) preview.src = dashboardWallpaperUrl;
+  if (status) {
+    status.textContent = statusText || (dashboardWallpaperUrl === DEFAULT_DASHBOARD_WALLPAPER
+      ? "Image Eau Vitale active par défaut."
+      : "Fond personnalisé actif pour tout le tableau de bord.");
+  }
+}
+
+function loadDashboardWallpaperSettings() {
+  if (dashboardWallpaperSettingsInitialized) {
+    applyDashboardWallpaper(dashboardWallpaperUrl);
+    return;
+  }
+  dashboardWallpaperSettingsInitialized = true;
+  onValue(ref(db, 'settings/dashboardWallpaper'), snap => {
+    applyDashboardWallpaper(snap.val() || DEFAULT_DASHBOARD_WALLPAPER);
+  });
+}
+
+async function persistDashboardWallpaper(value, successMessage) {
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) return;
+  const nextValue = normalizeDashboardWallpaperUrl(value);
+  updateDashboardWallpaperAdminUI('⏳ Enregistrement du fond en cours...');
+  try {
+    await set(ref(db, 'settings/dashboardWallpaper'), nextValue);
+    applyDashboardWallpaper(nextValue, { status: successMessage || '✅ Fond mis à jour.' });
+    showToast(successMessage || '✅ Fond du tableau de bord mis à jour', 'ok');
+  } catch (e) {
+    updateDashboardWallpaperAdminUI("❌ Impossible d'enregistrer ce fond pour le moment.");
+    showToast('❌ Impossible de sauvegarder le fond du tableau de bord', 'err');
+  }
+}
+
+window.saveDashboardWallpaperUrl = async function() {
+  const input = document.getElementById('dashboardWallpaperUrl');
+  const value = input?.value?.trim() || '';
+  if (!value) {
+    showToast('⚠️ Collez un lien image avant de valider.', 'info');
+    updateDashboardWallpaperAdminUI('⚠️ Ajoutez un lien direct vers une image.');
+    return;
+  }
+  await persistDashboardWallpaper(value, '✅ Fond appliqué à partir du lien.');
+};
+
+window.useDefaultDashboardWallpaper = async function() {
+  await persistDashboardWallpaper(DEFAULT_DASHBOARD_WALLPAPER, '✅ Image Eau Vitale appliquée comme fond.');
+};
+
+window.clearDashboardWallpaperCustom = async function() {
+  await persistDashboardWallpaper(DEFAULT_DASHBOARD_WALLPAPER, "↺ Fond réinitialisé sur l'image Eau Vitale.");
+};
+
+window.handleDashboardWallpaperUpload = async function(event) {
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) return;
+  const file = event?.target?.files?.[0];
+  if (!file) return;
+
+  updateDashboardWallpaperAdminUI('⏳ Préparation et compression de la photo...');
+
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1920;
+          const maxH = 1080;
+          let { width, height } = img;
+          const ratio = Math.min(maxW / width, maxH / height, 1);
+          width = Math.max(1, Math.round(width * ratio));
+          height = Math.max(1, Math.round(height * ratio));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.84));
+        };
+        img.onerror = () => reject(new Error('Image invalide'));
+        img.src = reader.result;
+      };
+      reader.onerror = () => reject(new Error('Lecture impossible'));
+      reader.readAsDataURL(file);
+    });
+
+    await persistDashboardWallpaper(dataUrl, '✅ Photo importée et appliquée comme fond.');
+  } catch (e) {
+    updateDashboardWallpaperAdminUI('❌ Import impossible. Essayez une autre image.');
+    showToast("❌ Impossible d'importer cette photo", 'err');
+  } finally {
+    if (event?.target) event.target.value = '';
+  }
+};
 
 // ══════════ HELPERS ══════════
 function num(v) { return (v !== undefined && v !== null && v !== '') ? Number(v).toLocaleString('fr-FR') : '—'; }
@@ -2742,6 +2901,7 @@ window.logout = async function() {
 };
 
 loadRegistrationSettings();
+loadDashboardWallpaperSettings();
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
@@ -5794,6 +5954,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
