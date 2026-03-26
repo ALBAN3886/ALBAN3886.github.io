@@ -372,8 +372,31 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
   grid-template-columns:64px 220px 1fr;
   grid-template-rows:60px 1fr;
   grid-template-areas:"icon topbar topbar" "icon sidebar main";
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  background:var(--bg);
 }
 #app.show { display:grid; }
+#app::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(5, 18, 35, 0.82) 0%,
+      rgba(7, 26, 46, 0.68) 42%,
+      rgba(4, 14, 28, 0.84) 100%
+    ),
+    var(--dashboard-bg-image);
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+#app > * { position:relative; z-index:1; }
 
 /* ICON BAR */
 .icon-bar {
@@ -739,27 +762,38 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
 
 
 /* ══════════════════════════════════════════════════════
-   🌊 FOND EAU VITALE — TABLEAU DE BORD
+   🌊 FOND EAU VITALE — TOUTE L'APPLICATION
    ══════════════════════════════════════════════════════ */
 
-/* Fond directement sur #page-dashboard avec overlay bleuté */
-#page-dashboard {
-  background-image:
-    linear-gradient(
-      135deg,
-      rgba(5, 18, 35, 0.80) 0%,
-      rgba(7, 26, 46, 0.73) 40%,
-      rgba(4, 14, 28, 0.82) 100%
-    ),
-    var(--dashboard-bg-image) !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-attachment: local !important;
+/* Le fond personnalisé est maintenant visible sur toute l'application */
+.icon-bar,
+.topbar,
+.sidebar {
+  background: rgba(8, 18, 38, 0.72) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.main {
+  background: rgba(5, 18, 35, 0.32) !important;
+}
+
+.page,
+#page-dashboard,
+#page-chat {
+  background: transparent !important;
   position: relative !important;
 }
 
-/* Effet glassmorphism sur les cartes du dashboard */
+#chatContactsPanel,
+#chatConvPanel,
+#mobileMenuPanel {
+  background: rgba(9, 20, 40, 0.82) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+/* Effet glassmorphism renforcé pour le tableau de bord */
 #page-dashboard .card,
 #page-dashboard .machine-card,
 #page-dashboard .stat-box {
@@ -1826,15 +1860,15 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
         </div>
         </div></div></div>
 
-      <!-- 🖼️ FOND D'ÉCRAN DU TABLEAU DE BORD -->
+      <!-- 🖼️ FOND D'ÉCRAN DE L'APPLICATION -->
       <div class="admin-accordion" id="acc-wallpaper">
         <div class="admin-accordion-header" onclick="toggleAccordion('wallpaper')">
-          <div class="acc-title" style="color:var(--soufflage)">🖼️ Fond d'écran du tableau de bord</div>
+          <div class="acc-title" style="color:var(--soufflage)">🖼️ Fond d'écran de l'application</div>
           <span class="acc-arrow">▼</span>
         </div>
         <div class="admin-accordion-body" id="acc-body-wallpaper">
         <div style="padding-top:16px">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez l'image affichée derrière le <strong style="color:var(--text)">tableau de bord</strong> pour tous les utilisateurs. Vous pouvez coller un lien image ou importer une photo depuis votre appareil.</p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Choisissez l'image affichée derrière <strong style="color:var(--text)">toute l'application</strong> pour tous les utilisateurs. Vous pouvez coller un lien image ou importer une photo depuis votre appareil.</p>
           <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:14px;align-items:start">
             <div style="display:flex;flex-direction:column;gap:10px">
               <div class="form-group" style="margin:0">
@@ -1857,8 +1891,8 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px">
               <div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px">Aperçu actuel</div>
-              <img id="dashboardWallpaperPreview" alt="Aperçu du fond du tableau de bord" style="width:100%;height:200px;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block">
-              <div style="margin-top:10px;font-size:11px;color:var(--muted)">Le fond est visible immédiatement sur le tableau de bord après l'enregistrement.</div>
+              <img id="dashboardWallpaperPreview" alt="Aperçu du fond de l'application" style="width:100%;height:200px;object-fit:cover;border-radius:12px;border:1px solid var(--border);display:block">
+              <div style="margin-top:10px;font-size:11px;color:var(--muted)">Le fond est visible immédiatement sur toute l'application après l'enregistrement.</div>
             </div>
           </div>
         </div></div></div>
@@ -2480,7 +2514,7 @@ function updateDashboardWallpaperAdminUI(statusText = '') {
   if (status) {
     status.textContent = statusText || (dashboardWallpaperUrl === DEFAULT_DASHBOARD_WALLPAPER
       ? "Image Eau Vitale active par défaut."
-      : "Fond personnalisé actif pour tout le tableau de bord.");
+      : "Fond personnalisé actif pour toute l'application.");
   }
 }
 
@@ -2503,10 +2537,10 @@ async function persistDashboardWallpaper(value, successMessage) {
   try {
     await set(ref(db, 'settings/dashboardWallpaper'), nextValue);
     applyDashboardWallpaper(nextValue, { status: successMessage || '✅ Fond mis à jour.' });
-    showToast(successMessage || '✅ Fond du tableau de bord mis à jour', 'ok');
+    showToast(successMessage || "✅ Fond de l'application mis à jour", 'ok');
   } catch (e) {
     updateDashboardWallpaperAdminUI("❌ Impossible d'enregistrer ce fond pour le moment.");
-    showToast('❌ Impossible de sauvegarder le fond du tableau de bord', 'err');
+    showToast("❌ Impossible de sauvegarder le fond de l'application", 'err');
   }
 }
 
@@ -5954,6 +5988,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
