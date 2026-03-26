@@ -416,19 +416,23 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .urole { font-size:11px; color:var(--muted); }
 
 /* SIDEBAR */
-.sidebar { grid-area:sidebar; background:var(--bg2); border-right:1px solid var(--border); overflow-y:auto; padding:12px 0; }
-.sidebar-label { font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); padding:8px 18px 5px; }
+.sidebar { grid-area:sidebar; background:var(--bg2); border-right:1px solid var(--border); overflow-y:auto; padding:34px 0 18px; }
+.sidebar-label { font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); padding:10px 20px 6px; }
 .sidebar-item {
-  display:flex; align-items:center; gap:10px; padding:9px 18px;
-  cursor:pointer; transition:all .15s; font-size:13px; font-weight:500;
-  color:var(--muted2); border-left:2px solid transparent; position:relative;
+  display:flex; align-items:center; gap:10px; padding:11px 14px;
+  cursor:pointer; transition:all .18s ease; font-size:13px; font-weight:600;
+  color:var(--muted2); border:1px solid transparent; border-radius:12px; position:relative;
+  margin:0 12px 6px; background:transparent;
 }
-.sidebar-item:hover { background:var(--surface); color:var(--text); }
-.sidebar-item.active { background:var(--surface); color:var(--text); border-left-color:var(--soufflage); }
+.sidebar-item:hover { background:var(--surface); color:var(--text); border-color:var(--border2); transform:translateX(2px); }
+.sidebar-item.active {
+  background:linear-gradient(135deg,rgba(0,153,204,.12),rgba(99,102,241,.08)); color:var(--text);
+  border-color:rgba(0,153,204,.35); box-shadow:0 10px 22px rgba(0,153,204,.10);
+}
 .si-icon { font-size:15px; width:20px; text-align:center; }
 .si-badge { margin-left:auto; background:var(--danger); color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; }
 .machine-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.sidebar-divider { height:1px; background:var(--border); margin:10px 18px; }
+.sidebar-divider { height:1px; background:var(--border); margin:12px 20px; }
 
 /* MAIN */
 .main { grid-area:main; overflow:hidden; background:var(--bg); display:flex; flex-direction:column; height:100%; }
@@ -572,6 +576,19 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
 .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--soufflage); box-shadow:0 0 0 2px rgba(0,212,255,.1); }
 .form-select option { background:var(--surface); }
 .form-textarea { resize:vertical; min-height:80px; }
+.auto-format-card {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  min-height:46px; padding:11px 14px; border-radius:10px;
+  border:1px solid rgba(99,102,241,.24); background:linear-gradient(135deg,rgba(99,102,241,.10),rgba(0,153,204,.08));
+}
+.auto-format-card strong { font-family:var(--font-display); font-size:15px; color:var(--text); }
+.auto-format-card span { font-size:12px; color:var(--muted); }
+.auto-format-chip {
+  display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.55); border:1px solid rgba(99,102,241,.18); color:#4f46e5; font-weight:800;
+}
+.form-help-text { font-size:12px; color:var(--muted); line-height:1.5; }
+.form-select.format-auto-hidden { display:none; }
 
 .alert-toggle {
   display:flex; align-items:center; gap:10px; padding:10px 14px;
@@ -1243,7 +1260,7 @@ tbody td,
 
   <!-- MENU MOBILE OVERLAY -->
   <div id="mobileMenuOverlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;background:rgba(122,156,198,.22); backdrop-filter:blur(4px);z-index:200"></div>
-  <div id="mobileMenuPanel" style="display:none;position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:201;overflow-y:auto;padding:16px 0;transform:translateX(-100%);transition:transform .3s ease">
+  <div id="mobileMenuPanel" style="display:none;position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);z-index:201;overflow-y:auto;padding:28px 0 16px;transform:translateX(-100%);transition:transform .3s ease">
     <div style="padding:12px 18px 20px;border-bottom:1px solid var(--border);margin-bottom:8px">
       <div style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--text)">TECHNICIEN</div>
       <div style="font-size:13px;color:var(--soufflage);font-weight:700;letter-spacing:2px">EAU VITALE</div>
@@ -1476,6 +1493,13 @@ tbody td,
           </div>
           <div class="form-group">
             <div class="form-label">📐 Format bouteille</div>
+            <div class="auto-format-card" id="f-format-display">
+              <div>
+                <strong id="f-format-label">Format non défini</strong>
+                <span id="f-format-help">L'administrateur peut définir un format automatique pour tous les rapports.</span>
+              </div>
+              <div class="auto-format-chip" id="f-format-chip">📐 —</div>
+            </div>
             <select class="form-select" id="f-format">
               <option value="">— Sélectionner —</option>
               <option value="0.35">🔹 0,35 L</option>
@@ -1483,6 +1507,7 @@ tbody td,
               <option value="1.5">🔷 1,5 L</option>
               <option value="1.6">🔶 1,6 L</option>
             </select>
+            <div class="form-help-text" id="f-format-note">Si aucun format automatique n'est défini, vous pouvez encore le choisir ici.</div>
           </div>
         </div>
         <div id="dynamicFields"></div>
@@ -1797,6 +1822,13 @@ tbody td,
             </div>
             <div class="form-group">
               <div class="form-label">📐 Format</div>
+              <div class="auto-format-card" id="edit-format-display">
+                <div>
+                  <strong id="edit-format-label">Format du rapport</strong>
+                  <span id="edit-format-help">Le format suit automatiquement le réglage administrateur s'il est défini.</span>
+                </div>
+                <div class="auto-format-chip" id="edit-format-chip">📐 —</div>
+              </div>
               <select class="form-select" id="edit-format">
                 <option value="">— Sélectionner —</option>
                 <option value="0.35">🔹 0,35 L</option>
@@ -1804,6 +1836,7 @@ tbody td,
                 <option value="1.5">🔷 1,5 L</option>
                 <option value="1.6">🔶 1,6 L</option>
               </select>
+              <div class="form-help-text" id="edit-format-note">Sans format automatique, la valeur d'origine du rapport reste modifiable.</div>
             </div>
           </div>
 
@@ -3613,7 +3646,7 @@ window.saveReport = async function() {
   const btn = document.getElementById('saveBtn');
   btn.disabled = true; btn.textContent = 'Enregistrement...';
 
-  const format = document.getElementById('f-format')?.value || '';
+  const format = getEffectiveReportFormat(document.getElementById('f-format')?.value || '');
   const reportKey = `${machine}_${date}_${shift}_${currentUser.uid}`;
   await set(ref(db, `reports/${reportKey}`), {
     id: reportKey, ts: serverTimestamp(),
@@ -3705,7 +3738,7 @@ window.clearForm = function() {
   document.querySelectorAll('.form-input').forEach(i => { if(i.type!=='date') i.value=''; });
   document.getElementById('f-note').value='';
   document.getElementById('f-status').value='ok';
-  const fmtEl = document.getElementById('f-format'); if(fmtEl) fmtEl.value='';
+  syncProductionFormatFields();
   panneSwitchOn=false;
   document.getElementById('panneSwitch').classList.remove('on');
 };
@@ -3775,7 +3808,7 @@ window.editReport = function(id) {
   document.getElementById('edit-status').value = r.status || 'ok';
   document.getElementById('edit-note').value   = r.note || '';
   document.getElementById('edit-dechets').value = r.fields?.dechets !== undefined ? r.fields.dechets : '';
-  const editFmtEl = document.getElementById('edit-format'); if(editFmtEl) editFmtEl.value = r.format || '';
+  syncProductionFormatFields(r.format || '');
 
   // Champs dynamiques de la machine
   const dynFields = document.getElementById('editDynamicFields');
@@ -3834,7 +3867,7 @@ window.saveEditReport = async function() {
     shift:  document.getElementById('edit-shift').value  || r.shift,
     status: document.getElementById('edit-status').value || r.status,
     note:   document.getElementById('edit-note').value.trim(),
-    format: document.getElementById('edit-format')?.value || r.format || '',
+    format: getEffectiveReportFormat(document.getElementById('edit-format')?.value || r.format || ''),
     fields,
     editedAt: Date.now(),
     editedBy: currentUConf?.name || '',
@@ -5133,12 +5166,62 @@ window.toggleAccordion = function(id) {
 const FORMAT_LABELS = { '0.35':'0,35 L', '0.5':'0,5 L', '1.5':'1,5 L', '1.6':'1,6 L' };
 const FORMAT_EMOJIS = { '0.35':'🔹', '0.5':'🔸', '1.5':'🔷', '1.6':'🔶' };
 const FORMAT_COLORS = { '0.35':'#60a5fa', '0.5':'#34d399', '1.5':'#a78bfa', '1.6':'#fb923c' };
+let activeProductionFormat = '';
 
 window.setProductionFormat = async function(fmt) {
   try {
     await set(ref(db, 'system/productionFormat'), fmt || null);
   } catch(e) { console.warn(e); }
 };
+
+function getEffectiveReportFormat(fallback = '') {
+  return activeProductionFormat || fallback || '';
+}
+
+function syncProductionFormatFields(defaultFormat = '') {
+  const effective = getEffectiveReportFormat(defaultFormat);
+  const automatic = !!activeProductionFormat;
+  const emoji = FORMAT_EMOJIS[effective] || '📐';
+  const label = FORMAT_LABELS[effective] || (effective ? `${effective} L` : 'Format non défini');
+
+  const formSelect = document.getElementById('f-format');
+  const formLabel = document.getElementById('f-format-label');
+  const formChip = document.getElementById('f-format-chip');
+  const formHelp = document.getElementById('f-format-help');
+  const formNote = document.getElementById('f-format-note');
+  if (formSelect) {
+    formSelect.value = effective;
+    formSelect.disabled = automatic;
+    formSelect.classList.toggle('format-auto-hidden', automatic);
+  }
+  if (formLabel) formLabel.textContent = automatic ? `Format automatique : ${label}` : label;
+  if (formChip) formChip.textContent = `${emoji} ${effective ? label : '—'}`;
+  if (formHelp) formHelp.textContent = automatic
+    ? "Le format choisi par l'administrateur s'applique automatiquement à tout le rapport."
+    : "Aucun format global n'est actif pour le moment.";
+  if (formNote) formNote.textContent = automatic
+    ? "Le champ de format est verrouillé car il est synchronisé avec l'administration."
+    : "Si aucun format automatique n'est défini, vous pouvez encore le choisir ici.";
+
+  const editSelect = document.getElementById('edit-format');
+  const editLabel = document.getElementById('edit-format-label');
+  const editChip = document.getElementById('edit-format-chip');
+  const editHelp = document.getElementById('edit-format-help');
+  const editNote = document.getElementById('edit-format-note');
+  if (editSelect) {
+    editSelect.value = effective;
+    editSelect.disabled = automatic;
+    editSelect.classList.toggle('format-auto-hidden', automatic);
+  }
+  if (editLabel) editLabel.textContent = automatic ? `Format automatique : ${label}` : label;
+  if (editChip) editChip.textContent = `${emoji} ${effective ? label : '—'}`;
+  if (editHelp) editHelp.textContent = automatic
+    ? "Le format administrateur remplace automatiquement le choix dans la modification du rapport."
+    : "Le format d'origine du rapport reste affiché ici.";
+  if (editNote) editNote.textContent = automatic
+    ? "Le format ne peut plus être changé ici tant qu'un format global est actif."
+    : "Sans format automatique, la valeur d'origine du rapport reste modifiable.";
+}
 
 function renderFormatBanner(fmt) {
   const banner = document.getElementById('formatBanner');
@@ -5158,6 +5241,7 @@ function renderFormatBanner(fmt) {
   }
   const lbl = document.getElementById('currentFormatLabel');
   if (lbl) lbl.textContent = fmt ? `✅ Format actif : ${FORMAT_LABELS[fmt] || fmt}` : 'Aucun format sélectionné';
+  syncProductionFormatFields(fmt);
 
   // Show/hide dashboard banner
   if (!fmt) { banner.style.display = 'none'; return; }
@@ -5182,6 +5266,7 @@ function renderFormatBanner(fmt) {
 // Écouter le format en temps réel depuis Firebase
 onValue(ref(db, 'system/productionFormat'), snap => {
   const fmt = snap.val() || '';
+  activeProductionFormat = fmt;
   renderFormatBanner(fmt);
 });
 
@@ -6108,6 +6193,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
