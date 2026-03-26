@@ -190,10 +190,11 @@ body { font-family:var(--font-body); background:var(--bg); color:var(--text); fo
    On utilise JS pour calculer le zoom exact selon la largeur réelle.
    Le CSS ci-dessous prépare le conteneur. */
 #app-scaler {
-  width: 1024px;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  transform: none !important;
   transform-origin: top left;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ══════════ LOGIN ══════════ */
@@ -766,6 +767,264 @@ body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
 #page-dashboard [class*="total"],
 #page-dashboard [class*="kpi"] {
   background: var(--surface) !important;
+}
+
+
+
+/* ===== CORRECTION LISIBILITÉ + FOND CENTRÉ ===== */
+:root {
+  --bg2: rgba(255,255,255,.76);
+  --surface: rgba(255,255,255,.84);
+  --card: rgba(255,255,255,.90);
+  --border: rgba(78,110,148,.20);
+  --border2: rgba(61,95,136,.30);
+  --text: #10283b;
+  --muted: #4b647d;
+  --muted2: #5c7690;
+  --panel-blur: 10px;
+  --wallpaper-overlay-from: rgba(255,255,255,.12);
+  --wallpaper-overlay-mid: rgba(255,255,255,.05);
+  --wallpaper-overlay-to: rgba(255,255,255,.14);
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+#app::before {
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  filter: saturate(1.02) contrast(1.02);
+}
+
+.main,
+.page,
+#page-dashboard,
+#page-chat {
+  background: transparent !important;
+}
+
+#page-dashboard .card,
+#page-dashboard .machine-card,
+#page-dashboard .stat-box,
+#page-dashboard .reports-table-wrap,
+#page-dashboard table,
+#page-dashboard .dashboard-style-menu,
+#page-dashboard .totals-bar,
+#page-dashboard [class*="total"],
+#page-dashboard [class*="kpi"] {
+  background: rgba(255,255,255,.88) !important;
+}
+
+.slabel,
+.ssub,
+.mm-label,
+.mc-sub,
+.page-header p,
+.card-title,
+thead th,
+tbody td,
+.alert-body p,
+.alert-time,
+.chat-meta,
+.urole,
+.topbar-date,
+.form-label,
+.sidebar-label {
+  color: var(--muted) !important;
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  #app-scaler {
+    width: 100% !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  #app {
+    width: 100% !important;
+    height: 100vh !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 58px 1fr !important;
+    grid-template-areas:
+      "topbar"
+      "main" !important;
+  }
+
+  .icon-bar,
+  .sidebar {
+    display: none !important;
+  }
+
+  .topbar {
+    padding: 0 12px !important;
+    gap: 8px;
+  }
+
+  .topbar > div:first-child {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .topbar-title {
+    font-size: 18px !important;
+    padding: 0 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 54vw;
+  }
+
+  .topbar-date,
+  .presence-pills,
+  .icon-bar {
+    display: none !important;
+  }
+
+  .user-badge {
+    padding: 4px 8px !important;
+    gap: 8px !important;
+  }
+
+  .user-badge .uname,
+  .user-badge .urole {
+    display: none !important;
+  }
+
+  .page {
+    padding: 14px !important;
+  }
+
+  .page-header {
+    margin-bottom: 16px !important;
+    padding-bottom: 14px !important;
+    gap: 10px !important;
+  }
+
+  .page-header h2 {
+    font-size: 22px !important;
+    line-height: 1.1;
+  }
+
+  .btn-row {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn,
+  .btn-sm,
+  .dash-style-btn {
+    min-height: 42px;
+  }
+
+  .dashboard-style-menu {
+    padding: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .dash-style-copy,
+  .dash-style-actions {
+    width: 100%;
+  }
+
+  .dash-style-title {
+    font-size: 16px !important;
+  }
+
+  .dash-style-sub,
+  .dash-style-btn,
+  .page-header p,
+  .card-title,
+  tbody td,
+  .btn,
+  .btn-sm,
+  .form-input,
+  .form-select,
+  .user-badge,
+  .uname,
+  .urole,
+  .chat-bubble {
+    font-size: 14px !important;
+  }
+
+  thead th,
+  .sidebar-label,
+  .slabel,
+  .ssub,
+  .mc-sub,
+  .mm-label,
+  .form-label {
+    font-size: 12px !important;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .machines-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .card,
+  .stat-box,
+  .machine-card {
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .sval {
+    font-size: 24px !important;
+  }
+
+  .mm-val {
+    font-size: 20px !important;
+  }
+
+  .reports-table-wrap,
+  .table-wrap,
+  .card table {
+    width: 100%;
+    overflow-x: auto !important;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 560px) {
+  #app::before {
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+
+  .topbar-title {
+    max-width: 46vw;
+    font-size: 17px !important;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page {
+    padding: 12px !important;
+  }
+
+  .page-header h2 {
+    font-size: 20px !important;
+  }
 }
 
 </style>
@@ -5836,26 +6095,20 @@ window.addEventListener('appinstalled', () => {
 function applyDesktopScale() {
   const scaler = document.getElementById('app-scaler');
   if (!scaler) return;
-  const screenW = window.innerWidth;
-  const targetW = 1024;
-  if (screenW < targetW) {
-    const scale = screenW / targetW;
-    scaler.style.transform = `scale(${scale})`;
-    scaler.style.width = targetW + 'px';
-    scaler.style.height = (window.innerHeight / scale) + 'px';
-    document.body.style.width = screenW + 'px';
-    document.body.style.height = window.innerHeight + 'px';
-    document.body.style.overflow = 'hidden';
-  } else {
-    scaler.style.transform = '';
-    scaler.style.width = '100%';
-    scaler.style.height = '100vh';
-  }
+  scaler.style.transform = 'none';
+  scaler.style.width = '100%';
+  scaler.style.height = 'auto';
+  scaler.style.minHeight = '100vh';
+  scaler.style.overflow = 'visible';
+  document.body.style.width = '100%';
+  document.body.style.height = 'auto';
+  document.body.style.overflow = window.innerWidth <= 900 ? 'auto' : '';
 }
 applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
