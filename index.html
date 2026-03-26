@@ -14,7 +14,11 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Technicien Eau Vitale</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet"></noscript>
 <style>
 :root {
   /* ── THÈME SOMBRE (défaut) ── */
@@ -836,6 +840,9 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <!-- Lien admin discret -->
     <div style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px">
       <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
+    </div>
+    <div style="text-align:center;margin-top:8px">
+      <span id="registerAccessLink" onclick="switchMode('register')" style="display:none;font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">✚ Créer un nouveau compte</span>
     </div>
 
     <!-- MODE AVANCÉ (caché par défaut) -->
@@ -1851,6 +1858,28 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         </div>
         </div></div></div>
 
+      <!-- INSCRIPTIONS -->
+      <div class="admin-accordion" id="acc-registration">
+        <div class="admin-accordion-header" onclick="toggleAccordion('registration')">
+          <div class="acc-title" style="color:var(--remplissage)">📝 Inscriptions des nouveaux utilisateurs</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-registration">
+        <div style="padding-top:16px">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Activez ou bloquez la création de nouveaux comptes depuis l'écran de connexion. Quand l'option est désactivée, le lien d'inscription est masqué et toute tentative de création est refusée.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
+            <div>
+              <div style="font-weight:700;font-size:13px;color:var(--text)">Autoriser l'inscription</div>
+              <div id="registrationStatusLabel" style="font-size:11px;color:var(--muted);margin-top:4px">Chargement...</div>
+            </div>
+            <button onclick="toggleRegistrationSetting()" id="toggle-registration"
+              style="width:48px;height:26px;border-radius:14px;border:none;cursor:pointer;position:relative;transition:all .3s;background:rgba(255,255,255,.15);flex-shrink:0">
+              <div id="knob-registration" style="width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:all .3s"></div>
+            </button>
+          </div>
+          <div id="registrationHint" style="font-size:12px;color:var(--muted);margin-top:10px">Chargement du paramètre...</div>
+        </div></div></div>
+
       <!-- UTILISATEURS -->
       <div class="admin-accordion" id="acc-users">
         <div class="admin-accordion-header" onclick="toggleAccordion('users')">
@@ -2157,6 +2186,8 @@ const USERS_CONFIG = [
   { email:'admin@eauvitale.fr', name:'Administrateur', role:'Admin', machine:null, color:'#c084fc' },
 ];
 let dynamicUsers = [...USERS_CONFIG];
+let registrationEnabled = true;
+let registrationSettingsInitialized = false;
 
 const MACHINE_MAP = {
   'Technicien Soufflage':   { machine:'Soufflage',   color:'#00d4ff' },
@@ -2269,6 +2300,66 @@ function buildLogin() {
       <div style="margin-left:auto;color:#0099cc;font-size:20px">→</div>
     </div>`;
   }).join('');
+  updateRegistrationUI();
+}
+
+function loadRegistrationSettings() {
+  if (registrationSettingsInitialized) {
+    updateRegistrationUI();
+    return;
+  }
+  registrationSettingsInitialized = true;
+  onValue(ref(db, 'settings/registrationEnabled'), snap => {
+    registrationEnabled = snap.val() !== false;
+    updateRegistrationUI();
+  });
+}
+
+function updateRegistrationUI() {
+  const link = document.getElementById('registerAccessLink');
+  const status = document.getElementById('registrationStatusLabel');
+  const hint = document.getElementById('registrationHint');
+  const btn = document.getElementById('toggle-registration');
+  const knob = document.getElementById('knob-registration');
+  const regBox = document.getElementById('modeRegister');
+
+  if (link) link.style.display = registrationEnabled ? 'inline-block' : 'none';
+
+  if (!registrationEnabled && regBox && regBox.style.display !== 'none') {
+    regBox.style.display = 'none';
+    const list = document.getElementById('quickUserList');
+    if (list) list.style.display = '';
+    const sub = document.querySelector('.login-logo .sub');
+    if (sub) sub.textContent = 'Choisissez votre nom pour continuer';
+  }
+
+  if (status) status.textContent = registrationEnabled ? '✅ Inscription activée' : '⛔ Inscription désactivée';
+  if (hint) hint.textContent = registrationEnabled
+    ? "Les nouveaux utilisateurs peuvent créer leur compte depuis l'écran de connexion."
+    : "Seuls les comptes existants peuvent se connecter. Le lien d'inscription est masqué.";
+
+  if (btn) btn.style.background = registrationEnabled ? 'var(--remplissage)' : 'rgba(255,255,255,.15)';
+  if (knob) {
+    knob.style.right = registrationEnabled ? '3px' : '';
+    knob.style.left = registrationEnabled ? '' : '3px';
+  }
+}
+
+window.toggleRegistrationSetting = async function() {
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) return;
+
+  const previous = registrationEnabled;
+  registrationEnabled = !registrationEnabled;
+  updateRegistrationUI();
+  try {
+    await set(ref(db, 'settings/registrationEnabled'), registrationEnabled);
+    showToast(registrationEnabled ? '✅ Inscriptions activées' : '⛔ Inscriptions désactivées', 'info');
+  } catch(e) {
+    registrationEnabled = previous;
+    updateRegistrationUI();
+    showToast('❌ Impossible de sauvegarder le paramètre', 'err');
+  }
 }
 
 // Connexion rapide par clic sur l'utilisateur
@@ -2309,6 +2400,17 @@ window.quickLogin = async function(email) {
 };
 
 window.switchMode = function(mode) {
+  let blocked = false;
+  if (mode === 'register' && !registrationEnabled) {
+    const err = document.getElementById('loginErr');
+    if (err) {
+      err.style.color = 'var(--danger)';
+      err.textContent = "L'inscription des nouveaux utilisateurs est actuellement désactivée.";
+    }
+    mode = 'quick';
+    blocked = true;
+  }
+
   const adv  = document.getElementById('modeAdvanced');
   const reg  = document.getElementById('modeRegister');
   const forg = document.getElementById('modeForgot');
@@ -2320,9 +2422,11 @@ window.switchMode = function(mode) {
   if (list) list.style.display = (mode === 'quick' || mode === 'login') ? '' : 'none';
   if (sub)  sub.textContent    = (mode === 'quick' || mode === 'login')
     ? 'Choisissez votre nom pour continuer'
-    : mode === 'advanced' ? 'Connexion administrateur' : '';
+    : mode === 'advanced' ? 'Connexion administrateur'
+    : mode === 'register' ? 'Créer un nouveau compte'
+    : mode === 'forgot' ? 'Réinitialisation du mot de passe' : '';
   const err = document.getElementById('loginErr');
-  if (err) { err.textContent = ''; }
+  if (err && !blocked) { err.textContent = ''; err.style.color = 'var(--danger)'; }
 };
 
 let selectedEmail = null;
@@ -2362,6 +2466,7 @@ window.doRegister = async function() {
   const pwd2  = document.getElementById('regPwd2').value;
   const err   = document.getElementById('loginErr');
   err.style.color = 'var(--danger)';
+  if (!registrationEnabled) { err.textContent = "L'inscription des nouveaux utilisateurs est actuellement désactivée par l'administrateur."; return; }
   if (!name)          { err.textContent = 'Entrez votre prénom et nom.'; return; }
   if (!email)         { err.textContent = 'Entrez votre adresse e-mail.'; return; }
   if (pwd.length < 6) { err.textContent = 'Mot de passe : minimum 6 caractères.'; return; }
@@ -2450,6 +2555,8 @@ window.logout = async function() {
   selectedEmail = null;
   if (window.switchMode) switchMode('login');
 };
+
+loadRegistrationSettings();
 
 // ══════════ AUTH STATE ══════════
 onAuthStateChanged(auth, async user => {
@@ -5469,6 +5576,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
