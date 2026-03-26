@@ -820,70 +820,77 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
     <img id="loginSlide1" src="" style="opacity:0;transition:opacity 1s ease">
     <img id="loginSlide2" src="" style="opacity:0;transition:opacity 1s ease">
   </div>
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px">EAU VITALE</span></div>
-      <div class="sub">Gestion de Ligne de Production</div>
-    </div>
-    <!-- ONGLETS MODE -->
-    <div style="display:flex;gap:6px;margin-bottom:20px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:4px;">
-      <button id="tabLogin" onclick="switchMode('login')" style="flex:1;padding:10px;border:none;border-radius:7px;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:var(--soufflage);color:#fff;transition:all .2s;letter-spacing:.03em">CONNEXION</button>
-      <button id="tabRegister" onclick="switchMode('register')" style="flex:1;padding:10px;border:none;border-radius:7px;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .2s;letter-spacing:.03em">CRÉER UN COMPTE</button>
+  <div class="login-box" style="width:100%;max-width:500px;padding:28px 24px">
+    <div class="login-logo" style="margin-bottom:20px">
+      <div class="brand" style="font-size:26px;letter-spacing:1px;line-height:1.3;color:#1a2030">TECHNICIEN<br><span style="font-size:20px;letter-spacing:4px;color:#0099cc">EAU VITALE</span></div>
+      <div class="sub" style="color:#7a8599">Choisissez votre nom pour continuer</div>
     </div>
 
-    <!-- MODE CONNEXION -->
-    <div id="modeLogin">
-      <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="emailInput" placeholder="prenom.nom@eauvitale.fr" onkeydown="if(event.key==='Enter')document.getElementById('pwdInput').focus()">
-      <div class="login-label">Mot de passe</div>
-      <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      <div style="text-align:right;margin-bottom:14px;margin-top:-8px">
-        <span onclick="switchMode('forgot')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
+    <!-- LISTE RAPIDE DES UTILISATEURS -->
+    <div id="quickUserList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:380px;overflow-y:auto">
+      <div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">⏳ Chargement des utilisateurs...</div>
+    </div>
+
+    <div class="login-err" id="loginErr" style="color:#dc2626;font-size:12px;text-align:center;min-height:16px"></div>
+
+    <!-- Lien admin discret -->
+    <div id="adminLoginLink" style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px;display:none">
+      <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
+    </div>
+
+    <!-- MODE AVANCÉ (caché par défaut) -->
+    <div id="modeAdvanced" style="display:none;margin-top:14px">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail</div>
+      <input type="email" class="login-input" id="emailInput" placeholder="admin@eauvitale.fr" onkeydown="if(event.key==='Enter')document.getElementById('pwdInput').focus()" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Mot de passe</div>
+      <input type="password" class="login-input" id="pwdInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <button class="btn-login" id="loginBtn" onclick="doLogin()" style="margin-top:4px">CONNEXION →</button>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;align-items:center">
+        <span onclick="switchMode('forgot')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">Mot de passe oublié ?</span>
+        <span id="registerLink" onclick="switchMode('register')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline;display:none">➕ Créer un compte</span>
       </div>
-      <button class="btn-login" id="loginBtn" onclick="doLogin()">CONNEXION →</button>
     </div>
 
-    <!-- MODE CRÉER COMPTE -->
-    <div id="modeRegister" style="display:none">
-      <div class="login-label">Prénom &amp; Nom</div>
-      <input type="text" class="login-input" id="regName" placeholder="Ex : Jean-Pierre Dupont">
-      <div class="login-label">Poste / Rôle</div>
-      <select class="login-input" id="regRole" style="cursor:pointer">
+    <!-- MODE MOT DE PASSE OUBLIÉ -->
+    <div id="modeForgot" style="display:none;margin-top:14px">
+      <div style="font-size:12px;color:#7a8599;margin-bottom:14px;line-height:1.6">
+        Entrez le <strong style="color:#0099cc">code secret</strong> fourni par votre administrateur.
+      </div>
+      <div class="login-label" style="color:#7a8599">Code secret</div>
+      <input type="password" class="login-input" id="resetCode" placeholder="Code secret" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail du compte</div>
+      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@eauvitale.fr" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Nouveau mot de passe</div>
+      <input type="password" class="login-input" id="newPwd" placeholder="Minimum 6 caractères" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Confirmer le nouveau mot de passe</div>
+      <input type="password" class="login-input" id="newPwd2" placeholder="Répéter le mot de passe" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <button class="btn-login" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
+      <div style="text-align:center;margin-top:12px">
+        <span onclick="switchMode('quick')" style="font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">← Retour</span>
+      </div>
+    </div>
+
+    <!-- MODE CRÉER COMPTE (admin seulement) -->
+    <div id="modeRegister" style="display:none;margin-top:14px">
+      <div class="login-label" style="color:#7a8599">Prénom &amp; Nom</div>
+      <input type="text" class="login-input" id="regName" placeholder="Ex : Jean-Pierre Dupont" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Poste / Rôle</div>
+      <select class="login-input" id="regRole" style="cursor:pointer;background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
         <option value="Technicien Soufflage">🫧 Technicien Soufflage</option>
         <option value="Technicien Remplissage">🧴 Technicien Remplissage</option>
         <option value="Technicien Étiquette">🏷️ Technicien Étiquette</option>
         <option value="Technicien Emballage">📦 Technicien Emballage</option>
         <option value="Technicien B19">⚙️ Technicien B19</option>
       </select>
-      <div class="login-label">Adresse e-mail</div>
-      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr">
-      <div class="login-label">Mot de passe</div>
-      <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères">
-      <div class="login-label">Confirmer le mot de passe</div>
-      <input type="password" class="login-input" id="regPwd2" placeholder="Répéter le mot de passe">
+      <div class="login-label" style="color:#7a8599">Adresse e-mail</div>
+      <input type="email" class="login-input" id="regEmail" placeholder="prenom.nom@eauvitale.fr" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Mot de passe</div>
+      <input type="password" class="login-input" id="regPwd" placeholder="Minimum 6 caractères" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
+      <div class="login-label" style="color:#7a8599">Confirmer le mot de passe</div>
+      <input type="password" class="login-input" id="regPwd2" placeholder="Répéter le mot de passe" style="background:#f0f4f8;border:1px solid #e2e6ed;color:#1a2030">
       <button class="btn-login" id="registerBtn" onclick="doRegister()">CRÉER MON COMPTE →</button>
     </div>
 
-    <!-- MODE MOT DE PASSE OUBLIÉ -->
-    <div id="modeForgot" style="display:none">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        Entrez le <strong style="color:var(--soufflage)">code secret</strong> fourni par votre administrateur, votre e-mail et choisissez un nouveau mot de passe.
-      </div>
-      <div class="login-label">Code secret</div>
-      <input type="password" class="login-input" id="resetCode" placeholder="Code secret administrateur">
-      <div class="login-label">Adresse e-mail du compte</div>
-      <input type="email" class="login-input" id="forgotEmail" placeholder="prenom.nom@eauvitale.fr">
-      <div class="login-label">Nouveau mot de passe</div>
-      <input type="password" class="login-input" id="newPwd" placeholder="Minimum 6 caractères">
-      <div class="login-label">Confirmer le nouveau mot de passe</div>
-      <input type="password" class="login-input" id="newPwd2" placeholder="Répéter le mot de passe">
-      <button class="btn-login" id="forgotBtn" onclick="doForgot()">RÉINITIALISER →</button>
-      <div style="text-align:center;margin-top:14px">
-        <span onclick="switchMode('login')" style="font-size:12px;color:var(--soufflage);cursor:pointer;text-decoration:underline">← Retour connexion</span>
-      </div>
-    </div>
-
-    <div class="login-err" id="loginErr"></div>
   </div>
 </div>
 
@@ -1846,6 +1853,42 @@ tbody td { padding:12px 16px; font-size:13px; vertical-align:middle; }
         </div></div></div>
 
       <!-- UTILISATEURS -->
+      <!-- ACCÈS CONNEXION -->
+      <div class="admin-accordion" id="acc-access">
+        <div class="admin-accordion-header" onclick="toggleAccordion('access')">
+          <div class="acc-title" style="color:var(--soufflage)">🔐 Accès &amp; Connexion</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-access">
+        <div style="padding-top:16px;display:flex;flex-direction:column;gap:10px">
+
+          <!-- Toggle : Connexion Admin -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">⚙️ Afficher "Connexion administrateur"</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Lien discret sous la liste des utilisateurs</div>
+            </div>
+            <button onclick="toggleAccessOption('showAdminLogin')" id="toggle-showAdminLogin"
+              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:rgba(255,255,255,.15);flex-shrink:0">
+              <div id="knob-showAdminLogin" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:all .3s"></div>
+            </button>
+          </div>
+
+          <!-- Toggle : Création de compte -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div>
+              <div style="font-weight:600;font-size:13px;color:var(--text)">➕ Autoriser la création de compte</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">Visible depuis la connexion administrateur</div>
+            </div>
+            <button onclick="toggleAccessOption('showRegister')" id="toggle-showRegister"
+              style="width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:all .3s;background:rgba(255,255,255,.15);flex-shrink:0">
+              <div id="knob-showRegister" style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:all .3s"></div>
+            </button>
+          </div>
+
+        </div>
+        </div></div>
+
       <div class="admin-accordion" id="acc-users">
         <div class="admin-accordion-header" onclick="toggleAccordion('users')">
           <div class="acc-title">👥 Comptes utilisateurs enregistrés</div>
@@ -2204,33 +2247,99 @@ function loadDynamicUsers() {
 }
 
 function buildLogin() {
-  const wrap = document.getElementById('userSelect');
+  const wrap = document.getElementById('quickUserList');
   if (!wrap) return;
+  if (dynamicUsers.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">Aucun utilisateur trouvé</div>';
+    return;
+  }
   wrap.innerHTML = dynamicUsers.map(u => {
-    const safeId = 'chip_' + u.email.replace(/[^a-zA-Z0-9]/g, '_');
-    return `<div class="user-chip" id="${safeId}" onclick="window._selectUser('${u.email}')">
-      <div class="chip-name"><span class="chip-dot" style="background:${u.color}"></span>${u.name}</div>
-      <div class="chip-role">${u.role}</div>
+    const initiale = (u.name||'?').charAt(0).toUpperCase();
+    const photo = photosCache[Object.keys(photosCache).find(k => photosCache[k].name === u.name)]?.photoURL;
+    const avatar = photo
+      ? `<img src="${photo}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid ${u.color}">`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:${u.color};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;font-weight:900;color:#fff;flex-shrink:0">${initiale}</div>`;
+    return `<div onclick="quickLogin('${u.email}', this)" style="
+      display:flex;align-items:center;gap:14px;
+      padding:12px 16px;border-radius:12px;cursor:pointer;
+      background:#f8fafc;border:1.5px solid #e2e6ed;
+      transition:all .15s;
+    " onmouseover="this.style.background='#e8f4fd';this.style.borderColor='#0099cc'" onmouseout="if(!this.style.borderColor.includes('26')){this.style.background='#f8fafc';this.style.borderColor='#e2e6ed'}">
+      ${avatar}
+      <div>
+        <div style="font-weight:700;font-size:15px;color:#1a2030">${u.name}</div>
+        <div style="font-size:12px;color:#7a8599;margin-top:2px">${u.role}</div>
+      </div>
+      <div class="ql-arrow" style="margin-left:auto;color:#0099cc;font-size:20px">→</div>
     </div>`;
   }).join('');
 }
 
-window.switchMode = function(mode) {
-  document.getElementById('modeLogin').style.display    = mode === 'login'    ? '' : 'none';
-  document.getElementById('modeRegister').style.display = mode === 'register' ? '' : 'none';
-  document.getElementById('modeForgot').style.display   = mode === 'forgot'   ? '' : 'none';
+// Connexion rapide par clic sur l'utilisateur
+const savedCredentials = {};
+window.quickLogin = async function(email, cardEl) {
   const err = document.getElementById('loginErr');
-  err.textContent = ''; err.style.color = 'var(--danger)';
-  const tabL = document.getElementById('tabLogin');
-  const tabR = document.getElementById('tabRegister');
-  if (tabL) {
-    tabL.style.background = mode === 'login' ? 'var(--soufflage)' : 'none';
-    tabL.style.color = mode === 'login' ? '#fff' : 'var(--muted)';
+  err.textContent = '';
+
+  // Feedback visuel immédiat sur la carte
+  if (cardEl) {
+    cardEl.style.background = '#e8f4fd';
+    cardEl.style.borderColor = '#0099cc';
+    const arrow = cardEl.querySelector('.ql-arrow');
+    if (arrow) arrow.textContent = '⏳';
   }
-  if (tabR) {
-    tabR.style.background = mode === 'register' ? 'var(--soufflage)' : 'none';
-    tabR.style.color = mode === 'register' ? '#fff' : 'var(--muted)';
+  err.textContent = '⏳ Connexion en cours...';
+
+  // Vérifier credentials sauvegardés
+  const creds = JSON.parse(localStorage.getItem('userCreds') || '{}');
+
+  if (creds[email]) {
+    try {
+      await signInWithEmailAndPassword(auth, email, creds[email]);
+      err.textContent = '';
+      return;
+    } catch(e) {
+      delete creds[email];
+      localStorage.setItem('userCreds', JSON.stringify(creds));
+    }
   }
+
+  // Première fois — demander mot de passe
+  if (cardEl) { cardEl.style.background = '#f8fafc'; cardEl.style.borderColor = '#e2e6ed'; }
+  err.textContent = '';
+  const pwd = prompt(`Première connexion\n${email}\n\nEntrez votre mot de passe :`);
+  if (!pwd) return;
+
+  err.textContent = '⏳ Connexion...';
+  try {
+    await signInWithEmailAndPassword(auth, email, pwd);
+    creds[email] = pwd;
+    localStorage.setItem('userCreds', JSON.stringify(creds));
+    err.textContent = '';
+  } catch(e) {
+    err.textContent = '❌ Mot de passe incorrect.';
+    if (cardEl) { cardEl.style.background = '#fff0f0'; cardEl.style.borderColor = '#dc2626'; }
+    setTimeout(() => {
+      if (cardEl) { cardEl.style.background = '#f8fafc'; cardEl.style.borderColor = '#e2e6ed'; }
+    }, 2000);
+  }
+};
+
+window.switchMode = function(mode) {
+  const adv  = document.getElementById('modeAdvanced');
+  const reg  = document.getElementById('modeRegister');
+  const forg = document.getElementById('modeForgot');
+  const list = document.getElementById('quickUserList');
+  const sub  = document.querySelector('.login-logo .sub');
+  if (adv)  adv.style.display  = mode === 'advanced'  ? '' : 'none';
+  if (reg)  reg.style.display  = mode === 'register'  ? '' : 'none';
+  if (forg) forg.style.display = mode === 'forgot'    ? '' : 'none';
+  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? '' : 'none';
+  if (sub)  sub.textContent    = (mode === 'quick' || mode === 'login')
+    ? 'Choisissez votre nom pour continuer'
+    : mode === 'advanced' ? 'Connexion administrateur' : '';
+  const err = document.getElementById('loginErr');
+  if (err) { err.textContent = ''; }
 };
 
 let selectedEmail = null;
@@ -2359,56 +2468,40 @@ window.logout = async function() {
 onAuthStateChanged(auth, async user => {
   if (user) {
     currentUser = user;
+
+    // Un seul appel Firebase pour tout récupérer
     let conf = getUserConf(user.email);
-    if (!conf) {
-      try {
-        const snap = await get(ref(db, `userProfiles/${user.uid}`));
-        if (snap.exists()) {
-          const p = snap.val();
-          conf = {
-            email:   p.email || user.email,
-            name:    p.name,
-            role:    p.role,
-            machine: (MACHINE_MAP[p.role] || {}).machine || null,
-            color:   (MACHINE_MAP[p.role] || {}).color   || '#00d4ff'
-          };
-          if (!dynamicUsers.find(u2 => u2.email === conf.email)) dynamicUsers.push(conf);
-        }
-      } catch(e) { console.warn('Profile load error', e); }
-    }
+    try {
+      const snap = await get(ref(db, `userProfiles/${user.uid}`));
+      if (snap.exists()) {
+        const p = snap.val();
+        conf = {
+          email:    p.email || user.email,
+          name:     p.name,
+          role:     p.role,
+          machine:  (MACHINE_MAP[p.role] || {}).machine || null,
+          color:    (MACHINE_MAP[p.role] || {}).color   || '#00d4ff',
+          phone:    p.phone    || null,
+          photoURL: p.photoURL || null,
+        };
+        if (!dynamicUsers.find(u2 => u2.email === conf.email)) dynamicUsers.push(conf);
+        photosCache[user.uid] = { photoURL: conf.photoURL, color: conf.color, name: conf.name };
+      }
+    } catch(e) { console.warn('Profile load error', e); }
+
     if (!conf) {
       await signOut(auth);
-      // Réactiver le bouton et afficher un message d'erreur clair
-      const btn = document.getElementById('loginBtn');
-      if (btn) { btn.disabled = false; btn.textContent = 'CONNEXION →'; }
       const err = document.getElementById('loginErr');
       if (err) { err.style.color = 'var(--danger)'; err.textContent = '❌ Profil introuvable. Contactez l\'administrateur.'; }
       return;
     }
     currentUConf = conf;
 
-    try {
-      // Load extra profile data (phone, photoURL)
-      const snap2 = await get(ref(db, `userProfiles/${user.uid}`));
-      if (snap2.exists()) {
-        const p = snap2.val();
-        if (p.phone)    currentUConf.phone    = p.phone;
-        if (p.photoURL) currentUConf.photoURL = p.photoURL;
-      }
-    } catch(e) {}
-
-    try {
-      // Charger le cache de photos EN ARRIÈRE-PLAN (ne bloque pas la connexion)
-      loadPhotosCache().catch(()=>{});
-    } catch(e) {}
-    // Ajouter soi-même au cache
-    photosCache[user.uid] = { photoURL: currentUConf.photoURL||null, color: currentUConf.color, name: currentUConf.name };
-
+    // Masquer login, afficher app immédiatement
     document.getElementById('loginScreen').classList.remove('show');
     document.getElementById('loginScreen').style.display = 'none';
-
-    // Montrer le splash uniquement à la toute première visite
     try { initApp(); } catch(e) { console.warn('initApp error', e); }
+
     const splashSeen = localStorage.getItem('splashSeen');
     if (!splashSeen) {
       localStorage.setItem('splashSeen', '1');
@@ -2416,10 +2509,13 @@ onAuthStateChanged(auth, async user => {
     } else {
       document.getElementById('app')?.classList.add('show');
     }
+
+    // Charger photos en arrière-plan (ne bloque plus)
+    loadPhotosCache().catch(()=>{});
+
   } else {
     document.getElementById('loginScreen').classList.add('show');
     document.getElementById('app').classList.remove('show');
-    // Toujours réactiver le bouton de connexion
     const btn = document.getElementById('loginBtn');
     if (btn) { btn.disabled = false; btn.textContent = 'CONNEXION →'; }
     loadDynamicUsers();
@@ -4371,6 +4467,54 @@ window.loadEmailStats = async function() {
     container.innerHTML = `<div style="color:var(--danger);font-size:12px;padding:8px">❌ Erreur : ${e.message}</div>`;
   }
 };
+
+// ══════════ ACCÈS & CONNEXION ══════════
+let accessSettings = { showAdminLogin: false, showRegister: false };
+
+function applyAccessSettings() {
+  // Lien connexion admin
+  const adminLink = document.getElementById('adminLoginLink');
+  if (adminLink) adminLink.style.display = accessSettings.showAdminLogin ? '' : 'none';
+  // Lien créer un compte
+  const regLink = document.getElementById('registerLink');
+  if (regLink) regLink.style.display = accessSettings.showRegister ? '' : 'none';
+  // Mettre à jour les toggles admin
+  updateAccessToggles();
+}
+
+function updateAccessToggles() {
+  ['showAdminLogin','showRegister'].forEach(key => {
+    const btn  = document.getElementById('toggle-'+key);
+    const knob = document.getElementById('knob-'+key);
+    if (!btn) return;
+    const on = accessSettings[key];
+    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
+    if (knob) { knob.style.left = on ? '' : '3px'; knob.style.right = on ? '3px' : ''; }
+  });
+}
+
+window.toggleAccessOption = async function(key) {
+  accessSettings[key] = !accessSettings[key];
+  applyAccessSettings();
+  try { await update(ref(db, 'system/accessSettings'), accessSettings); } catch(e) {}
+};
+
+// Charger les paramètres d'accès depuis Firebase en temps réel
+onValue(ref(db, 'system/accessSettings'), snap => {
+  if (snap.val()) accessSettings = { ...accessSettings, ...snap.val() };
+  applyAccessSettings();
+});
+
+function updateAccessToggles() {
+  ['showAdminLogin','showRegister'].forEach(key => {
+    const btn  = document.getElementById('toggle-'+key);
+    const knob = document.getElementById('knob-'+key);
+    if (!btn) return;
+    const on = accessSettings[key];
+    btn.style.background = on ? 'var(--soufflage)' : 'rgba(255,255,255,.15)';
+    if (knob) { knob.style.left = on ? '' : '3px'; knob.style.right = on ? '3px' : ''; }
+  });
+}
 
 // Charger les paramètres email depuis Firebase (temps réel)
 onValue(ref(db, 'system/emailSettings'), snap => {
