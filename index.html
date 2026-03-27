@@ -2602,7 +2602,7 @@ async function updateForgotUI() {
   const err = document.getElementById('loginErr');
   const resetCtx = getResetContext();
 
-  setFieldVisibility(codeInput, false);
+  setFieldVisibility(codeInput, true);
 
   if (resetCtx) {
     if (intro) intro.innerHTML = 'Choisissez votre nouveau mot de passe. Après validation, votre compte sera <strong style="color:#0099cc">ouvert automatiquement</strong>.';
@@ -2638,7 +2638,7 @@ async function updateForgotUI() {
     return;
   }
 
-  if (intro) intro.innerHTML = 'Entrez votre adresse e-mail pour recevoir un lien de réinitialisation. En ouvrant le lien reçu, vous pourrez définir le nouveau mot de passe ici.';
+  if (intro) intro.innerHTML = 'Saisissez le <strong>code secret</strong>, l\'e-mail du compte et le nouveau mot de passe pour réinitialiser directement.';
   if (emailLabel) emailLabel.textContent = 'Adresse e-mail du compte';
   if (emailInput) {
     emailInput.disabled = false;
@@ -2646,11 +2646,11 @@ async function updateForgotUI() {
     if (!emailInput.value) emailInput.value = localStorage.getItem(LAST_LOGIN_EMAIL_KEY) || '';
     emailInput.placeholder = 'prenom.nom@eauvitale.fr';
   }
-  setFieldVisibility(pwdInput, false);
-  setFieldVisibility(pwd2Input, false);
+  setFieldVisibility(pwdInput, true);
+  setFieldVisibility(pwd2Input, true);
   if (pwdInput) pwdInput.value = '';
   if (pwd2Input) pwd2Input.value = '';
-  if (btn) btn.textContent = 'ENVOYER LE LIEN →';
+  if (btn) btn.textContent = 'RÉINITIALISER →';
 }
 function enhancePasswordFields() {
   document.querySelectorAll('input[type="password"]').forEach(input => {
@@ -3230,29 +3230,44 @@ window.doForgot = async function() {
     return;
   }
 
+  // Validation du code secret
+  const code = document.getElementById('resetCode')?.value.trim() || '';
+  if (code !== RESET_SECRET) {
+    err.textContent = '❌ Code secret incorrect.';
+    return;
+  }
   if (!email) {
     err.textContent = 'Entrez votre adresse e-mail.';
     return;
   }
+  if (pwd.length < 6) {
+    err.textContent = 'Nouveau mot de passe : minimum 6 caractères.';
+    return;
+  }
+  if (pwd !== pwd2) {
+    err.textContent = 'Les mots de passe ne correspondent pas.';
+    return;
+  }
 
   btn.disabled = true;
-  btn.textContent = 'Envoi...';
+  btn.textContent = 'Réinitialisation...';
 
   try {
-    const resetUrl = window.location.origin + window.location.pathname;
-    await sendPasswordResetEmail(auth, email, { url: resetUrl, handleCodeInApp: true });
+    // Étape 1 : demander le lien OOB à Firebase (sans continueUrl → pas d'erreur de domaine)
+    await sendPasswordResetEmail(auth, email);
+    // Étape 2 : notifier l'admin que l'e-mail a été envoyé à l'utilisateur
     rememberLastEmail(email);
     err.style.color = 'var(--ok)';
-    err.textContent = '✅ Lien de réinitialisation envoyé à ' + email + '. Ouvrez le lien reçu pour choisir votre nouveau mot de passe. Le compte s’ouvrira automatiquement après validation.';
+    err.textContent = '✅ E-mail de réinitialisation envoyé à ' + email + '. L\'utilisateur doit cliquer sur le lien reçu pour définir son mot de passe.';
   } catch (e) {
     if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-email') {
-      err.textContent = 'Adresse e-mail introuvable.';
+      err.textContent = '❌ Adresse e-mail introuvable dans Firebase.';
     } else {
       err.textContent = 'Erreur : ' + e.message;
     }
   }
   btn.disabled = false;
-  btn.textContent = 'ENVOYER LE LIEN →';
+  btn.textContent = 'RÉINITIALISER →';
 };
 
 window.logout = async function() {
@@ -6395,6 +6410,7 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
