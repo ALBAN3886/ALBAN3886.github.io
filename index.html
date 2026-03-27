@@ -1419,18 +1419,7 @@ tbody td,
         </div>
       </div>
 
-      <div class="dashboard-style-menu">
-        <div class="dash-style-copy">
-          <div class="dash-style-eyebrow">Menu des tableaux de bord</div>
-          <div class="dash-style-title">Modernisé, classique ou élégant</div>
-          <div class="dash-style-sub">Le rendu change sans recharger les données.</div>
-        </div>
-        <div class="dash-style-actions">
-          <button class="dash-style-btn" data-dash-variant="modern" onclick="setDashboardVariant('modern', this)">✨ Modernisé</button>
-          <button class="dash-style-btn" data-dash-variant="classic" onclick="setDashboardVariant('classic', this)">🧭 Classique</button>
-          <button class="dash-style-btn" data-dash-variant="elegant" onclick="setDashboardVariant('elegant', this)">🏛️ Élégant</button>
-        </div>
-      </div>
+
 
       <!-- BANNIÈRE ANNONCE ADMIN -->
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
@@ -4668,69 +4657,224 @@ window.exportExcel = function() {
 
 window.exportPDF = function() {
   const rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
-  const html = `<!DOCTYPE html><html><head><title>Rapport LineOps</title><style>
-    body{font-family:Arial,sans-serif;padding:28px;color:var(--text);}
-    h1{font-size:22px;} .sub{color:var(--muted);margin-bottom:20px;font-size:13px;}
-    table{width:100%;border-collapse:collapse;} th{background:#f0f4f8;padding:8px;font-size:11px;text-transform:uppercase;text-align:left;}
-    td{padding:8px;border-bottom:1px solid var(--border);font-size:13px;}
-    .panne{color:#dc2626;font-weight:bold;} .ok{color:#16a34a;} .warn{color:#d97706;}
-  
-/* ===== PASS 2 — PERF + MENU DASHBOARD ===== */
-.dashboard-style-menu{
-  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  margin-bottom:16px;padding:14px 16px;border-radius:16px;
-  background:linear-gradient(135deg,rgba(0,153,204,.10),rgba(99,102,241,.08));
-  border:1px solid rgba(0,153,204,.18); box-shadow:0 8px 30px rgba(0,0,0,.10);
-}
-.dash-style-copy{display:flex;flex-direction:column;gap:4px}
-.dash-style-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--soufflage);font-weight:800}
-.dash-style-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text)}
-.dash-style-sub{font-size:12px;color:var(--muted)}
-.dash-style-actions{display:flex;gap:8px;flex-wrap:wrap}
-.dash-style-btn{
-  padding:10px 14px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.02);
-  color:var(--muted2);font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;transition:all .18s ease;
-}
-.dash-style-btn:hover{transform:translateY(-1px);border-color:rgba(0,153,204,.4);color:var(--text)}
-.dash-style-btn.active{background:linear-gradient(135deg,var(--soufflage),#5b7cff);border-color:transparent;color:#fff;box-shadow:0 8px 24px rgba(0,153,204,.28)}
-body[data-dash-variant="modern"] #page-dashboard .machine-card,
-body[data-dash-variant="modern"] #page-dashboard .card,
-body[data-dash-variant="modern"] #page-dashboard .stat-box{box-shadow:0 10px 28px rgba(0,0,0,.12)}
-body[data-dash-variant="classic"] #page-dashboard .machine-card,
-body[data-dash-variant="classic"] #page-dashboard .card,
-body[data-dash-variant="classic"] #page-dashboard .stat-box{border-radius:10px;box-shadow:none}
-body[data-dash-variant="classic"] #page-dashboard .dashboard-style-menu{background:var(--card);box-shadow:none}
-body[data-dash-variant="elegant"] #page-dashboard .machine-card,
-body[data-dash-variant="elegant"] #page-dashboard .card,
-body[data-dash-variant="elegant"] #page-dashboard .stat-box{
-  border-color:rgba(255,255,255,.18);
-  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-  box-shadow:0 14px 34px rgba(0,0,0,.18);
-}
-body[data-dash-variant="elegant"] #page-dashboard .dashboard-style-menu{
-  background:linear-gradient(135deg,rgba(17,24,39,.86),rgba(30,41,59,.72));
-  border-color:rgba(255,255,255,.10);
-}
-body[data-dash-variant="elegant"] #page-dashboard .dash-style-title{color:#fff}
-body[data-dash-variant="elegant"] #page-dashboard .dash-style-sub{color:#b8c2d9}
-@media(max-width:900px){
-  .dashboard-style-menu{padding:12px}
-  .dash-style-title{font-size:16px}
-  .dash-style-actions{width:100%}
-  .dash-style-btn{flex:1;justify-content:center;text-align:center}
-}
+  const wallpaper = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
+  const exportDate = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport Eau Vitale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    @page{margin:0;size:A4;}
+    body{
+      font-family:'Barlow',Arial,sans-serif;
+      background:#0d1b2a;
+      color:#e8f4fd;
+      min-height:100vh;
+      position:relative;
+    }
 
-</style></head><body>
-    <h1>📋 Rapport de Production — Technicien Eau Vitale</h1>
-    <div class="sub">Exporté le ${new Date().toLocaleDateString('fr-FR')} par ${currentUConf?.name}</div>
-    <table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th></tr></thead>
-    <tbody>${rows.map(r=>`<tr>
-      <td>${r.date}</td><td>${r.machine}</td><td>${r.operatorName}</td><td>${r.shift}</td>
-      <td><b>${r.fields?.prod||0}</b></td>
-      <td class="${r.status}">${{ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status]||''}</td>
-      <td>${r.note||''}</td></tr>`).join('')}</tbody></table>
+    /* ── FOND WALLPAPER ── */
+    .bg-wrap{
+      position:fixed;inset:0;z-index:0;
+      background-image:url('${wallpaper}');
+      background-size:cover;background-position:center;
+    }
+    .bg-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(5,18,35,.88) 0%,rgba(0,40,70,.78) 50%,rgba(5,18,35,.92) 100%);
+    }
+
+    /* ── CONTENU ── */
+    .page{position:relative;z-index:1;padding:36px 40px;}
+
+    /* ── EN-TÊTE ── */
+    .header{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      border-bottom:2px solid rgba(0,180,255,.35);
+      padding-bottom:22px;margin-bottom:28px;
+    }
+    .header-left{}
+    .brand-eyebrow{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+      color:#00b4ff;font-weight:700;margin-bottom:6px;
+    }
+    .brand-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:28px;font-weight:900;letter-spacing:.02em;
+      color:#fff;line-height:1.1;
+    }
+    .brand-title span{color:#00b4ff;}
+    .brand-sub{font-size:12px;color:rgba(200,230,255,.6);margin-top:5px;}
+
+    .header-right{text-align:right;}
+    .report-badge{
+      background:linear-gradient(135deg,rgba(0,153,204,.25),rgba(0,80,160,.20));
+      border:1px solid rgba(0,180,255,.35);
+      border-radius:10px;padding:10px 16px;
+      display:inline-block;
+    }
+    .report-badge .label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00b4ff;font-weight:700;}
+    .report-badge .val{font-size:13px;font-weight:600;color:#e8f4fd;margin-top:2px;}
+
+    /* ── STATS ROW ── */
+    .stats-row{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+      margin-bottom:26px;
+    }
+    .stat-card{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(0,180,255,.18);
+      border-radius:12px;padding:14px 16px;
+      backdrop-filter:blur(10px);
+    }
+    .stat-card .s-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:rgba(180,220,255,.6);margin-bottom:6px;}
+    .stat-card .s-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;}
+    .stat-card .s-sub{font-size:10px;color:rgba(160,210,255,.5);margin-top:2px;}
+    .stat-ok .s-val{color:#22d68a;}
+    .stat-warn .s-val{color:#fbbf24;}
+    .stat-panne .s-val{color:#f87171;}
+
+    /* ── TABLEAU ── */
+    .section-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:13px;font-weight:800;letter-spacing:.14em;
+      text-transform:uppercase;color:#00b4ff;
+      margin-bottom:12px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .section-title::after{content:'';flex:1;height:1px;background:rgba(0,180,255,.2);}
+
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:rgba(0,153,204,.18);}
+    th{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+      color:rgba(160,220,255,.75);padding:10px 12px;text-align:left;
+      border-bottom:1px solid rgba(0,180,255,.25);
+    }
+    td{
+      padding:9px 12px;font-size:12px;color:#cce4f5;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    tr:nth-child(even) td{background:rgba(255,255,255,.025);}
+    tr:hover td{background:rgba(0,153,204,.08);}
+
+    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em;}
+    .badge-ok{background:rgba(34,214,138,.15);color:#22d68a;border:1px solid rgba(34,214,138,.3);}
+    .badge-warn{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
+    .badge-panne{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
+    .badge-arret{background:rgba(148,163,184,.15);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
+
+    .machine-pill{
+      display:inline-block;padding:2px 8px;border-radius:6px;
+      font-size:10px;font-weight:700;
+    }
+    .machine-Soufflage{background:rgba(0,167,214,.18);color:#00a7d6;}
+    .machine-Remplissage{background:rgba(23,185,123,.18);color:#17b97b;}
+    .machine-Etiquette{background:rgba(226,154,47,.18);color:#e29a2f;}
+    .machine-Emballage{background:rgba(242,124,87,.18);color:#f27c57;}
+    .machine-B19{background:rgba(124,108,255,.18);color:#7c6cff;}
+
+    /* ── PIED DE PAGE ── */
+    .footer{
+      margin-top:28px;padding-top:14px;
+      border-top:1px solid rgba(0,180,255,.18);
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:10px;color:rgba(160,200,240,.45);
+    }
+    .footer strong{color:rgba(0,180,255,.7);}
+
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .bg-wrap{position:fixed;}
+    }
+  </style></head><body>
+  <div class="bg-wrap"><div class="bg-overlay"></div></div>
+  <div class="page">
+
+    <!-- EN-TÊTE -->
+    <div class="header">
+      <div class="header-left">
+        <div class="brand-eyebrow">📄 Rapport de Production</div>
+        <div class="brand-title">Technicien <span>Eau Vitale</span></div>
+        <div class="brand-sub">AP Industrie — Système de gestion de ligne</div>
+      </div>
+      <div class="header-right">
+        <div class="report-badge">
+          <div class="label">Exporté le</div>
+          <div class="val">${exportDate}</div>
+        </div>
+        <div style="margin-top:8px" class="report-badge">
+          <div class="label">Par</div>
+          <div class="val">${currentUConf?.name||'—'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    ${(()=>{
+      const total = rows.length;
+      const ok    = rows.filter(r=>r.status==='ok').length;
+      const warn  = rows.filter(r=>r.status==='warn').length;
+      const panne = rows.filter(r=>r.status==='panne'||r.status==='arret').length;
+      const prod  = rows.reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
+      return `<div class="stats-row">
+        <div class="stat-card">
+          <div class="s-label">Total rapports</div>
+          <div class="s-val">${total}</div>
+          <div class="s-sub">Tous statuts</div>
+        </div>
+        <div class="stat-card stat-ok">
+          <div class="s-label">✅ OK</div>
+          <div class="s-val">${ok}</div>
+          <div class="s-sub">${total?Math.round(ok/total*100):0}% du total</div>
+        </div>
+        <div class="stat-card stat-warn">
+          <div class="s-label">⚠️ Lent / Alerte</div>
+          <div class="s-val">${warn}</div>
+          <div class="s-sub">${total?Math.round(warn/total*100):0}% du total</div>
+        </div>
+        <div class="stat-card stat-panne">
+          <div class="s-label">🔴 Panne / Arrêt</div>
+          <div class="s-val">${panne}</div>
+          <div class="s-sub">Production : ${prod.toLocaleString('fr-FR')}</div>
+        </div>
+      </div>`;
+    })()}
+
+    <!-- TABLEAU -->
+    <div class="section-title">Détail des rapports</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th>
+          <th>Production</th><th>Statut</th><th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r=>`<tr>
+          <td>${r.date||'—'}</td>
+          <td><span class="machine-pill machine-${(r.machine||'').replace(/\s/g,'')}">${r.machine||'—'}</span></td>
+          <td style="font-weight:600">${r.operatorName||'—'}</td>
+          <td>${r.shift||'—'}</td>
+          <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff">${(parseInt(r.fields?.prod)||0).toLocaleString('fr-FR')}</td>
+          <td>${{ok:'<span class="badge badge-ok">✅ OK</span>',warn:'<span class="badge badge-warn">⚠️ Lent</span>',panne:'<span class="badge badge-panne">🔴 Panne</span>',arret:'<span class="badge badge-arret">⏸️ Arrêt</span>'}[r.status]||'—'}</td>
+          <td style="color:rgba(200,230,255,.55);font-style:italic">${r.note||''}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+
+    <!-- PIED DE PAGE -->
+    <div class="footer">
+      <span>Technicien Eau Vitale — AP Industrie</span>
+      <span>Document généré automatiquement · <strong>${exportDate}</strong></span>
+      <span>${rows.length} rapport(s) au total</span>
+    </div>
+
+  </div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
   </body></html>`;
-  const w=window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),500);
+  const w=window.open('','_blank'); w.document.write(html); w.document.close();
 };
 // ══════════ PROFIL ══════════
 function renderProfile() {
