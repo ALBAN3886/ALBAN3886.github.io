@@ -1150,9 +1150,9 @@ tbody td,
     <!-- Bouton Continuer -->
     <button id="splashBtn" onclick="goToWelcome()" style="
       width:100%; padding:13px;
-      background:rgba(255,255,255,.25);
-      border:1.5px solid rgba(255,255,255,.6);
-      color:#fff;
+      background:rgba(255,215,0,.25);
+      border:1.5px solid rgba(255,215,0,.8);
+      color:#ffd700;
       border-radius:10px;
       font-family:'Barlow Condensed',sans-serif;
       font-size:16px; font-weight:700;
@@ -2557,6 +2557,8 @@ function hideLoginScreen() {
 }
 function showAppScreen() {
   const appEl = document.getElementById('app');
+  const splash = document.getElementById('splashScreen');
+  if (splash) splash.style.display = 'none';
   hideLoginScreen();
   if (appEl) {
     appEl.style.display = 'grid';
@@ -5844,70 +5846,17 @@ loadSavedTheme();
 })();
 
 // ══════════ SPLASH SCREEN ══════════
-const SPLASH_DURATION = 0;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
 
 function showSplash(target) {
   splashTarget = target || 'login';
-  const splash = document.getElementById('splashScreen');
-  if (!splash) return;
-
-  // Réinitialiser
-  const progress  = document.getElementById('splashProgress');
-  const countdown = document.getElementById('splashCountdown');
-  const btn       = document.getElementById('splashBtn');
-  if (progress)  { progress.style.width = '0%'; progress.style.transition = 'none'; }
-  if (countdown) countdown.textContent = `Patientez encore ${SPLASH_DURATION} secondes...`;
-  if (btn) {
-    btn.disabled = true;
-    btn.style.background   = 'rgba(255,215,0,.1)';
-    btn.style.borderColor  = 'rgba(255,215,0,.2)';
-    btn.style.color        = 'rgba(255,215,0,.35)';
-    btn.style.cursor       = 'not-allowed';
-    btn.style.boxShadow    = 'none';
+  // Splash désactivé : passer directement à la destination
+  if (splashTarget === 'app') {
+    showAppScreen();
+  } else {
+    showLoginScreen();
   }
-
-  // Afficher
-  splash.style.display   = 'flex';
-  splash.style.opacity   = '0';
-  splash.style.transition = 'opacity .5s ease';
-  setTimeout(() => { splash.style.opacity = '1'; }, 30);
-
-  // Masquer tout le reste
-  const login = document.getElementById('loginScreen');
-  const app   = document.getElementById('app');
-  if (login) login.style.display = 'none';
-  if (app)   app.classList.remove('show');
-
-  // Timer
-  if (splashInterval) clearInterval(splashInterval);
-  let elapsed = 0;
-  setTimeout(() => { if (progress) progress.style.transition = 'width .1s linear'; }, 60);
-
-  splashInterval = setInterval(() => {
-    elapsed++;
-    const pct = Math.min((elapsed / SPLASH_DURATION) * 100, 100);
-    if (progress) progress.style.width = pct + '%';
-
-    const remaining = SPLASH_DURATION - elapsed;
-    if (remaining > 0) {
-      if (countdown) countdown.textContent = `Patientez encore ${remaining} seconde${remaining > 1 ? 's' : ''}...`;
-    } else {
-      clearInterval(splashInterval);
-      if (countdown) countdown.textContent = '✓ Vous pouvez continuer';
-      if (btn) {
-        btn.disabled = false;
-        btn.style.background  = 'rgba(255,215,0,.25)';
-        btn.style.borderColor = 'rgba(255,215,0,.8)';
-        btn.style.color       = '#ffd700';
-        btn.style.cursor      = 'pointer';
-        btn.style.boxShadow   = '0 0 20px rgba(255,215,0,.25)';
-        // Faire pulser le bouton pour attirer l'attention
-        btn.style.animation   = 'splashPulse 1.5s ease-in-out infinite';
-      }
-    }
-  }, 1000);
 }
 
 window.closeSplash = function() {
