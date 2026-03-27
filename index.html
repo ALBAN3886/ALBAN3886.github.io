@@ -1109,58 +1109,12 @@ tbody td,
 </div>
 
 <!-- SPLASH MESSAGE -->
-<div id="splashScreen" style="
-  position:fixed; inset:0; z-index:9999;
-  background:#eff6fb;
-  display:flex; align-items:center; justify-content:center;
-  animation:fadeIn .4s ease;
-">
-  <!-- Diaporama 3 photos -->
-  <div id="splashSlides" style="position:absolute;inset:0">
-    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23001524'/><stop offset='1' stop-color='%230099cc'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g1)'/><circle cx='1200' cy='120' r='240' fill='rgba(255,255,255,.08)'/><circle cx='280' cy='760' r='260' fill='rgba(0,212,255,.10)'/><text x='110' y='760' fill='rgba(255,255,255,.14)' font-size='92' font-family='Arial'>Technicien Eau Vitale</text></svg>" alt="Fond tableau de bord 1" decoding="async" fetchpriority="high" style="opacity:1;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23040b18'/><stop offset='1' stop-color='%236366f1'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g2)'/><rect x='110' y='120' width='1380' height='660' rx='28' fill='rgba(255,255,255,.04)'/><circle cx='1380' cy='180' r='140' fill='rgba(255,255,255,.08)'/><text x='110' y='760' fill='rgba(255,255,255,.14)' font-size='92' font-family='Arial'>Performance • Qualité • Suivi</text></svg>" alt="Fond tableau de bord 2" decoding="async" style="opacity:0;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g3' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23111827'/><stop offset='1' stop-color='%2300b894'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g3)'/><circle cx='220' cy='180' r='180' fill='rgba(255,255,255,.06)'/><circle cx='1280' cy='700' r='260' fill='rgba(255,255,255,.05)'/><text x='110' y='760' fill='rgba(255,255,255,.15)' font-size='92' font-family='Arial'>Ouverture rapide • Interface fluide</text></svg>" alt="Fond tableau de bord 3" decoding="async" style="opacity:0;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
-  </div>
-
-  <!-- Overlay sombre pour lisibilité -->
-  <div style="position:absolute;inset:0;background:rgba(0,0,0,.35)"></div>
-
-  <!-- Contenu centré -->
-  <div style="
-    position:relative; z-index:1;
-    width:100%; max-width:400px;
-    padding:32px 28px;
-    text-align:center;
-  ">
-    <!-- Espace logo (remplacé par photos) -->
-    <div style="margin-bottom:40px"></div>
-
-    <!-- Barre de progression -->
-    <div style="width:100%;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;margin-bottom:12px">
-      <div id="splashProgress" style="
-        height:100%;
-        background:#fff;
-        border-radius:2px;
-        width:0%;
-        transition:width .1s linear;
-      "></div>
-    </div>
-    <div id="splashCountdown" style="display:none"></div>
-
-    <!-- Bouton Continuer -->
-    <button id="splashBtn" onclick="goToWelcome()" style="
-      width:100%; padding:13px;
-      background:rgba(255,215,0,.25);
-      border:1.5px solid rgba(255,215,0,.8);
-      color:#ffd700;
-      border-radius:10px;
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:16px; font-weight:700;
-      letter-spacing:.05em;
-      cursor:pointer;
-      transition:all .4s;
-    ">CONTINUER →</button>
-  </div>
+<!-- Splash supprimé — placeholder invisible pour compatibilité JS -->
+<div id="splashScreen" style="display:none">
+  <div id="splashSlides"></div>
+  <div id="splashProgress"></div>
+  <div id="splashCountdown"></div>
+  <button id="splashBtn" onclick="goToWelcome()"></button>
 </div>
 
 <!-- ÉCRAN BIENVENUE ALBAN ELOH -->
@@ -1206,7 +1160,7 @@ tbody td,
   </div>
 </div>
 
-<div id="loginScreen" class="show" style="display:none">
+<div id="loginScreen" class="show" style="display:flex">
   <!-- Diaporama arrière-plan (même slides que splash) -->
   <div id="loginSlides">
     <img id="loginSlide0" src="" style="opacity:1;transition:opacity 1s ease">
@@ -5877,22 +5831,12 @@ window.closeSplash = function() {
 
 window.goToWelcome = function() {
   if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
-  const splash = document.getElementById('splashScreen');
-  const welcome = document.getElementById('welcomeScreen');
-  if (!splash) return;
-  splash.style.transition = 'opacity .6s ease';
-  splash.style.opacity = '0';
-  setTimeout(() => {
-    splash.style.display = 'none';
-    if (welcome) {
-      welcome.style.display = 'flex';
-      welcome.style.opacity = '0';
-      welcome.style.transition = 'opacity .8s ease';
-      setTimeout(() => { welcome.style.opacity = '1'; }, 30);
-    } else {
-      closeSplash();
-    }
-  }, 600);
+  // Aller directement à la destination sans écran de bienvenue
+  if (splashTarget === 'app') {
+    showAppScreen();
+  } else {
+    showLoginScreen();
+  }
 };
 
 window.closeWelcome = function() {
