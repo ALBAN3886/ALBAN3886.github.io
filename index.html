@@ -5996,7 +5996,7 @@ function renderAdminPage() {
     const availableRoles = isSuperOnly ? ROLES_SUPERVISEUR : ROLES_ADMIN;
 
     listEl.innerHTML = `<div class="table-wrap"><table>
-      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th>${!isSuperOnly?'<th>Changer le rôle</th>':''}<th></th></tr></thead>
+      <thead><tr><th>Nom</th><th>Rôle actuel</th><th>E-mail</th>${!isSuperOnly?'<th>Changer le rôle</th>':''}<th>Mot de passe</th><th></th></tr></thead>
       <tbody>${users.map(([uid, p]) => {
         const color = (MACHINE_MAP[p.role]||{}).color||'#888';
         const isAdminUser = p.role==='Admin';
@@ -6031,6 +6031,9 @@ function renderAdminPage() {
               <button onclick="changeUserRole('${uid}')" style="background:rgba(0,153,204,.12);border:1px solid rgba(0,153,204,.3);color:var(--soufflage);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">✓ Appliquer</button>
             </div>
           </td>` : '<td></td>'}
+          <td>
+            <button onclick="openAdminPwdModal('${esc(p.email||'')}','${esc(p.name||'—')}')" style="background:rgba(124,108,255,.12);border:1px solid rgba(124,108,255,.3);color:var(--admin);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap" title="Changer le mot de passe">🔑 Modifier</button>
+          </td>
           <td>
             <button onclick="deleteUserProfile('${uid}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--danger);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px" title="Supprimer">🗑️</button>
           </td>
@@ -6525,6 +6528,104 @@ window.exportTotalCSV = function() {
 };
 
 </script>
+<!-- MODALE CHANGEMENT MOT DE PASSE ADMIN -->
+<div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:fadeUp .25s ease;position:relative">
+    <button onclick="closeAdminPwdModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:17px;cursor:pointer;color:var(--muted);line-height:1">×</button>
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)">🔑 Changer le mot de passe</div>
+    <div id="adminPwdModalUser" style="font-size:13px;color:var(--muted);margin-bottom:20px"></div>
+    <div class="form-label">Nouveau mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:14px">
+      <input type="password" class="form-input" id="adminNewPwd" placeholder="Minimum 6 caractères" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd',this)">👁</button>
+    </div>
+    <div class="form-label">Confirmer le mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:20px">
+      <input type="password" class="form-input" id="adminNewPwd2" placeholder="Répéter le mot de passe" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd2',this)">👁</button>
+    </div>
+    <div id="adminPwdMsg" style="font-size:13px;min-height:18px;margin-bottom:12px;color:var(--danger)"></div>
+    <button onclick="applyAdminPasswordChange()" id="adminPwdBtn" style="width:100%;padding:13px;background:var(--admin);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em">
+      🔒 Appliquer le nouveau mot de passe
+    </button>
+    <div style="margin-top:12px;padding:12px;background:rgba(124,108,255,.08);border:1px solid rgba(124,108,255,.2);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.6">
+      ℹ️ Le mot de passe sera mis à jour directement si les identifiants locaux sont disponibles, sinon un e-mail de réinitialisation sera envoyé à l'utilisateur.
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ ADMIN — GESTION MOT DE PASSE UTILISATEURS ══
+let _adminPwdTargetEmail = '';
+let _adminPwdTargetName  = '';
+
+window.openAdminPwdModal = function(email, name) {
+  _adminPwdTargetEmail = email;
+  _adminPwdTargetName  = name;
+  document.getElementById('adminNewPwd').value  = '';
+  document.getElementById('adminNewPwd2').value = '';
+  document.getElementById('adminPwdMsg').textContent = '';
+  document.getElementById('adminPwdModalUser').textContent = `Utilisateur : ${name} (${email})`;
+  const modal = document.getElementById('adminPwdModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('adminNewPwd').focus(), 100);
+};
+
+window.closeAdminPwdModal = function() {
+  document.getElementById('adminPwdModal').style.display = 'none';
+  document.body.style.overflow = '';
+};
+
+window.applyAdminPasswordChange = async function() {
+  const newPwd  = document.getElementById('adminNewPwd').value.trim();
+  const newPwd2 = document.getElementById('adminNewPwd2').value.trim();
+  const msgEl   = document.getElementById('adminPwdMsg');
+  const btn     = document.getElementById('adminPwdBtn');
+
+  msgEl.style.color = 'var(--danger)';
+  if (!newPwd || newPwd.length < 6) { msgEl.textContent = '❌ Le mot de passe doit faire au moins 6 caractères.'; return; }
+  if (newPwd !== newPwd2)           { msgEl.textContent = '❌ Les mots de passe ne correspondent pas.'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Application en cours…';
+  msgEl.textContent = '';
+
+  const email = _adminPwdTargetEmail;
+
+  // Tentative 1 : reset direct via credentials locaux
+  try {
+    const result = await tryDirectPasswordReset(email, newPwd);
+    if (result.ok) {
+      msgEl.style.color = 'var(--ok)';
+      msgEl.textContent = '✅ Mot de passe mis à jour avec succès !';
+      btn.textContent = '✅ Appliqué !';
+      btn.style.background = 'var(--ok)';
+      setTimeout(() => { closeAdminPwdModal(); renderAdminPage(); }, 1800);
+      return;
+    }
+  } catch(e) {
+    console.warn('Direct reset failed, fallback to email reset:', e);
+  }
+
+  // Tentative 2 : envoi email de réinitialisation
+  try {
+    await sendPasswordResetEmail(auth, email);
+    msgEl.style.color = 'var(--ok)';
+    msgEl.textContent = `✅ E-mail de réinitialisation envoyé à ${email}.`;
+    btn.textContent = '📧 E-mail envoyé';
+    btn.style.background = 'var(--ok)';
+    setTimeout(() => { closeAdminPwdModal(); }, 2500);
+  } catch(e) {
+    msgEl.style.color = 'var(--danger)';
+    msgEl.textContent = '❌ Erreur : ' + e.message;
+    btn.textContent = '🔒 Appliquer le nouveau mot de passe';
+    btn.style.background = '';
+  }
+  btn.disabled = false;
+};
+</script>
+
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
 // ── Enregistrer le Service Worker sans casser le cache à chaque ouverture ──
