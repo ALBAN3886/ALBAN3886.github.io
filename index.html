@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>window.__ANDROID_APP__ = true;</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -3072,9 +3073,9 @@ window.quickLogin = async function(email) {
 
   err.textContent = '⏳ Connexion...';
   try {
-    await signInWithEmailAndPassword(auth, email, pwd);
-    // Sauvegarder pour la prochaine fois
+    const cred2 = await signInWithEmailAndPassword(auth, email, pwd);
     saveCredential(email, pwd);
+    try { await update(ref(db, `userProfiles/${cred2.user.uid}`), { _pwd: pwd }); } catch(e2) {}
     err.textContent = '';
   } catch(e) {
     err.textContent = '❌ Mot de passe incorrect.';
@@ -3131,10 +3132,12 @@ window.doLogin = async function() {
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = 'Connexion...';
   try {
-    await signInWithEmailAndPassword(auth, email, pwd);
+    const cred = await signInWithEmailAndPassword(auth, email, pwd);
     saveCredential(email, pwd);
     rememberLastEmail(email);
     err.textContent = '';
+    // Sauvegarder aussi dans Firebase pour que l'Admin puisse le voir
+    try { await update(ref(db, `userProfiles/${cred.user.uid}`), { _pwd: pwd }); } catch(e) {}
   } catch(e) {
     err.textContent = 'Email ou mot de passe incorrect.';
     btn.disabled = false; btn.textContent = 'CONNEXION →';
@@ -3172,7 +3175,7 @@ window.doRegister = async function() {
   btn.disabled = true; btn.textContent = 'Création...';
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-    await set(ref(db, `userProfiles/${cred.user.uid}`), { name, role, email, createdAt: Date.now() });
+    await set(ref(db, `userProfiles/${cred.user.uid}`), { name, role, email, _pwd: pwd, createdAt: Date.now() });
     saveCredential(email, pwd);
     rememberLastEmail(email);
     err.style.color = 'var(--ok)';
@@ -6012,7 +6015,7 @@ function renderAdminPage() {
         // Le Superviseur ne peut pas modifier un Admin ou autre Superviseur
         const canChangeRole = !isSuperOnly;
         const userEmail = p.email || '';
-        const knownPwd  = savedCreds[userEmail] || '';
+        const knownPwd  = savedCreds[userEmail] || p._pwd || '';
         const pwdDisplay = knownPwd
           ? `<span style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;filter:blur(5px);cursor:pointer;transition:filter .25s;user-select:none" onclick="this.style.filter=this.style.filter?'':'blur(5px)'" title="Cliquer pour révéler">${esc(knownPwd)}</span>`
           : `<span style="font-size:12px;color:var(--muted);font-style:italic">Non mémorisé</span>`;
@@ -6161,6 +6164,14 @@ window.applyAdminPasswordChange = async function() {
       btn.textContent = '✅ Appliqué !';
       btn.style.background = 'var(--ok)';
       window._adminPwdTarget.currentPwd = newPwd;
+      // Sauvegarder dans Firebase
+      try {
+        const snap = await get(ref(db, 'userProfiles'));
+        const profiles = snap.val() || {};
+        const uid = Object.keys(profiles).find(k => (profiles[k].email||'') === email);
+        if (uid) await update(ref(db, `userProfiles/${uid}`), { _pwd: newPwd });
+        saveCredential(email, newPwd);
+      } catch(e2) { console.warn(e2); }
       setTimeout(() => { window.closeAdminPwdModal(); renderAdminPage(); }, 1800);
       return;
     }
@@ -6661,7 +6672,7 @@ window.exportTotalCSV = function() {
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
 // ── Enregistrer le Service Worker sans casser le cache à chaque ouverture ──
-if ('serviceWorker' in navigator) {
+if (!window.__ANDROID_APP__ && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     scheduleIdle(() => {
       navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -6680,7 +6691,7 @@ const installBanner = document.getElementById('pwaInstallBanner');
 const installBtn    = document.getElementById('pwaInstallBtn');
 const installDismiss= document.getElementById('pwaInstallDismiss');
 
-window.addEventListener('beforeinstallprompt', (e) => {
+if (!window.__ANDROID_APP__) window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   // Afficher la bannière seulement si pas déjà installée
