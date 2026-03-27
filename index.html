@@ -2491,6 +2491,7 @@ tbody td,
   </div>
 </div>
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, verifyPasswordResetCode, confirmPasswordReset }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2638,7 +2639,7 @@ async function updateForgotUI() {
     return;
   }
 
-  if (intro) intro.innerHTML = 'Saisissez le <strong>code secret</strong>, l\'e-mail du compte et le nouveau mot de passe pour réinitialiser directement.';
+  if (intro) intro.innerHTML = 'Saisissez le <strong>code secret</strong>, l\'e-mail du compte et le nouveau mot de passe pour <strong style="color:#0099cc">réinitialiser directement sur cet appareil</strong>. Si le compte n'a jamais été ouvert ici, l'application enverra automatiquement un lien de secours.';
   if (emailLabel) emailLabel.textContent = 'Adresse e-mail du compte';
   if (emailInput) {
     emailInput.disabled = false;
@@ -2733,6 +2734,7 @@ let listeners     = [];
 let currentPage   = 'dashboard';
 let chartJsPromise = null;
 window.__activeStatTab = 'global';
+window.__activeAdminSection = 'settings';
 
 function scheduleIdle(fn, timeout=700) {
   if (typeof window.requestIdleCallback === 'function') {
@@ -3253,12 +3255,25 @@ window.doForgot = async function() {
   btn.textContent = 'Réinitialisation...';
 
   try {
-    // Étape 1 : demander le lien OOB à Firebase (sans continueUrl → pas d'erreur de domaine)
+    const directReset = await tryDirectPasswordReset(email, pwd);
+    if (directReset.ok) {
+      err.style.color = 'var(--ok)';
+      err.textContent = '✅ Mot de passe réinitialisé sur cet appareil. Connexion automatique...';
+      const resetCodeEl = document.getElementById('resetCode');
+      if (resetCodeEl) resetCodeEl.value = '';
+      if (emailEl) emailEl.value = email;
+      document.getElementById('newPwd').value = '';
+      document.getElementById('newPwd2').value = '';
+      btn.textContent = 'CONNEXION...';
+      return;
+    }
+
     await sendPasswordResetEmail(auth, email);
-    // Étape 2 : notifier l'admin que l'e-mail a été envoyé à l'utilisateur
     rememberLastEmail(email);
     err.style.color = 'var(--ok)';
-    err.textContent = '✅ E-mail de réinitialisation envoyé à ' + email + '. L\'utilisateur doit cliquer sur le lien reçu pour définir son mot de passe.';
+    err.textContent = directReset.reason === 'no-local-credential'
+      ? '✅ Aucun ancien mot de passe n'a été trouvé sur cet appareil. Un lien de secours a été envoyé à ' + email + ' pour terminer la réinitialisation.'
+      : '✅ L'ancien mot de passe local n'est plus valide. Un lien de secours a été envoyé à ' + email + ' pour terminer la réinitialisation.';
   } catch (e) {
     if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-email') {
       err.textContent = '❌ Adresse e-mail introuvable dans Firebase.';
@@ -3269,6 +3284,28 @@ window.doForgot = async function() {
   btn.disabled = false;
   btn.textContent = 'RÉINITIALISER →';
 };
+
+async function tryDirectPasswordReset(email, newPassword) {
+  const knownPwd = getSavedCreds()[email];
+  if (!knownPwd) return { ok:false, reason:'no-local-credential' };
+
+  try {
+    const { updatePassword } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await signInWithEmailAndPassword(auth, email, knownPwd);
+    const signedUser = auth.currentUser;
+    if (!signedUser) throw new Error('Connexion introuvable après authentification.');
+    await updatePassword(signedUser, newPassword);
+    saveCredential(email, newPassword);
+    rememberLastEmail(email);
+    return { ok:true };
+  } catch (e) {
+    if (['auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials','auth/user-not-found'].includes(e.code)) {
+      removeSavedCredential(email);
+      return { ok:false, reason:'local-credential-invalid', error:e };
+    }
+    throw e;
+  }
+}
 
 window.logout = async function() {
   if (!currentUser) {
@@ -5357,6 +5394,155 @@ onValue(ref(db, 'system/emailSettings'), snap => {
   updateEmailToggles();
 });
 
+const ADMIN_SECTION_BY_ACCORDION = {
+  'acc-format': 'settings',
+  'acc-theme': 'settings',
+  'acc-wallpaper': 'settings',
+  'acc-datemode': 'reports',
+  'acc-emails': 'communication',
+  'acc-annonce': 'communication',
+  'acc-registration': 'users',
+  'acc-users': 'users',
+  'acc-clean': 'data',
+  'acc-reset': 'data',
+  'acc-firebase': 'data'
+};
+
+const ADMIN_SECTION_META = {
+  settings: { icon:'⚙️', label:'Paramètres', desc:'Format, thème et fond d'écran de l'application.' },
+  reports: { icon:'📝', label:'Rapports', desc:'Réglages d'affichage des rapports visibles par tout le monde.' },
+  communication: { icon:'📧', label:'Communication', desc:'Notifications email et annonces générales.' },
+  users: { icon:'👥', label:'Utilisateurs', desc:'Inscriptions et gestion des comptes enregistrés.' },
+  data: { icon:'🗄️', label:'Données', desc:'Nettoyage, réinitialisation et opérations sensibles.' }
+};
+
+function ensureAdminMenuStyles() {
+  if (document.getElementById('adminMenuInjectedStyles')) return;
+  const style = document.createElement('style');
+  style.id = 'adminMenuInjectedStyles';
+  style.textContent = `
+    .admin-shell{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start}
+    .admin-side{background:linear-gradient(180deg,#44566f 0%,#324154 100%);border-radius:18px;padding:18px 14px;border:1px solid rgba(255,255,255,.08);box-shadow:0 18px 34px rgba(17,24,39,.18);position:sticky;top:92px}
+    .admin-side-brand{padding:8px 10px 16px;border-bottom:1px solid rgba(255,255,255,.09);margin-bottom:10px}
+    .admin-side-kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-bottom:5px}
+    .admin-side-title{font-family:var(--font-display);font-size:22px;font-weight:900;color:#fff;line-height:1.05}
+    .admin-side-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:6px;line-height:1.5}
+    .admin-menu{display:flex;flex-direction:column;gap:8px}
+    .admin-menu-item{width:100%;display:flex;align-items:center;gap:12px;background:none;border:1px solid transparent;border-radius:14px;padding:12px 12px;color:rgba(255,255,255,.88);cursor:pointer;text-align:left;transition:all .2s ease}
+    .admin-menu-item:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);transform:translateX(2px)}
+    .admin-menu-item.active{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.18);box-shadow:inset 3px 0 0 #fff}
+    .admin-menu-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);font-size:17px;flex-shrink:0}
+    .admin-menu-copy{display:flex;flex-direction:column;min-width:0}
+    .admin-menu-label{font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;line-height:1.1}
+    .admin-menu-desc{font-size:11px;color:rgba(255,255,255,.68);margin-top:3px;line-height:1.35}
+    .admin-content{min-width:0;display:flex;flex-direction:column;gap:14px}
+    .admin-section-banner{background:linear-gradient(135deg,rgba(255,255,255,.82),rgba(238,246,251,.9));border:1px solid var(--border);border-radius:18px;padding:18px 20px;box-shadow:0 10px 26px rgba(0,0,0,.06)}
+    .admin-section-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+    .admin-section-title{font-family:var(--font-display);font-size:24px;font-weight:900;color:var(--text);margin-bottom:6px}
+    .admin-section-desc{font-size:13px;color:var(--muted);line-height:1.6}
+    .admin-accordion-list{display:flex;flex-direction:column;gap:10px}
+    @media (max-width: 1100px){.admin-shell{grid-template-columns:1fr}.admin-side{position:relative;top:auto;padding:14px}.admin-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}}
+    @media (max-width: 640px){.admin-menu{grid-template-columns:1fr}.admin-menu-item{padding:11px 10px}.admin-section-title{font-size:20px}}
+  `;
+  document.head.appendChild(style);
+}
+
+window.switchAdminSection = function(section) {
+  if (!ADMIN_SECTION_META[section]) section = 'settings';
+  window.__activeAdminSection = section;
+
+  document.querySelectorAll('#page-admin .admin-menu-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.section === section);
+  });
+
+  const meta = ADMIN_SECTION_META[section];
+  const banner = document.getElementById('adminSectionBanner');
+  if (banner && meta) {
+    banner.innerHTML = `
+      <div class="admin-section-eyebrow">Organisation de l'administration</div>
+      <div class="admin-section-title">${meta.icon} ${meta.label}</div>
+      <div class="admin-section-desc">${meta.desc}</div>
+    `;
+  }
+
+  document.querySelectorAll('#page-admin .admin-accordion').forEach(acc => {
+    const visible = (acc.dataset.adminSection || 'settings') === section;
+    acc.style.display = visible ? '' : 'none';
+    if (!visible) {
+      acc.querySelector('.admin-accordion-body')?.classList.remove('open');
+      acc.querySelector('.admin-accordion-header')?.classList.remove('open');
+    }
+  });
+
+  const firstVisible = document.querySelector(`#page-admin .admin-accordion[data-admin-section="${section}"]`);
+  if (firstVisible) {
+    const body = firstVisible.querySelector('.admin-accordion-body');
+    if (!body?.classList.contains('open')) {
+      const accordionId = firstVisible.id.replace('acc-', '');
+      setTimeout(() => window.toggleAccordion?.(accordionId), 30);
+    }
+  }
+};
+
+window.setupAdminPanel = function() {
+  const page = document.getElementById('page-admin');
+  if (!page) return;
+  const accordions = Array.from(page.querySelectorAll('.admin-accordion'));
+  if (!accordions.length) return;
+
+  ensureAdminMenuStyles();
+  accordions.forEach(acc => {
+    acc.dataset.adminSection = ADMIN_SECTION_BY_ACCORDION[acc.id] || 'settings';
+  });
+
+  if (page.dataset.adminMenuReady === '1') {
+    window.switchAdminSection(window.__activeAdminSection || 'settings');
+    return;
+  }
+
+  const shell = document.createElement('div');
+  shell.className = 'admin-shell';
+
+  const side = document.createElement('aside');
+  side.className = 'admin-side';
+  side.innerHTML = `
+    <div class="admin-side-brand">
+      <div class="admin-side-kicker">Menu administrateur</div>
+      <div class="admin-side-title">Panneau Admin</div>
+      <div class="admin-side-sub">Présentation classée comme dans votre modèle : paramètres, rapports, communication, utilisateurs et données.</div>
+    </div>
+    <div class="admin-menu">
+      ${Object.entries(ADMIN_SECTION_META).map(([key, meta]) => `
+        <button type="button" class="admin-menu-item" data-section="${key}" onclick="switchAdminSection('${key}')">
+          <span class="admin-menu-icon">${meta.icon}</span>
+          <span class="admin-menu-copy">
+            <span class="admin-menu-label">${meta.label}</span>
+            <span class="admin-menu-desc">${meta.desc}</span>
+          </span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  const content = document.createElement('div');
+  content.className = 'admin-content';
+  const banner = document.createElement('div');
+  banner.id = 'adminSectionBanner';
+  banner.className = 'admin-section-banner';
+  const accordionList = document.createElement('div');
+  accordionList.className = 'admin-accordion-list';
+  accordions.forEach(acc => accordionList.appendChild(acc));
+  content.appendChild(banner);
+  content.appendChild(accordionList);
+
+  shell.appendChild(side);
+  shell.appendChild(content);
+  page.appendChild(shell);
+  page.dataset.adminMenuReady = '1';
+
+  window.switchAdminSection(window.__activeAdminSection || 'settings');
+};
+
 // ══════════ ACCORDÉON ADMIN ══════════
 window.toggleAccordion = function(id) {
   const body   = document.getElementById('acc-body-'+id);
@@ -5713,6 +5899,7 @@ if (_bootSplash) _bootSplash.style.display = 'none';
 const _bootLogin = document.getElementById('loginScreen');
 if (_bootLogin) _bootLogin.style.display = 'flex';
 enhancePasswordFields();
+window.setupAdminPanel?.();
 if (getResetContext()) {
   switchMode('forgot');
 }
@@ -5786,6 +5973,7 @@ window.addEventListener('resize', initMobileUI);
 function renderAdminPage() {
   const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
   if (!isAdmin) { navigate('dashboard'); return; }
+  window.setupAdminPanel?.();
 
   const isSuperOnly = currentUConf?.role === 'Superviseur'; // Superviseur mais pas Admin
   const listEl = document.getElementById('adminUserList');
@@ -6419,6 +6607,8 @@ window.addEventListener('resize', applyDesktopScale);
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
+</script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
