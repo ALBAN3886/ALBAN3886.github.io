@@ -1557,7 +1557,8 @@ tbody td,
       <div class="page-header">
         <div><h2>📋 Historique</h2><p>Tous les rapports enregistrés</p></div>
         <div class="btn-row">
-          <button class="btn btn-ghost btn-sm" onclick="openDownloadModal()">📥 Télécharger</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Excel</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 PDF</button>
         </div>
       </div>
       <div class="filter-row">
@@ -4646,7 +4647,13 @@ window.clearAlerts = async function() {
 };
 
 // ══════════ EXPORT ══════════
-window.exportExcel = function() { openDownloadModal(); };
+window.exportExcel = function() {
+  const headers = ['Date','Machine','Opérateur','Poste','Production','Statut','Note'];
+  const rows = Object.values(allReports).map(r=>[r.date,r.machine,r.operatorName,r.shift,r.fields?.prod||0,r.status,`"${r.note||''}"`]);
+  const csv = [headers,...rows].map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`rapport_${today()}.csv`; a.click();
+};
 
 window.exportPDF = function() {
   const rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -5322,7 +5329,8 @@ async function incrementEmailCounter(machine, type) {
 
 // ── Envoyer un email lié à un rapport (avec comptage) ──
 async function sendEmailForReport(subject, message, machine, type) {
-  const sent = await sendEmailToAllUsers(subject, message);
+  const senderEmail = currentUser?.email || null;
+  const sent = await sendEmailToAllUsers(subject, message, senderEmail);
   if (sent > 0) {
     await incrementEmailCounter(machine, type || 'rapport');
   }
@@ -5330,11 +5338,11 @@ async function sendEmailForReport(subject, message, machine, type) {
 }
 
 // ── Envoyer un email à TOUS les utilisateurs ──
-async function sendEmailToAllUsers(subject, message) {
+async function sendEmailToAllUsers(subject, message, excludeEmail = null) {
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
-    const users = Object.values(profiles).filter(p => p.email);
+    const users = Object.values(profiles).filter(p => p.email && p.email !== excludeEmail);
     if (users.length === 0) {
       showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
       return 0;
@@ -6771,224 +6779,6 @@ window.renderTotalPage = function() {
   </table></div>`;
 };
 
-// ══════════ MODALE TÉLÉCHARGEMENT ══════════
-let dlSelectedMachine = '';
-
-window.openDownloadModal = function() {
-  // Pré-remplir avec les filtres actifs de la page historique
-  const fm = document.getElementById('filterMonth')?.value || '';
-  const fmach = document.getElementById('filterMachine')?.value || '';
-
-  // Dates
-  if (fm) {
-    const [y, m] = fm.split('-');
-    const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
-    document.getElementById('dlDateFrom').value = `${y}-${m}-01`;
-    document.getElementById('dlDateTo').value   = `${y}-${m}-${String(lastDay).padStart(2,'0')}`;
-  } else {
-    document.getElementById('dlDateFrom').value = '';
-    document.getElementById('dlDateTo').value   = '';
-  }
-
-  // Machine
-  dlSelectedMachine = fmach;
-  document.querySelectorAll('.dl-machine-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.m === fmach);
-  });
-
-  updateDlCount();
-  const modal = document.getElementById('downloadModal');
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-};
-
-window.closeDownloadModal = function() {
-  document.getElementById('downloadModal').style.display = 'none';
-  document.body.style.overflow = '';
-};
-
-window.selectDlMachine = function(btn, machine) {
-  dlSelectedMachine = machine;
-  document.querySelectorAll('.dl-machine-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateDlCount();
-};
-
-// Mettre à jour le compteur de rapports filtrés
-function updateDlCount() {
-  const from = document.getElementById('dlDateFrom')?.value || '';
-  const to   = document.getElementById('dlDateTo')?.value   || '';
-  const rows = getDlRows(from, to, dlSelectedMachine);
-  const el = document.getElementById('dlCount');
-  if (el) {
-    const machineLabel = dlSelectedMachine || 'toutes les machines';
-    el.textContent = rows.length > 0
-      ? `✅ ${rows.length} rapport(s) correspondant(s) — ${machineLabel}`
-      : `⚠️ Aucun rapport pour cette sélection`;
-    el.style.color = rows.length > 0 ? 'var(--ok)' : 'var(--warn)';
-  }
-}
-
-// Écouter les changements de dates
-document.addEventListener('DOMContentLoaded', () => {
-  ['dlDateFrom','dlDateTo'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', updateDlCount);
-  });
-});
-
-function getDlRows(from, to, machine) {
-  return Object.values(allReports).filter(r => {
-    const matchMachine = !machine || r.machine === machine;
-    const matchFrom    = !from || r.date >= from;
-    const matchTo      = !to   || r.date <= to;
-    return matchMachine && matchFrom && matchTo;
-  }).sort((a,b) => a.date > b.date ? 1 : -1);
-}
-
-window.triggerDownload = function(format) {
-  const from    = document.getElementById('dlDateFrom')?.value || '';
-  const to      = document.getElementById('dlDateTo')?.value   || '';
-  const machine = dlSelectedMachine;
-  const rows    = getDlRows(from, to, machine);
-
-  if (rows.length === 0) {
-    showToast('⚠️ Aucun rapport pour cette sélection', 'warn');
-    return;
-  }
-
-  const machineLabel = machine || 'toutes_machines';
-  const periodLabel  = from && to ? `${from}_${to}` : (from || to || today());
-
-  if (format === 'csv') {
-    const headers = ['Date','Machine','Opérateur','Poste','Format','Production','Statut','Note'];
-    const data    = rows.map(r => [
-      r.date, r.machine, r.operatorName||'—', r.shift||'—',
-      r.format||'—', r.fields?.prod||0, r.status, `"${r.note||''}"`
-    ]);
-    const csv  = [headers, ...data].map(r => r.join(';')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'});
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(blob);
-    a.download = `rapport_${machineLabel}_${periodLabel}.csv`;
-    a.click();
-    closeDownloadModal();
-    showToast(`✅ CSV téléchargé — ${rows.length} rapport(s)`, 'ok');
-  } else {
-    // PDF via impression
-    exportPDFFiltered(rows, machine, from, to);
-    closeDownloadModal();
-  }
-};
-
-window.exportPDFFiltered = function(rows, machine, from, to) {
-  const wallpaper  = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
-  const exportDate = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-  const periodText = (from && to) ? `Du ${from} au ${to}` : (from ? `À partir du ${from}` : (to ? `Jusqu\'au ${to}` : 'Toute la période'));
-  const machineText = machine || 'Toutes les machines';
-
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport ${machine||'Global'} — Eau Vitale</title>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    @page{margin:0;size:A4;}
-    body{font-family:'Barlow',Arial,sans-serif;background:#0d1b2a;color:#e8f4fd;min-height:100vh;position:relative;}
-    .bg-wrap{position:fixed;inset:0;z-index:0;background-image:url('${wallpaper}');background-size:cover;background-position:center;}
-    .bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,18,35,.88) 0%,rgba(0,40,70,.78) 50%,rgba(5,18,35,.92) 100%);}
-    .page{position:relative;z-index:1;padding:36px 40px;}
-    .header{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid rgba(0,180,255,.35);padding-bottom:22px;margin-bottom:28px;}
-    .brand-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#00b4ff;font-weight:700;margin-bottom:6px;}
-    .brand-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:.02em;color:#fff;line-height:1.1;}
-    .brand-title span{color:#00b4ff;}
-    .brand-sub{font-size:12px;color:rgba(200,230,255,.6);margin-top:5px;}
-    .header-right{text-align:right;}
-    .report-badge{background:linear-gradient(135deg,rgba(0,153,204,.25),rgba(0,80,160,.20));border:1px solid rgba(0,180,255,.35);border-radius:10px;padding:10px 16px;display:inline-block;margin-bottom:6px;}
-    .report-badge .label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00b4ff;font-weight:700;}
-    .report-badge .val{font-size:13px;font-weight:600;color:#e8f4fd;margin-top:2px;}
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px;}
-    .stat-card{background:rgba(255,255,255,.06);border:1px solid rgba(0,180,255,.18);border-radius:12px;padding:14px 16px;}
-    .stat-card .s-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:rgba(180,220,255,.6);margin-bottom:6px;}
-    .stat-card .s-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;}
-    .stat-card .s-sub{font-size:10px;color:rgba(160,210,255,.5);margin-top:2px;}
-    .stat-ok .s-val{color:#22d68a;} .stat-warn .s-val{color:#fbbf24;} .stat-panne .s-val{color:#f87171;}
-    .section-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#00b4ff;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-    .section-title::after{content:'';flex:1;height:1px;background:rgba(0,180,255,.2);}
-    table{width:100%;border-collapse:collapse;}
-    thead tr{background:rgba(0,153,204,.18);}
-    th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(160,220,255,.75);padding:10px 12px;text-align:left;border-bottom:1px solid rgba(0,180,255,.25);}
-    td{padding:9px 12px;font-size:12px;color:#cce4f5;border-bottom:1px solid rgba(255,255,255,.05);}
-    tr:nth-child(even) td{background:rgba(255,255,255,.025);}
-    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em;}
-    .badge-ok{background:rgba(34,214,138,.15);color:#22d68a;border:1px solid rgba(34,214,138,.3);}
-    .badge-warn{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
-    .badge-panne{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
-    .badge-arret{background:rgba(148,163,184,.15);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
-    .machine-pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
-    .machine-Soufflage{background:rgba(0,167,214,.18);color:#00a7d6;}
-    .machine-Remplissage{background:rgba(23,185,123,.18);color:#17b97b;}
-    .machine-Etiquette{background:rgba(226,154,47,.18);color:#e29a2f;}
-    .machine-Emballage{background:rgba(242,124,87,.18);color:#f27c57;}
-    .machine-B19{background:rgba(124,108,255,.18);color:#7c6cff;}
-    .footer{margin-top:28px;padding-top:14px;border-top:1px solid rgba(0,180,255,.18);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:rgba(160,200,240,.45);}
-    .footer strong{color:rgba(0,180,255,.7);}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.bg-wrap{position:fixed;}}
-  </style></head><body>
-  <div class="bg-wrap"><div class="bg-overlay"></div></div>
-  <div class="page">
-    <div class="header">
-      <div class="header-left">
-        <div class="brand-eyebrow">📄 Rapport de Production</div>
-        <div class="brand-title">Technicien <span>Eau Vitale</span></div>
-        <div class="brand-sub">AP Industrie — Système de gestion de ligne</div>
-        <div style="margin-top:8px;font-size:12px;color:rgba(0,180,255,.8);font-weight:600">
-          🏭 ${machineText} &nbsp;·&nbsp; 📅 ${periodText}
-        </div>
-      </div>
-      <div class="header-right">
-        <div class="report-badge"><div class="label">Exporté le</div><div class="val">${exportDate}</div></div><br>
-        <div class="report-badge"><div class="label">Machine</div><div class="val">${machineText}</div></div>
-      </div>
-    </div>
-    ${(()=>{
-      const total  = rows.length;
-      const ok     = rows.filter(r=>r.status==='ok').length;
-      const warn   = rows.filter(r=>r.status==='warn').length;
-      const panne  = rows.filter(r=>r.status==='panne'||r.status==='arret').length;
-      const prod   = rows.reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
-      return `<div class="stats-row">
-        <div class="stat-card"><div class="s-label">Total rapports</div><div class="s-val">${total}</div><div class="s-sub">Tous statuts</div></div>
-        <div class="stat-card stat-ok"><div class="s-label">✅ OK</div><div class="s-val">${ok}</div><div class="s-sub">${total?Math.round(ok/total*100):0}% du total</div></div>
-        <div class="stat-card stat-warn"><div class="s-label">⚠️ Lent / Alerte</div><div class="s-val">${warn}</div><div class="s-sub">${total?Math.round(warn/total*100):0}% du total</div></div>
-        <div class="stat-card stat-panne"><div class="s-label">🔴 Panne / Arrêt</div><div class="s-val">${panne}</div><div class="s-sub">Production : ${prod.toLocaleString('fr-FR')}</div></div>
-      </div>`;
-    })()}
-    <div class="section-title">Détail des rapports</div>
-    <table>
-      <thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Format</th><th>Production</th><th>Statut</th><th>Note</th></tr></thead>
-      <tbody>${rows.map(r=>`<tr>
-        <td>${r.date||'—'}</td>
-        <td><span class="machine-pill machine-${(r.machine||'').replace(/\s/g,'').replace('é','e').replace('è','e')}">${r.machine||'—'}</span></td>
-        <td style="font-weight:600">${r.operatorName||'—'}</td>
-        <td>${r.shift||'—'}</td>
-        <td style="color:rgba(160,200,255,.6);font-size:11px">${r.format?r.format+'L':'—'}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff">${(parseInt(r.fields?.prod)||0).toLocaleString('fr-FR')}</td>
-        <td>${{ok:'<span class="badge badge-ok">✅ OK</span>',warn:'<span class="badge badge-warn">⚠️ Lent</span>',panne:'<span class="badge badge-panne">🔴 Panne</span>',arret:'<span class="badge badge-arret">⏸️ Arrêt</span>'}[r.status]||'—'}</td>
-        <td style="color:rgba(200,230,255,.55);font-style:italic">${r.note||''}</td>
-      </tr>`).join('')}</tbody>
-    </table>
-    <div class="footer">
-      <span>Technicien Eau Vitale — AP Industrie</span>
-      <span>Document généré automatiquement · <strong>${exportDate}</strong></span>
-      <span>${rows.length} rapport(s) · ${machineText}</span>
-    </div>
-  </div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
-  </body></html>`;
-  const w = window.open('','_blank');
-  w.document.write(html);
-  w.document.close();
-};
-
 window.exportTotalCSV = function() {
   const fm = document.getElementById('totalFilterMonth')?.value||'';
   const reps = Object.values(allReports).filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&(!fm||r.date.startsWith(fm))).sort((a,b)=>a.date>b.date?1:-1);
@@ -7000,75 +6790,6 @@ window.exportTotalCSV = function() {
 };
 
 </script>
-<!-- ══ MODALE TÉLÉCHARGEMENT ══ -->
-<div id="downloadModal" onclick="if(event.target===this)closeDownloadModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.65);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:16px">
-  <div style="background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:28px 24px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
-    <button onclick="closeDownloadModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
-
-    <!-- Titre -->
-    <div style="font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text);margin-bottom:4px">📥 Télécharger un rapport</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Choisissez la machine, la période et le format</div>
-
-    <!-- Machine -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Machine</div>
-    <div id="dlMachineGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px">
-      <button class="dl-machine-btn active" data-m="" onclick="selectDlMachine(this,'')">🏭 Toutes</button>
-      <button class="dl-machine-btn" data-m="Soufflage" onclick="selectDlMachine(this,'Soufflage')" style="--mc:var(--soufflage)">🫧 Soufflage</button>
-      <button class="dl-machine-btn" data-m="Remplissage" onclick="selectDlMachine(this,'Remplissage')" style="--mc:var(--remplissage)">🧴 Remplissage</button>
-      <button class="dl-machine-btn" data-m="Étiquette" onclick="selectDlMachine(this,'Étiquette')" style="--mc:var(--etiquette)">🏷️ Étiquette</button>
-      <button class="dl-machine-btn" data-m="Emballage" onclick="selectDlMachine(this,'Emballage')" style="--mc:var(--emballage)">📦 Emballage</button>
-      <button class="dl-machine-btn" data-m="B19" onclick="selectDlMachine(this,'B19')" style="--mc:var(--b19)">⚙️ B19</button>
-    </div>
-
-    <!-- Période -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Période</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
-      <div>
-        <div style="font-size:11px;color:var(--muted2);margin-bottom:4px">Du</div>
-        <input type="date" id="dlDateFrom" class="form-input" style="margin-bottom:0">
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--muted2);margin-bottom:4px">Au</div>
-        <input type="date" id="dlDateTo" class="form-input" style="margin-bottom:0">
-      </div>
-    </div>
-    <div id="dlCount" style="font-size:12px;color:var(--muted);margin-bottom:18px;text-align:center;min-height:18px"></div>
-
-    <!-- Format -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px">Format</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px">
-      <button onclick="triggerDownload('csv')" style="padding:14px 10px;background:linear-gradient(135deg,rgba(34,214,138,.15),rgba(34,214,138,.08));border:1.5px solid rgba(34,214,138,.4);border-radius:12px;color:var(--text);cursor:pointer;font-family:var(--font-display);font-size:16px;font-weight:700;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:5px">
-        <span style="font-size:26px">📊</span>
-        <span>CSV / Excel</span>
-        <span style="font-size:10px;font-family:var(--font-body);color:var(--muted);font-weight:400">Ouvrir dans Excel</span>
-      </button>
-      <button onclick="triggerDownload('pdf')" style="padding:14px 10px;background:linear-gradient(135deg,rgba(0,153,204,.15),rgba(0,153,204,.08));border:1.5px solid rgba(0,153,204,.4);border-radius:12px;color:var(--text);cursor:pointer;font-family:var(--font-display);font-size:16px;font-weight:700;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:5px">
-        <span style="font-size:26px">📄</span>
-        <span>PDF / Impression</span>
-        <span style="font-size:10px;font-family:var(--font-body);color:var(--muted);font-weight:400">Rapport imprimable</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<style>
-.dl-machine-btn {
-  padding:9px 6px;
-  border:1.5px solid var(--border2);
-  border-radius:10px;
-  background:var(--surface);
-  color:var(--text);
-  cursor:pointer;
-  font-family:var(--font-display);
-  font-size:13px;
-  font-weight:700;
-  transition:all .17s;
-  line-height:1.2;
-}
-.dl-machine-btn:hover { border-color:var(--mc,var(--soufflage)); background:var(--bg2); }
-.dl-machine-btn.active { background:var(--mc,var(--soufflage)); border-color:var(--mc,var(--soufflage)); color:#fff; }
-</style>
-
 <!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
 <div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
