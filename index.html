@@ -1109,12 +1109,58 @@ tbody td,
 </div>
 
 <!-- SPLASH MESSAGE -->
-<!-- Splash supprimé — placeholder invisible pour compatibilité JS -->
-<div id="splashScreen" style="display:none">
-  <div id="splashSlides"></div>
-  <div id="splashProgress"></div>
-  <div id="splashCountdown"></div>
-  <button id="splashBtn" onclick="goToWelcome()"></button>
+<div id="splashScreen" style="
+  position:fixed; inset:0; z-index:9999;
+  background:#eff6fb;
+  display:flex; align-items:center; justify-content:center;
+  animation:fadeIn .4s ease;
+">
+  <!-- Diaporama 3 photos -->
+  <div id="splashSlides" style="position:absolute;inset:0">
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g1' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23001524'/><stop offset='1' stop-color='%230099cc'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g1)'/><circle cx='1200' cy='120' r='240' fill='rgba(255,255,255,.08)'/><circle cx='280' cy='760' r='260' fill='rgba(0,212,255,.10)'/><text x='110' y='760' fill='rgba(255,255,255,.14)' font-size='92' font-family='Arial'>Technicien Eau Vitale</text></svg>" alt="Fond tableau de bord 1" decoding="async" fetchpriority="high" style="opacity:1;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23040b18'/><stop offset='1' stop-color='%236366f1'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g2)'/><rect x='110' y='120' width='1380' height='660' rx='28' fill='rgba(255,255,255,.04)'/><circle cx='1380' cy='180' r='140' fill='rgba(255,255,255,.08)'/><text x='110' y='760' fill='rgba(255,255,255,.14)' font-size='92' font-family='Arial'>Performance • Qualité • Suivi</text></svg>" alt="Fond tableau de bord 2" decoding="async" style="opacity:0;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'><defs><linearGradient id='g3' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23111827'/><stop offset='1' stop-color='%2300b894'/></linearGradient></defs><rect width='1600' height='900' fill='url(%23g3)'/><circle cx='220' cy='180' r='180' fill='rgba(255,255,255,.06)'/><circle cx='1280' cy='700' r='260' fill='rgba(255,255,255,.05)'/><text x='110' y='760' fill='rgba(255,255,255,.15)' font-size='92' font-family='Arial'>Ouverture rapide • Interface fluide</text></svg>" alt="Fond tableau de bord 3" decoding="async" style="opacity:0;transition:opacity 1s ease;position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+  </div>
+
+  <!-- Overlay sombre pour lisibilité -->
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,.35)"></div>
+
+  <!-- Contenu centré -->
+  <div style="
+    position:relative; z-index:1;
+    width:100%; max-width:400px;
+    padding:32px 28px;
+    text-align:center;
+  ">
+    <!-- Espace logo (remplacé par photos) -->
+    <div style="margin-bottom:40px"></div>
+
+    <!-- Barre de progression -->
+    <div style="width:100%;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;margin-bottom:12px">
+      <div id="splashProgress" style="
+        height:100%;
+        background:#fff;
+        border-radius:2px;
+        width:0%;
+        transition:width .1s linear;
+      "></div>
+    </div>
+    <div id="splashCountdown" style="display:none"></div>
+
+    <!-- Bouton Continuer -->
+    <button id="splashBtn" onclick="goToWelcome()" style="
+      width:100%; padding:13px;
+      background:rgba(255,255,255,.25);
+      border:1.5px solid rgba(255,255,255,.6);
+      color:#fff;
+      border-radius:10px;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:16px; font-weight:700;
+      letter-spacing:.05em;
+      cursor:pointer;
+      transition:all .4s;
+    ">CONTINUER →</button>
+  </div>
 </div>
 
 <!-- ÉCRAN BIENVENUE ALBAN ELOH -->
@@ -1160,7 +1206,7 @@ tbody td,
   </div>
 </div>
 
-<div id="loginScreen" class="show" style="display:flex">
+<div id="loginScreen" class="show" style="display:none">
   <!-- Diaporama arrière-plan (même slides que splash) -->
   <div id="loginSlides">
     <img id="loginSlide0" src="" style="opacity:1;transition:opacity 1s ease">
@@ -1175,37 +1221,14 @@ tbody td,
 
     <!-- LISTE RAPIDE DES UTILISATEURS -->
     <div id="quickUserList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:380px;overflow-y:auto">
-      <div style="text-align:center;color:#7a8599;padding:16px;font-size:13px">
-        ⏳ Chargement des utilisateurs...<br>
-        <span style="font-size:11px;color:#aab0bb">Si cela prend trop longtemps :<br>
-        <span onclick="(function(){
-          var l=document.getElementById('quickUserList');
-          var a=document.getElementById('modeAdvanced');
-          if(l){l.style.display='none';}
-          if(a){a.style.display='block';}
-          var s=document.querySelector('.login-logo .sub');
-          if(s){s.textContent='Connexion administrateur';}
-        })()" style="color:#0099cc;cursor:pointer;text-decoration:underline;font-size:12px;font-weight:700">👉 Connexion administrateur</span></span>
-      </div>
+      <div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">⏳ Chargement des utilisateurs...</div>
     </div>
 
     <div class="login-err" id="loginErr" style="color:#dc2626;font-size:12px;text-align:center;min-height:16px"></div>
 
     <!-- Lien admin discret -->
     <div style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px">
-      <span onclick="(function(){
-        var l=document.getElementById('quickUserList');
-        var a=document.getElementById('modeAdvanced');
-        var r=document.getElementById('modeRegister');
-        var f=document.getElementById('modeForgot');
-        if(l){l.style.display='none';}
-        if(r){r.style.display='none';}
-        if(f){f.style.display='none';}
-        if(a){a.style.display='block';}
-        var s=document.querySelector('.login-logo .sub');
-        if(s){s.textContent='Connexion administrateur';}
-        setTimeout(function(){var e=document.getElementById('emailInput');if(e)e.focus();},100);
-      })()" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
+      <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
     </div>
     <div style="text-align:center;margin-top:8px">
       <span id="registerAccessLink" onclick="switchMode('register')" style="display:none;font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">✚ Créer un nouveau compte</span>
@@ -1392,7 +1415,7 @@ tbody td,
           <input type="date" class="form-input" id="dashDatePicker" style="padding:7px 12px;font-size:13px;width:auto" onchange="this.dataset.manuallySet='1';renderDashboard()">
           <button class="btn btn-ghost btn-sm" onclick="goToToday()" style="background:rgba(0,184,230,.15);border:1px solid rgba(0,184,230,.4);color:var(--soufflage);font-weight:700">📅 Aujourd'hui</button>
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Export Excel</button>
-          <button class="btn btn-ghost btn-sm" onclick="openPDFModal()" style="background:rgba(0,180,255,.12);border:1px solid rgba(0,180,255,.35);color:#00b4ff;font-weight:700">📄 Export PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
         </div>
       </div>
 
@@ -1535,7 +1558,7 @@ tbody td,
         <div><h2>📋 Historique</h2><p>Tous les rapports enregistrés</p></div>
         <div class="btn-row">
           <button class="btn btn-ghost btn-sm" onclick="exportExcel()">📥 Excel</button>
-          <button class="btn btn-ghost btn-sm" onclick="openPDFModal()" style="background:rgba(0,180,255,.12);border:1px solid rgba(0,180,255,.35);color:#00b4ff;font-weight:700">📄 PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 PDF</button>
         </div>
       </div>
       <div class="filter-row">
@@ -2460,7 +2483,7 @@ tbody td,
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, verifyPasswordResetCode, confirmPasswordReset }
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, verifyPasswordResetCode, confirmPasswordReset }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -2480,11 +2503,9 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
-// Garder la session — avec fallback pour WebView APK
-setPersistence(auth, browserLocalPersistence).catch(() => {
-  setPersistence(auth, browserSessionPersistence).catch(e => {
-    console.warn('Auth persistence fallback failed', e);
-  });
+// Garder la session sur cet appareil même après fermeture / réouverture
+setPersistence(auth, browserLocalPersistence).catch(err => {
+  console.warn('Auth persistence error', err);
 });
 
 const USER_CREDS_KEY = 'userCreds';
@@ -2536,8 +2557,6 @@ function hideLoginScreen() {
 }
 function showAppScreen() {
   const appEl = document.getElementById('app');
-  const splash = document.getElementById('splashScreen');
-  if (splash) splash.style.display = 'none';
   hideLoginScreen();
   if (appEl) {
     appEl.style.display = 'grid';
@@ -2907,21 +2926,8 @@ function getLast14Days() {
 
 // ══════════ BUILD LOGIN ══════════
 function loadDynamicUsers() {
-  // Timeout de sécurité : si Firebase ne répond pas en 6s, afficher quand même
-  const timeoutId = setTimeout(() => {
-    const wrap = document.getElementById('quickUserList');
-    if (wrap && wrap.innerHTML.includes('Chargement')) {
-      wrap.innerHTML = `
-        <div style="text-align:center;padding:16px 10px">
-          <div style="font-size:13px;color:#e35d6a;margin-bottom:10px">⚠️ Connexion lente ou hors ligne</div>
-          <div style="font-size:12px;color:#7a8599;margin-bottom:14px">Utilisez la connexion administrateur ci-dessous</div>
-        </div>`;
-    }
-  }, 6000);
-
   const uRef = ref(db, 'userProfiles');
   onValue(uRef, snap => {
-    clearTimeout(timeoutId);
     const profiles = snap.val() || {};
     const fromDB = Object.values(profiles).map(p => ({
       email: p.email, name: p.name, role: p.role,
@@ -2936,10 +2942,6 @@ function loadDynamicUsers() {
     buildLogin();
     // Si connecté, re-render chat pour afficher nouvelles photos
     if (currentUser) renderChat();
-  }, err => {
-    clearTimeout(timeoutId);
-    const wrap = document.getElementById('quickUserList');
-    if (wrap) wrap.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:#e35d6a">⚠️ Erreur de connexion Firebase.<br>Vérifiez votre connexion internet.</div>`;
   });
 }
 
@@ -3086,10 +3088,10 @@ window.switchMode = function(mode) {
   const forg = document.getElementById('modeForgot');
   const list = document.getElementById('quickUserList');
   const sub  = document.querySelector('.login-logo .sub');
-  if (adv)  adv.style.display  = mode === 'advanced'  ? 'block' : 'none';
-  if (reg)  reg.style.display  = mode === 'register'  ? 'block' : 'none';
-  if (forg) forg.style.display = mode === 'forgot'    ? 'block' : 'none';
-  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? 'flex' : 'none';
+  if (adv)  adv.style.display  = mode === 'advanced'  ? '' : 'none';
+  if (reg)  reg.style.display  = mode === 'register'  ? '' : 'none';
+  if (forg) forg.style.display = mode === 'forgot'    ? '' : 'none';
+  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? '' : 'none';
   if (sub)  sub.textContent    = (mode === 'quick' || mode === 'login')
     ? 'Choisissez votre nom pour continuer'
     : mode === 'advanced' ? 'Connexion administrateur'
@@ -3114,47 +3116,20 @@ window.doLogin = async function() {
   const email = document.getElementById('emailInput').value.trim();
   const pwd   = document.getElementById('pwdInput').value;
   const err   = document.getElementById('loginErr');
-  err.style.color = 'var(--danger)';
   if (!email) { err.textContent = 'Entrez votre adresse e-mail.'; return; }
   if (!pwd)   { err.textContent = 'Entrez votre mot de passe.'; return; }
   const btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = '⏳ Connexion...';
-  err.textContent = '';
-
-  // Timeout de sécurité pour APK WebView
-  let timedOut = false;
-  const timeoutId = setTimeout(() => {
-    timedOut = true;
-    btn.disabled = false; btn.textContent = 'CONNEXION →';
-    err.textContent = '⏱️ Délai dépassé. Vérifiez votre connexion internet et réessayez.';
-  }, 15000);
-
+  btn.disabled = true; btn.textContent = 'Connexion...';
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pwd);
-    if (timedOut) return;
-    clearTimeout(timeoutId);
     saveCredential(email, pwd);
     rememberLastEmail(email);
     err.textContent = '';
-    // Sauvegarder dans Firebase en arrière-plan
-    update(ref(db, `userProfiles/${cred.user.uid}`), { _pwd: pwd }).catch(()=>{});
+    // Sauvegarder aussi dans Firebase pour que l'Admin puisse le voir
+    try { await update(ref(db, `userProfiles/${cred.user.uid}`), { _pwd: pwd }); } catch(e) {}
   } catch(e) {
-    if (timedOut) return;
-    clearTimeout(timeoutId);
+    err.textContent = 'Email ou mot de passe incorrect.';
     btn.disabled = false; btn.textContent = 'CONNEXION →';
-    const code = e.code || '';
-    if (code.includes('wrong-password') || code.includes('invalid-credential') || code.includes('invalid-login')) {
-      err.textContent = '❌ Mot de passe incorrect.';
-    } else if (code.includes('user-not-found')) {
-      err.textContent = '❌ Aucun compte avec cet email.';
-    } else if (code.includes('network') || code.includes('timeout') || code.includes('unavailable')) {
-      err.textContent = '🌐 Erreur réseau. Vérifiez votre connexion internet.';
-    } else if (code.includes('too-many-requests')) {
-      err.textContent = '⛔ Trop de tentatives. Attendez quelques minutes.';
-    } else {
-      err.textContent = '❌ Erreur : ' + (e.message || code || 'Connexion impossible.');
-    }
-    console.error('Login error:', e.code, e.message);
   }
 };
 
@@ -4680,89 +4655,163 @@ window.exportExcel = function() {
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`rapport_${today()}.csv`; a.click();
 };
 
-window.openPDFModal = function() {
-  document.getElementById('pdfExportModal').style.display = 'flex';
-};
-window.closePDFModal = function() {
-  document.getElementById('pdfExportModal').style.display = 'none';
-};
-
 window.exportPDF = function() {
-  const machine  = document.getElementById('pdfMachineSelect').value;
-  const moisVal  = document.getElementById('pdfMonthSelect').value;
-  const action   = document.getElementById('pdfActionSelect').value; // 'download' | 'print'
-
-  let rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
-  if (machine)  rows = rows.filter(r => r.machine === machine);
-  if (moisVal)  rows = rows.filter(r => (r.date||'').startsWith(moisVal));
-
-  const machineLabel = machine || 'Toutes les machines';
-  const wallpaper    = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
-  const exportDate   = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-
-  const MACHINE_COLORS = {
-    'Soufflage':   '#00a7d6',
-    'Remplissage': '#17b97b',
-    'Étiquette':   '#e29a2f',
-    'Emballage':   '#f27c57',
-    'B19':         '#7c6cff',
-  };
-  const mc = MACHINE_COLORS[machine] || '#00b4ff';
-
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport ${machineLabel} — Eau Vitale</title>
+  const rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const wallpaper = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
+  const exportDate = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport Eau Vitale</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     @page{margin:0;size:A4;}
-    body{font-family:'Barlow',Arial,sans-serif;background:#0d1b2a;color:#e8f4fd;min-height:100vh;position:relative;}
-    .bg-wrap{position:fixed;inset:0;z-index:0;background-image:url('${wallpaper}');background-size:cover;background-position:center;}
-    .bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,18,35,.90) 0%,rgba(0,40,70,.80) 50%,rgba(5,18,35,.93) 100%);}
+    body{
+      font-family:'Barlow',Arial,sans-serif;
+      background:#0d1b2a;
+      color:#e8f4fd;
+      min-height:100vh;
+      position:relative;
+    }
+
+    /* ── FOND WALLPAPER ── */
+    .bg-wrap{
+      position:fixed;inset:0;z-index:0;
+      background-image:url('${wallpaper}');
+      background-size:cover;background-position:center;
+    }
+    .bg-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(5,18,35,.88) 0%,rgba(0,40,70,.78) 50%,rgba(5,18,35,.92) 100%);
+    }
+
+    /* ── CONTENU ── */
     .page{position:relative;z-index:1;padding:36px 40px;}
-    .header{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid ${mc}55;padding-bottom:22px;margin-bottom:28px;}
-    .brand-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:${mc};font-weight:700;margin-bottom:6px;}
-    .brand-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1.1;}
-    .brand-title span{color:${mc};}
+
+    /* ── EN-TÊTE ── */
+    .header{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      border-bottom:2px solid rgba(0,180,255,.35);
+      padding-bottom:22px;margin-bottom:28px;
+    }
+    .header-left{}
+    .brand-eyebrow{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+      color:#00b4ff;font-weight:700;margin-bottom:6px;
+    }
+    .brand-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:28px;font-weight:900;letter-spacing:.02em;
+      color:#fff;line-height:1.1;
+    }
+    .brand-title span{color:#00b4ff;}
     .brand-sub{font-size:12px;color:rgba(200,230,255,.6);margin-top:5px;}
-    .report-badge{background:rgba(255,255,255,.06);border:1px solid ${mc}44;border-radius:10px;padding:10px 16px;display:inline-block;margin-bottom:6px;}
-    .report-badge .label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:${mc};font-weight:700;}
+
+    .header-right{text-align:right;}
+    .report-badge{
+      background:linear-gradient(135deg,rgba(0,153,204,.25),rgba(0,80,160,.20));
+      border:1px solid rgba(0,180,255,.35);
+      border-radius:10px;padding:10px 16px;
+      display:inline-block;
+    }
+    .report-badge .label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00b4ff;font-weight:700;}
     .report-badge .val{font-size:13px;font-weight:600;color:#e8f4fd;margin-top:2px;}
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px;}
-    .stat-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:14px 16px;}
+
+    /* ── STATS ROW ── */
+    .stats-row{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+      margin-bottom:26px;
+    }
+    .stat-card{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(0,180,255,.18);
+      border-radius:12px;padding:14px 16px;
+      backdrop-filter:blur(10px);
+    }
     .stat-card .s-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:rgba(180,220,255,.6);margin-bottom:6px;}
     .stat-card .s-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;}
     .stat-card .s-sub{font-size:10px;color:rgba(160,210,255,.5);margin-top:2px;}
-    .stat-ok .s-val{color:#22d68a;} .stat-warn .s-val{color:#fbbf24;} .stat-panne .s-val{color:#f87171;}
-    .section-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:${mc};margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-    .section-title::after{content:'';flex:1;height:1px;background:${mc}33;}
+    .stat-ok .s-val{color:#22d68a;}
+    .stat-warn .s-val{color:#fbbf24;}
+    .stat-panne .s-val{color:#f87171;}
+
+    /* ── TABLEAU ── */
+    .section-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:13px;font-weight:800;letter-spacing:.14em;
+      text-transform:uppercase;color:#00b4ff;
+      margin-bottom:12px;
+      display:flex;align-items:center;gap:8px;
+    }
+    .section-title::after{content:'';flex:1;height:1px;background:rgba(0,180,255,.2);}
+
     table{width:100%;border-collapse:collapse;}
-    thead tr{background:rgba(255,255,255,.05);}
-    th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(160,220,255,.75);padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.10);}
-    td{padding:9px 12px;font-size:12px;color:#cce4f5;border-bottom:1px solid rgba(255,255,255,.04);}
+    thead tr{background:rgba(0,153,204,.18);}
+    th{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+      color:rgba(160,220,255,.75);padding:10px 12px;text-align:left;
+      border-bottom:1px solid rgba(0,180,255,.25);
+    }
+    td{
+      padding:9px 12px;font-size:12px;color:#cce4f5;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
     tr:nth-child(even) td{background:rgba(255,255,255,.025);}
-    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+    tr:hover td{background:rgba(0,153,204,.08);}
+
+    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em;}
     .badge-ok{background:rgba(34,214,138,.15);color:#22d68a;border:1px solid rgba(34,214,138,.3);}
     .badge-warn{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
     .badge-panne{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
     .badge-arret{background:rgba(148,163,184,.15);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
-    .machine-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;background:${mc}22;color:${mc};border:1px solid ${mc}44;}
-    .footer{margin-top:28px;padding-top:14px;border-top:1px solid rgba(255,255,255,.10);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:rgba(160,200,240,.45);}
-    .footer strong{color:${mc}99;}
-    .empty-state{text-align:center;padding:60px 20px;color:rgba(160,200,255,.4);font-size:14px;}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.bg-wrap{position:fixed;}}
+
+    .machine-pill{
+      display:inline-block;padding:2px 8px;border-radius:6px;
+      font-size:10px;font-weight:700;
+    }
+    .machine-Soufflage{background:rgba(0,167,214,.18);color:#00a7d6;}
+    .machine-Remplissage{background:rgba(23,185,123,.18);color:#17b97b;}
+    .machine-Etiquette{background:rgba(226,154,47,.18);color:#e29a2f;}
+    .machine-Emballage{background:rgba(242,124,87,.18);color:#f27c57;}
+    .machine-B19{background:rgba(124,108,255,.18);color:#7c6cff;}
+
+    /* ── PIED DE PAGE ── */
+    .footer{
+      margin-top:28px;padding-top:14px;
+      border-top:1px solid rgba(0,180,255,.18);
+      display:flex;justify-content:space-between;align-items:center;
+      font-size:10px;color:rgba(160,200,240,.45);
+    }
+    .footer strong{color:rgba(0,180,255,.7);}
+
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .bg-wrap{position:fixed;}
+    }
   </style></head><body>
   <div class="bg-wrap"><div class="bg-overlay"></div></div>
   <div class="page">
+
+    <!-- EN-TÊTE -->
     <div class="header">
-      <div>
+      <div class="header-left">
         <div class="brand-eyebrow">📄 Rapport de Production</div>
-        <div class="brand-title">Machine : <span>${machineLabel}</span></div>
-        <div class="brand-sub">AP Industrie — Technicien Eau Vitale${moisVal ? ' · ' + new Date(moisVal+'-01').toLocaleDateString('fr-FR',{month:'long',year:'numeric'}) : ''}</div>
+        <div class="brand-title">Technicien <span>Eau Vitale</span></div>
+        <div class="brand-sub">AP Industrie — Système de gestion de ligne</div>
       </div>
-      <div style="text-align:right">
-        <div class="report-badge"><div class="label">Exporté le</div><div class="val">${exportDate}</div></div><br>
-        <div class="report-badge"><div class="label">Par</div><div class="val">${currentUConf?.name||'—'}</div></div>
+      <div class="header-right">
+        <div class="report-badge">
+          <div class="label">Exporté le</div>
+          <div class="val">${exportDate}</div>
+        </div>
+        <div style="margin-top:8px" class="report-badge">
+          <div class="label">Par</div>
+          <div class="val">${currentUConf?.name||'—'}</div>
+        </div>
       </div>
     </div>
+
+    <!-- STATS -->
     ${(()=>{
       const total = rows.length;
       const ok    = rows.filter(r=>r.status==='ok').length;
@@ -4770,56 +4819,62 @@ window.exportPDF = function() {
       const panne = rows.filter(r=>r.status==='panne'||r.status==='arret').length;
       const prod  = rows.reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
       return `<div class="stats-row">
-        <div class="stat-card"><div class="s-label">Total rapports</div><div class="s-val">${total}</div><div class="s-sub">Tous statuts</div></div>
-        <div class="stat-card stat-ok"><div class="s-label">✅ OK</div><div class="s-val">${ok}</div><div class="s-sub">${total?Math.round(ok/total*100):0}%</div></div>
-        <div class="stat-card stat-warn"><div class="s-label">⚠️ Alerte</div><div class="s-val">${warn}</div><div class="s-sub">${total?Math.round(warn/total*100):0}%</div></div>
-        <div class="stat-card stat-panne"><div class="s-label">🔴 Panne/Arrêt</div><div class="s-val">${panne}</div><div class="s-sub">Prod : ${prod.toLocaleString('fr-FR')}</div></div>
+        <div class="stat-card">
+          <div class="s-label">Total rapports</div>
+          <div class="s-val">${total}</div>
+          <div class="s-sub">Tous statuts</div>
+        </div>
+        <div class="stat-card stat-ok">
+          <div class="s-label">✅ OK</div>
+          <div class="s-val">${ok}</div>
+          <div class="s-sub">${total?Math.round(ok/total*100):0}% du total</div>
+        </div>
+        <div class="stat-card stat-warn">
+          <div class="s-label">⚠️ Lent / Alerte</div>
+          <div class="s-val">${warn}</div>
+          <div class="s-sub">${total?Math.round(warn/total*100):0}% du total</div>
+        </div>
+        <div class="stat-card stat-panne">
+          <div class="s-label">🔴 Panne / Arrêt</div>
+          <div class="s-val">${panne}</div>
+          <div class="s-sub">Production : ${prod.toLocaleString('fr-FR')}</div>
+        </div>
       </div>`;
     })()}
+
+    <!-- TABLEAU -->
     <div class="section-title">Détail des rapports</div>
-    ${rows.length === 0
-      ? `<div class="empty-state">Aucun rapport trouvé pour cette sélection.</div>`
-      : `<table><thead><tr><th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th><th>Production</th><th>Statut</th><th>Note</th></tr></thead>
-      <tbody>${rows.map(r=>`<tr>
-        <td>${r.date||'—'}</td>
-        <td><span class="machine-tag">${r.machine||'—'}</span></td>
-        <td style="font-weight:600">${r.operatorName||'—'}</td>
-        <td>${r.shift||'—'}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff">${(parseInt(r.fields?.prod)||0).toLocaleString('fr-FR')}</td>
-        <td>${{ok:'<span class="badge badge-ok">✅ OK</span>',warn:'<span class="badge badge-warn">⚠️ Lent</span>',panne:'<span class="badge badge-panne">🔴 Panne</span>',arret:'<span class="badge badge-arret">⏸️ Arrêt</span>'}[r.status]||'—'}</td>
-        <td style="color:rgba(200,230,255,.5);font-style:italic">${r.note||''}</td>
-      </tr>`).join('')}</tbody></table>`}
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Machine</th><th>Opérateur</th><th>Poste</th>
+          <th>Production</th><th>Statut</th><th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r=>`<tr>
+          <td>${r.date||'—'}</td>
+          <td><span class="machine-pill machine-${(r.machine||'').replace(/\s/g,'')}">${r.machine||'—'}</span></td>
+          <td style="font-weight:600">${r.operatorName||'—'}</td>
+          <td>${r.shift||'—'}</td>
+          <td style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff">${(parseInt(r.fields?.prod)||0).toLocaleString('fr-FR')}</td>
+          <td>${{ok:'<span class="badge badge-ok">✅ OK</span>',warn:'<span class="badge badge-warn">⚠️ Lent</span>',panne:'<span class="badge badge-panne">🔴 Panne</span>',arret:'<span class="badge badge-arret">⏸️ Arrêt</span>'}[r.status]||'—'}</td>
+          <td style="color:rgba(200,230,255,.55);font-style:italic">${r.note||''}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+
+    <!-- PIED DE PAGE -->
     <div class="footer">
       <span>Technicien Eau Vitale — AP Industrie</span>
       <span>Document généré automatiquement · <strong>${exportDate}</strong></span>
-      <span>${rows.length} rapport(s)</span>
+      <span>${rows.length} rapport(s) au total</span>
     </div>
+
   </div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
   </body></html>`;
-
-  closePDFModal();
-
-  if (action === 'download') {
-    // Téléchargement direct (compatible APK)
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    const safeMachine = (machine || 'toutes').replace(/\s/g,'-').toLowerCase();
-    const safeMois    = moisVal || new Date().toISOString().slice(0,7);
-    a.href     = url;
-    a.download = `rapport_${safeMachine}_${safeMois}.html`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
-  } else {
-    // Impression / aperçu
-    const w = window.open('', '_blank');
-    w.document.write(html);
-    w.document.close();
-    setTimeout(() => w.print(), 600);
-  }
-};
-
+  const w=window.open('','_blank'); w.document.write(html); w.document.close();
 };
 // ══════════ PROFIL ══════════
 function renderProfile() {
@@ -5869,17 +5924,70 @@ loadSavedTheme();
 })();
 
 // ══════════ SPLASH SCREEN ══════════
+const SPLASH_DURATION = 0;
 let splashInterval = null;
 let splashTarget = 'login'; // 'login' ou 'app'
 
 function showSplash(target) {
   splashTarget = target || 'login';
-  // Splash désactivé : passer directement à la destination
-  if (splashTarget === 'app') {
-    showAppScreen();
-  } else {
-    showLoginScreen();
+  const splash = document.getElementById('splashScreen');
+  if (!splash) return;
+
+  // Réinitialiser
+  const progress  = document.getElementById('splashProgress');
+  const countdown = document.getElementById('splashCountdown');
+  const btn       = document.getElementById('splashBtn');
+  if (progress)  { progress.style.width = '0%'; progress.style.transition = 'none'; }
+  if (countdown) countdown.textContent = `Patientez encore ${SPLASH_DURATION} secondes...`;
+  if (btn) {
+    btn.disabled = true;
+    btn.style.background   = 'rgba(255,215,0,.1)';
+    btn.style.borderColor  = 'rgba(255,215,0,.2)';
+    btn.style.color        = 'rgba(255,215,0,.35)';
+    btn.style.cursor       = 'not-allowed';
+    btn.style.boxShadow    = 'none';
   }
+
+  // Afficher
+  splash.style.display   = 'flex';
+  splash.style.opacity   = '0';
+  splash.style.transition = 'opacity .5s ease';
+  setTimeout(() => { splash.style.opacity = '1'; }, 30);
+
+  // Masquer tout le reste
+  const login = document.getElementById('loginScreen');
+  const app   = document.getElementById('app');
+  if (login) login.style.display = 'none';
+  if (app)   app.classList.remove('show');
+
+  // Timer
+  if (splashInterval) clearInterval(splashInterval);
+  let elapsed = 0;
+  setTimeout(() => { if (progress) progress.style.transition = 'width .1s linear'; }, 60);
+
+  splashInterval = setInterval(() => {
+    elapsed++;
+    const pct = Math.min((elapsed / SPLASH_DURATION) * 100, 100);
+    if (progress) progress.style.width = pct + '%';
+
+    const remaining = SPLASH_DURATION - elapsed;
+    if (remaining > 0) {
+      if (countdown) countdown.textContent = `Patientez encore ${remaining} seconde${remaining > 1 ? 's' : ''}...`;
+    } else {
+      clearInterval(splashInterval);
+      if (countdown) countdown.textContent = '✓ Vous pouvez continuer';
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background  = 'rgba(255,215,0,.25)';
+        btn.style.borderColor = 'rgba(255,215,0,.8)';
+        btn.style.color       = '#ffd700';
+        btn.style.cursor      = 'pointer';
+        btn.style.boxShadow   = '0 0 20px rgba(255,215,0,.25)';
+        // Faire pulser le bouton pour attirer l'attention
+        btn.style.animation   = 'splashPulse 1.5s ease-in-out infinite';
+      }
+    }
+  }, 1000);
 }
 
 window.closeSplash = function() {
@@ -5900,12 +6008,22 @@ window.closeSplash = function() {
 
 window.goToWelcome = function() {
   if (splashInterval) { clearInterval(splashInterval); splashInterval = null; }
-  // Aller directement à la destination sans écran de bienvenue
-  if (splashTarget === 'app') {
-    showAppScreen();
-  } else {
-    showLoginScreen();
-  }
+  const splash = document.getElementById('splashScreen');
+  const welcome = document.getElementById('welcomeScreen');
+  if (!splash) return;
+  splash.style.transition = 'opacity .6s ease';
+  splash.style.opacity = '0';
+  setTimeout(() => {
+    splash.style.display = 'none';
+    if (welcome) {
+      welcome.style.display = 'flex';
+      welcome.style.opacity = '0';
+      welcome.style.transition = 'opacity .8s ease';
+      setTimeout(() => { welcome.style.opacity = '1'; }, 30);
+    } else {
+      closeSplash();
+    }
+  }, 600);
 };
 
 window.closeWelcome = function() {
@@ -6671,84 +6789,6 @@ window.exportTotalCSV = function() {
 };
 
 </script>
-<!-- ══ MODALE EXPORT PDF ══ -->
-<div id="pdfExportModal" onclick="if(event.target===this)closePDFModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(5,15,30,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
-  <div style="background:linear-gradient(160deg,rgba(10,25,50,.97),rgba(5,18,40,.98));border:1px solid rgba(0,180,255,.25);border-radius:22px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:fadeUp .25s ease;position:relative">
-    <button onclick="closePDFModal()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:rgba(180,220,255,.6);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
-
-    <!-- Titre -->
-    <div style="font-family:var(--font-display);font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#00b4ff;margin-bottom:6px">📄 Export Rapport PDF</div>
-    <div style="font-family:var(--font-display);font-size:20px;font-weight:900;color:#fff;margin-bottom:4px">Choisir le rapport</div>
-    <div style="font-size:12px;color:rgba(160,210,255,.55);margin-bottom:24px">Sélectionne la machine, la période et l'action souhaitée.</div>
-
-    <!-- Sélection machine -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(160,210,255,.6);margin-bottom:8px">Machine</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px" id="pdfMachineBtns">
-      <button onclick="setPDFMachine('',this)" class="pdf-machine-btn active" data-machine="" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(0,180,255,.18);color:#00b4ff;font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">🏭 Toutes</button>
-      <button onclick="setPDFMachine('Soufflage',this)" class="pdf-machine-btn" data-machine="Soufflage" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(200,230,255,.6);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">💨 Soufflage</button>
-      <button onclick="setPDFMachine('Remplissage',this)" class="pdf-machine-btn" data-machine="Remplissage" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(200,230,255,.6);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">🚰 Remplissage</button>
-      <button onclick="setPDFMachine('Étiquette',this)" class="pdf-machine-btn" data-machine="Étiquette" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(200,230,255,.6);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">🏷️ Étiquette</button>
-      <button onclick="setPDFMachine('Emballage',this)" class="pdf-machine-btn" data-machine="Emballage" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(200,230,255,.6);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">📦 Emballage</button>
-      <button onclick="setPDFMachine('B19',this)" class="pdf-machine-btn" data-machine="B19" style="padding:10px 6px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(200,230,255,.6);font-family:var(--font-display);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">🫙 B19</button>
-    </div>
-
-    <!-- Sélection mois -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(160,210,255,.6);margin-bottom:8px">Période</div>
-    <input type="month" id="pdfMonthSelect" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(0,180,255,.2);border-radius:10px;padding:10px 14px;font-size:14px;color:#e8f4fd;margin-bottom:20px;outline:none;font-family:var(--font-body)">
-
-    <!-- Action -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(160,210,255,.6);margin-bottom:8px">Action</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
-      <button onclick="setPDFAction('download',this)" id="pdfActionDL" style="padding:12px;border-radius:11px;border:2px solid #00b4ff;background:rgba(0,180,255,.15);color:#00b4ff;font-family:var(--font-display);font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <span style="font-size:20px">⬇️</span> Télécharger
-      </button>
-      <button onclick="setPDFAction('print',this)" id="pdfActionPrint" style="padding:12px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(180,210,255,.6);font-family:var(--font-display);font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <span style="font-size:20px">🖨️</span> Imprimer
-      </button>
-    </div>
-
-    <!-- Hidden inputs -->
-    <input type="hidden" id="pdfMachineSelect" value="">
-    <input type="hidden" id="pdfActionSelect" value="download">
-
-    <!-- Bouton générer -->
-    <button onclick="exportPDF()" style="width:100%;padding:14px;background:linear-gradient(135deg,#0099cc,#0060a0);color:#fff;border:none;border-radius:12px;font-family:var(--font-display);font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 8px 28px rgba(0,153,204,.35);transition:all .2s">
-      📄 Générer le rapport
-    </button>
-  </div>
-</div>
-
-<script>
-window.setPDFMachine = function(val, btn) {
-  document.getElementById('pdfMachineSelect').value = val;
-  const COLORS = {'':{bg:'rgba(0,180,255,.18)',color:'#00b4ff',border:'rgba(0,180,255,.4)'},'Soufflage':{bg:'rgba(0,167,214,.2)',color:'#00a7d6',border:'rgba(0,167,214,.5)'},'Remplissage':{bg:'rgba(23,185,123,.2)',color:'#17b97b',border:'rgba(23,185,123,.5)'},'Étiquette':{bg:'rgba(226,154,47,.2)',color:'#e29a2f',border:'rgba(226,154,47,.5)'},'Emballage':{bg:'rgba(242,124,87,.2)',color:'#f27c57',border:'rgba(242,124,87,.5)'},'B19':{bg:'rgba(124,108,255,.2)',color:'#7c6cff',border:'rgba(124,108,255,.5)'}};
-  document.querySelectorAll('.pdf-machine-btn').forEach(b=>{
-    b.style.background='rgba(255,255,255,.04)';b.style.color='rgba(200,230,255,.6)';b.style.border='1px solid rgba(255,255,255,.08)';
-  });
-  const c = COLORS[val]||COLORS[''];
-  btn.style.background=c.bg; btn.style.color=c.color; btn.style.border='1px solid '+c.border;
-};
-window.setPDFAction = function(val, btn) {
-  document.getElementById('pdfActionSelect').value = val;
-  const dlBtn    = document.getElementById('pdfActionDL');
-  const printBtn = document.getElementById('pdfActionPrint');
-  if(val==='download'){
-    dlBtn.style.border='2px solid #00b4ff';dlBtn.style.background='rgba(0,180,255,.15)';dlBtn.style.color='#00b4ff';
-    printBtn.style.border='1px solid rgba(255,255,255,.12)';printBtn.style.background='rgba(255,255,255,.04)';printBtn.style.color='rgba(180,210,255,.6)';
-  } else {
-    printBtn.style.border='2px solid #00b4ff';printBtn.style.background='rgba(0,180,255,.15)';printBtn.style.color='#00b4ff';
-    dlBtn.style.border='1px solid rgba(255,255,255,.12)';dlBtn.style.background='rgba(255,255,255,.04)';dlBtn.style.color='rgba(180,210,255,.6)';
-  }
-};
-// Initialise le mois courant par défaut
-(function(){
-  const now = new Date();
-  const m = now.toISOString().slice(0,7);
-  const el = document.getElementById('pdfMonthSelect');
-  if(el) el.value = m;
-})();
-</script>
-
 <!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
 <div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
