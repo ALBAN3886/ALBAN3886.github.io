@@ -1321,12 +1321,12 @@ tbody td,
       <div class="sidebar-item" onclick="navigate('alertes');closeMobileMenu()"><span class="si-icon">🔔</span> Alertes</div>
       <div class="sidebar-divider"></div>
       <div class="sidebar-label">Machines</div>
-      <div class="sidebar-item" onclick="navigate('soufflage');closeMobileMenu()"><div class="machine-dot" style="background:var(--soufflage)"></div> 🫧 Soufflage</div>
-      <div class="sidebar-item" onclick="navigate('remplissage');closeMobileMenu()"><div class="machine-dot" style="background:var(--remplissage)"></div> 🧴 Remplissage</div>
-      <div class="sidebar-item" onclick="navigate('etiquetage');closeMobileMenu()"><div class="machine-dot" style="background:var(--etiquette)"></div> 🏷️ Étiquette</div>
-      <div class="sidebar-item" onclick="navigate('emballage-info');closeMobileMenu()"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Emballage</div>
+      <div class="sidebar-item" onclick="navigate('machine-Soufflage');closeMobileMenu()"><div class="machine-dot" style="background:var(--soufflage)"></div> Soufflage</div>
+      <div class="sidebar-item" onclick="navigate('machine-Remplissage');closeMobileMenu()"><div class="machine-dot" style="background:var(--remplissage)"></div> Remplissage</div>
+      <div class="sidebar-item" onclick="navigate('machine-Etiquette');closeMobileMenu()"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
+      <div class="sidebar-item" onclick="navigate('machine-Emballage');closeMobileMenu()"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
       <div class="sidebar-item" onclick="navigate('emballage');closeMobileMenu()"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Suivi Emballage</div>
-      <div class="sidebar-item" onclick="navigate('b19-info');closeMobileMenu()"><div class="machine-dot" style="background:var(--b19)"></div> ⚙️ B19</div>
+      <div class="sidebar-item" onclick="navigate('machine-B19');closeMobileMenu()"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
       <div class="sidebar-item" onclick="navigate('b19');closeMobileMenu()"><div class="machine-dot" style="background:var(--b19)"></div> ⚙️ Suivi B19</div>
       <div class="sidebar-item" onclick="navigate('total');closeMobileMenu()"><span class="si-icon" style="color:#6366f1">📊</span> <span style="color:#6366f1">Total B19 + Emballage</span></div>
       <div class="sidebar-divider"></div>
@@ -1404,12 +1404,12 @@ tbody td,
     <div class="sidebar-item" onclick="navigate('alertes')"><span class="si-icon">🔔</span> Alertes <span class="si-badge" id="alertBadge" style="display:none">0</span></div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Machines</div>
-    <div class="sidebar-item" onclick="navigate('soufflage')"><div class="machine-dot" style="background:var(--soufflage)"></div> 🫧 Soufflage</div>
-    <div class="sidebar-item" onclick="navigate('remplissage')"><div class="machine-dot" style="background:var(--remplissage)"></div> 🧴 Remplissage</div>
-    <div class="sidebar-item" onclick="navigate('etiquetage')"><div class="machine-dot" style="background:var(--etiquette)"></div> 🏷️ Étiquette</div>
-    <div class="sidebar-item" onclick="navigate('emballage-info')"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Emballage</div>
+    <div class="sidebar-item" onclick="navigate('machine-Soufflage')"><div class="machine-dot" style="background:var(--soufflage)"></div> Soufflage</div>
+    <div class="sidebar-item" onclick="navigate('machine-Remplissage')"><div class="machine-dot" style="background:var(--remplissage)"></div> Remplissage</div>
+    <div class="sidebar-item" onclick="navigate('machine-Etiquette')"><div class="machine-dot" style="background:var(--etiquette)"></div> Étiquette</div>
+    <div class="sidebar-item" onclick="navigate('machine-Emballage')"><div class="machine-dot" style="background:var(--emballage)"></div> Emballage</div>
     <div class="sidebar-item" onclick="navigate('emballage')"><div class="machine-dot" style="background:var(--emballage)"></div> 📦 Suivi Emballage</div>
-    <div class="sidebar-item" onclick="navigate('b19-info')"><div class="machine-dot" style="background:var(--b19)"></div> ⚙️ B19</div>
+    <div class="sidebar-item" onclick="navigate('machine-B19')"><div class="machine-dot" style="background:var(--b19)"></div> B19</div>
     <div class="sidebar-item" onclick="navigate('b19')"><div class="machine-dot" style="background:var(--b19)"></div> ⚙️ Suivi B19</div>
     <div class="sidebar-item" onclick="navigate('total')" style="font-weight:600"><span class="si-icon" style="color:#6366f1">📊</span> <span style="color:#6366f1">Total B19 + Emballage</span></div>
     <div class="sidebar-divider"></div>
@@ -1566,6 +1566,14 @@ tbody td,
         </div>
       </div>
     </div>
+
+
+    <!-- ══ PAGES MACHINES ══ -->
+    <div class="page" id="page-machine-Soufflage"><div id="mc-Soufflage" style="padding:4px 0"></div></div>
+    <div class="page" id="page-machine-Remplissage"><div id="mc-Remplissage" style="padding:4px 0"></div></div>
+    <div class="page" id="page-machine-Etiquette"><div id="mc-Etiquette" style="padding:4px 0"></div></div>
+    <div class="page" id="page-machine-Emballage"><div id="mc-Emballage" style="padding:4px 0"></div></div>
+    <div class="page" id="page-machine-B19"><div id="mc-B19" style="padding:4px 0"></div></div>
 
     <!-- HISTORIQUE -->
     <div class="page" id="page-historique">
@@ -2382,28 +2390,6 @@ tbody td,
 
     </div>
 
-    <!-- PAGES MACHINES INFO -->
-    <div class="page" id="page-soufflage">
-      <div class="page-header"><div><h2>🫧 Machine Soufflage</h2><p>Opérateurs affectés, définition machine &amp; rôle technicien</p></div></div>
-      <div id="mpage-soufflage" style="display:grid;gap:14px"></div>
-    </div>
-    <div class="page" id="page-remplissage">
-      <div class="page-header"><div><h2>🧴 Machine Remplissage</h2><p>Opérateurs affectés, définition machine &amp; rôle technicien</p></div></div>
-      <div id="mpage-remplissage" style="display:grid;gap:14px"></div>
-    </div>
-    <div class="page" id="page-etiquetage">
-      <div class="page-header"><div><h2>🏷️ Machine Étiquette</h2><p>Opérateurs affectés, définition machine &amp; rôle technicien</p></div></div>
-      <div id="mpage-etiquetage" style="display:grid;gap:14px"></div>
-    </div>
-    <div class="page" id="page-emballage-info">
-      <div class="page-header"><div><h2>📦 Machine Emballage</h2><p>Opérateurs affectés, définition machine &amp; rôle technicien</p></div></div>
-      <div id="mpage-emballage-info" style="display:grid;gap:14px"></div>
-    </div>
-    <div class="page" id="page-b19-info">
-      <div class="page-header"><div><h2>⚙️ Machine B19</h2><p>Opérateurs affectés, définition machine &amp; rôle technicien</p></div></div>
-      <div id="mpage-b19-info" style="display:grid;gap:14px"></div>
-    </div>
-
     <!-- PAGE SUIVI EMBALLAGE -->
     <div class="page" id="page-emballage">
       <div class="page-header">
@@ -2805,11 +2791,6 @@ function refreshActivePage() {
   if (currentPage === 'emballage') return renderEmballagePage();
   if (currentPage === 'b19') return renderB19Page();
   if (currentPage === 'total') return renderTotalPage();
-  if (currentPage === 'soufflage') return renderMachinePage('Soufflage');
-  if (currentPage === 'remplissage') return renderMachinePage('Remplissage');
-  if (currentPage === 'etiquetage') return renderMachinePage('Étiquette');
-  if (currentPage === 'emballage-info') return renderMachinePage('Emballage');
-  if (currentPage === 'b19-info') return renderMachinePage('B19');
 }
 
 window.setDashboardVariant = function(variant, btn) {
@@ -3601,7 +3582,7 @@ function renderPresence() {
 }
 
 // ══════════ NAVIGATION ══════════
-const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', equipe:'Équipe', admin:'Administration', emballage:'Suivi Emballage', b19:'Suivi B19', total:'Total B19 + Emballage', soufflage:'🫧 Machine Soufflage', remplissage:'🧴 Machine Remplissage', etiquetage:'🏷️ Machine Étiquette', 'emballage-info':'📦 Machine Emballage', 'b19-info':'⚙️ Machine B19' };
+const PAGE_TITLES = { dashboard:'Tableau de Bord', rapport:'Mon Rapport', historique:'Historique', stats:'Statistiques', chat:'Messagerie', alertes:'Alertes', profil:'Mon Profil', equipe:'Équipe', admin:'Administration', emballage:'Suivi Emballage', b19:'Suivi B19', total:'Total B19 + Emballage', 'machine-Soufflage':'🫧 Soufflage', 'machine-Remplissage':'🧴 Remplissage', 'machine-Etiquette':'🏷️ Étiquette', 'machine-Emballage':'📦 Emballage', 'machine-B19':'⚙️ B19' };
 
 window.navigate = function(page) {
   currentPage = page;
@@ -3618,6 +3599,7 @@ window.navigate = function(page) {
   if (page==='stats' && !window.__activeStatTab) window.__activeStatTab = 'global';
   if (page==='chat') { unreadChat=0; unreadGroup=0; updateBadges(); listenGroupChat(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
+  if (page.startsWith('machine-')) renderMachinePage(page.replace('machine-',''));
   refreshActivePage();
 };
 
@@ -5045,184 +5027,6 @@ window.changePassword = async function() {
     else errEl.textContent = 'Erreur : ' + e.message;
   }
 };
-  }
-};
-
-// ══════════ PAGES MACHINES INFO ══════════
-const MACHINE_DEFS = {
-  'Soufflage': {
-    containerId: 'mpage-soufflage',
-    color: '#00a7d6',
-    icon: '🫧',
-    role: 'Technicien Soufflage',
-    definition: "La machine Soufflage transforme des préformes en plastique en bouteilles finies par injection d'air chaud sous haute pression. Elle contrôle précisément la température, la pression et le moule pour garantir la forme et l'épaisseur des bouteilles.",
-    missions: [
-      "Surveiller les paramètres de température (four, moule)",
-      "Contrôler la cadence de production et les rejets",
-      "Effectuer les réglages de moule selon le format bouteille",
-      "Signaler toute anomalie de forme ou de déformation"
-    ]
-  },
-  'Remplissage': {
-    containerId: 'mpage-remplissage',
-    color: '#17b97b',
-    icon: '🧴',
-    role: 'Technicien Remplissage',
-    definition: "La machine Remplissage dose et verse l'eau dans chaque bouteille avec précision, puis applique les bouchons de fermeture. Elle assure la stérilité du processus et le contrôle du volume rempli pour respecter les normes de qualité.",
-    missions: [
-      "Contrôler le volume d'eau remplie par bouteille",
-      "Suivre la consommation et le stock de bouchons",
-      "Vérifier l'étanchéité des bouchons appliqués",
-      "Surveiller la propreté et la stérilisation de la ligne"
-    ]
-  },
-  'Étiquette': {
-    containerId: 'mpage-etiquetage',
-    color: '#e29a2f',
-    icon: '🏷️',
-    role: 'Technicien Étiquette',
-    definition: "La machine Étiquetage applique automatiquement les étiquettes de marque et d'information sur chaque bouteille. Elle positionne et colle les étiquettes avec précision, en assurant l'alignement et la lisibilité des informations réglementaires.",
-    missions: [
-      "Surveiller l'alignement et la qualité des étiquettes appliquées",
-      "Gérer le stock d'étiquettes et les bobines",
-      "Effectuer les réglages de position selon le format bouteille",
-      "Contrôler les dates, lots et mentions légales visibles"
-    ]
-  },
-  'Emballage': {
-    containerId: 'mpage-emballage-info',
-    color: '#f27c57',
-    icon: '📦',
-    role: 'Technicien Emballage',
-    definition: "La machine Emballage regroupe les bouteilles étiquetées en packs ou cartons selon le format demandé, puis les filme ou ferme pour le stockage et l'expédition. Elle optimise la cadence d'emballage et la solidité des colis.",
-    missions: [
-      "Compter et enregistrer les cartons emballés par poste",
-      "Gérer le stock de sachets et films d'emballage",
-      "Contrôler la solidité et la conformité des colis",
-      "Organiser le placement en zone de stockage"
-    ]
-  },
-  'B19': {
-    containerId: 'mpage-b19-info',
-    color: '#7c6cff',
-    icon: '⚙️',
-    role: 'Technicien B19',
-    definition: "La machine B19 est une ligne dédiée au format 19 litres (bonbonnes). Elle assure le remplissage, le bouchage et le contrôle qualité des grands contenants destinés aux professionnels et aux distributeurs d'eau en vrac.",
-    missions: [
-      "Gérer la production et le comptage des bonbonnes B19",
-      "Contrôler l'étanchéité et la propreté des contenants",
-      "Suivre les pannes et arrêts de la ligne",
-      "Assurer la traçabilité de chaque lot produit"
-    ]
-  }
-};
-
-window.renderMachinePage = async function(machineId) {
-  const def = MACHINE_DEFS[machineId];
-  if (!def) return;
-  const container = document.getElementById(def.containerId);
-  if (!container) return;
-  const c = def.color;
-
-  container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Chargement...</div>`;
-
-  const snap = await get(ref(db, 'userProfiles'));
-  const profiles = snap.val() || {};
-  const operators = Object.entries(profiles).filter(([, p]) => p.role === def.role);
-
-  let html = '';
-
-  // ── Bloc Définition Machine ──
-  html += `<div class="card" style="border-top:4px solid ${c}">
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-      <div style="font-size:36px;width:60px;height:60px;border-radius:14px;background:${c}22;display:flex;align-items:center;justify-content:center;flex-shrink:0">${def.icon}</div>
-      <div>
-        <div class="card-title" style="color:${c};margin-bottom:3px">Définition de la machine</div>
-        <div style="font-size:12px;color:var(--muted)">AP Industry Eau Vitale — Ligne de production</div>
-      </div>
-    </div>
-    <p style="font-size:14px;line-height:1.75;color:var(--text);margin-bottom:16px">${def.definition}</p>
-    <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-bottom:10px">📋 Missions principales</div>
-    <div style="display:grid;gap:8px">
-      ${def.missions.map(m => `<div style="display:flex;align-items:flex-start;gap:10px;background:${c}11;border-radius:9px;padding:10px 14px;border-left:3px solid ${c}">
-        <span style="color:${c};font-weight:800;flex-shrink:0;margin-top:1px">→</span>
-        <span style="font-size:13px;color:var(--text)">${m}</span>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  // ── Bloc Rôle Technicien ──
-  html += `<div class="card" style="border-top:4px solid ${c}">
-    <div class="card-title" style="color:${c};margin-bottom:12px">👷 Rôle du Technicien</div>
-    <p style="font-size:14px;line-height:1.75;color:var(--text);margin-bottom:14px">
-      Un <strong>${def.role}</strong> est responsable du bon fonctionnement de la machine ${def.icon} <strong>${machineId}</strong>.
-      Il saisit ses rapports de production quotidiens dans l'application TEV, surveille les indicateurs clés de sa machine et remonte toute anomalie à son superviseur.
-    </p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
-      <div style="background:var(--surface);border-radius:10px;padding:12px;border:1px solid var(--border)">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">Rapport quotidien</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text)">📝 Production, pannes, déchets</div>
-      </div>
-      <div style="background:var(--surface);border-radius:10px;padding:12px;border:1px solid var(--border)">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">Statut machine</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text)">✅ ⚠️ 🔴 ⏸️ Temps réel</div>
-      </div>
-      <div style="background:var(--surface);border-radius:10px;padding:12px;border:1px solid var(--border)">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px">Format bouteille</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text)">📐 0,35L · 0,5L · 1,5L · 1,6L</div>
-      </div>
-    </div>
-  </div>`;
-
-  // ── Bloc Profils Opérateurs ──
-  html += `<div class="card" style="border-top:4px solid ${c}">
-    <div class="card-title" style="color:${c};margin-bottom:14px">👤 Opérateurs affectés — ${def.role}</div>`;
-
-  if (operators.length === 0) {
-    html += `<div class="empty"><div class="eico">👤</div><p>Aucun opérateur enregistré pour cette machine</p></div>`;
-  } else {
-    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">`;
-    for (const [uid, p] of operators) {
-      const isOnline = Object.values(presence).some(x => x.name === p.name && x.online);
-      const reps = Object.values(allReports).filter(r => r.operatorName === p.name);
-      const prod = reps.reduce((s, r) => s + (r.fields?.prod || 0), 0);
-      const pannes = reps.filter(r => r.status === 'panne').length;
-      const avEl = p.photoURL
-        ? `<img src="${esc(p.photoURL)}" style="width:56px;height:56px;border-radius:50%;object-fit:cover">`
-        : `<div style="width:56px;height:56px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff">${(p.name||'?').charAt(0).toUpperCase()}</div>`;
-      html += `<div onclick="openUserProfile('${uid}')" style="background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px;cursor:pointer;transition:all .2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.10)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="position:relative;flex-shrink:0">${avEl}<div style="position:absolute;bottom:1px;right:1px;width:12px;height:12px;border-radius:50%;background:${isOnline?'#22c55e':'#ccc'};border:2px solid var(--surface)"></div></div>
-          <div style="flex:1;min-width:0">
-            <div style="font-family:var(--font-display);font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name||'—')}</div>
-            <div style="font-size:11px;color:${isOnline?'#22c55e':'var(--muted)'};margin-top:1px">${isOnline?'● En ligne':'● Hors ligne'}</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px">
-          <div style="background:var(--card);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:${c}">${prod>0?num(prod):'—'}</div>
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Production</div>
-          </div>
-          <div style="background:var(--card);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:800">${reps.length}</div>
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Rapports</div>
-          </div>
-          <div style="background:var(--card);border-radius:8px;padding:8px;text-align:center">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:${pannes>0?'var(--danger)':'var(--text)'}">${pannes}</div>
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Pannes</div>
-          </div>
-        </div>
-        ${p.phone?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">📱 ${esc(p.phone)}</div>`:''}
-        <div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📧 ${esc(p.email||'—')}</div>
-      </div>`;
-    }
-    html += `</div>`;
-  }
-  html += `</div>`;
-
-  container.innerHTML = html;
-};
-
 // ══════════ PAGE ÉQUIPE ══════════
 window.renderEquipePage = async function() {
   const grid = document.getElementById('equipeGrid');
@@ -6997,6 +6801,185 @@ window.renderTotalPage = function() {
     </tr></tfoot>
   </table></div>`;
 };
+
+
+// ══════════ PAGES MACHINES ══════════
+const MACHINE_DEFS = {
+  Soufflage: {
+    emoji: '🫧',
+    desc: "La machine Soufflage transforme les préformes plastiques en bouteilles par soufflage à haute température. C'est la première étape de la ligne de production Eau Vitale.",
+    role: "Le technicien Soufflage assure le démarrage, la surveillance et le réglage des paramètres de chauffe et de soufflage. Il contrôle la qualité des bouteilles produites et gère les rejets.",
+    champs: ['Bouteilles soufflées','Rejets / déchets','Température de chauffe','Déchets (kg)']
+  },
+  Remplissage: {
+    emoji: '🧴',
+    desc: "La machine Remplissage remplit les bouteilles soufflées avec l'eau purifiée Eau Vitale. Elle assure le dosage précis et la fermeture hermétique avec les bouchons.",
+    role: "Le technicien Remplissage surveille le niveau de remplissage, la pose des bouchons et la conformité du produit. Il gère le stock de bouchons et signale tout dysfonctionnement.",
+    champs: ['Bouteilles remplies','Bouchons utilisés','Bouchons restants','Déchets (kg)']
+  },
+  Etiquette: {
+    emoji: '🏷️',
+    desc: "La machine Étiquette applique automatiquement les étiquettes de marque Eau Vitale sur chaque bouteille remplie. Elle assure la traçabilité et la présentation commerciale du produit.",
+    role: "Le technicien Étiquette contrôle le positionnement des étiquettes, surveille le stock et effectue les changements de rouleaux. Il détecte les bouteilles mal étiquetées.",
+    champs: ['Bouteilles étiquetées','Étiquettes utilisées','Étiquettes restantes','Déchets (kg)']
+  },
+  Emballage: {
+    emoji: '📦',
+    desc: "La machine Emballage regroupe les bouteilles étiquetées en cartons pour l'expédition. C'est la dernière étape de conditionnement de la ligne de production.",
+    role: "Le technicien Emballage surveille le comptage des cartons, gère les sachets de regroupement et veille à la conformité des palettes avant expédition.",
+    champs: ['Cartons emballés','Sachets utilisés','Sachets restants','Déchets (kg)']
+  },
+  B19: {
+    emoji: '⚙️',
+    desc: "La machine B19 est dédiée à la production des grands bidons de 19 litres. Elle opère en parallèle de la ligne principale et alimente une clientèle professionnelle et industrielle.",
+    role: "Le technicien B19 gère le cycle complet de production des bidons : soufflage, remplissage et bouchonnage. Il suit les objectifs de production journaliers et hebdomadaires.",
+    champs: ['Production B19 (unités)','Déchets (kg)']
+  }
+};
+
+const MACHINE_ROLE_MAP = {
+  Soufflage:   'Technicien Soufflage',
+  Remplissage: 'Technicien Remplissage',
+  Etiquette:   'Technicien Étiquette',
+  Emballage:   'Technicien Emballage',
+  B19:         'Technicien B19'
+};
+
+async function renderMachinePage(machineKey) {
+  const container = document.getElementById('mc-' + machineKey);
+  if (!container) return;
+
+  // ID réel dans MACHINES (Étiquette a un accent)
+  const machineId = machineKey === 'Etiquette' ? 'Étiquette' : machineKey;
+  const m   = MACHINES.find(x => x.id === machineId);
+  const def = MACHINE_DEFS[machineKey] || {};
+  if (!m) return;
+
+  container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">${def.emoji}</div>Chargement...</div>`;
+
+  // Opérateurs assignés
+  let profiles = {};
+  try { const snap = await get(ref(db,'userProfiles')); profiles = snap.val()||{}; } catch(e) {}
+  const assignedRole = MACHINE_ROLE_MAP[machineKey];
+  const ops = Object.entries(profiles).filter(([,p]) => p.role === assignedRole);
+
+  // Rapports
+  const reps      = Object.values(allReports).filter(r => r.machine === machineId).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const totalProd = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+  const okCount   = reps.filter(r=>r.status==='ok').length;
+  const panneCount= reps.filter(r=>r.status==='panne'||r.status==='arret').length;
+  const recent5   = reps.slice(0,5);
+
+  // HTML opérateurs
+  const opsHtml = ops.length === 0
+    ? `<div style="padding:18px;text-align:center;color:var(--muted);font-size:13px;background:var(--surface);border-radius:12px;border:1px dashed var(--border)">Aucun opérateur assigné à cette machine</div>`
+    : ops.map(([uid,p]) => {
+        const isOnline = Object.values(presence).some(x=>x.name===p.name&&x.online);
+        const col = m.color;
+        const avEl = p.photoURL
+          ? `<img src="${p.photoURL}" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:3px solid ${col}">`
+          : `<div style="width:58px;height:58px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;border:3px solid ${col}">${(p.name||'?').charAt(0).toUpperCase()}</div>`;
+        const opReps = reps.filter(r=>r.operatorName===p.name);
+        const opProd = opReps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+        const lastActive = opReps[0] ? formatDate(opReps[0].date) : '—';
+        return `<div style="display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;border-left:4px solid ${col}">
+          <div style="position:relative;flex-shrink:0">
+            ${avEl}
+            <div style="position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:${isOnline?'#22c55e':'#9ca3af'};border:2px solid var(--card)"></div>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--text)">${esc(p.name||'—')}</div>
+            <div style="font-size:12px;font-weight:700;color:${col};margin-top:1px">${esc(p.role||'—')}</div>
+            <div style="font-size:11px;margin-top:3px;color:${isOnline?'#22c55e':'var(--muted)'}">
+              ${isOnline?'🟢 En ligne maintenant':'⚫ Hors ligne'} &nbsp;·&nbsp; Dernier rapport : ${lastActive}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:var(--font-display);font-size:24px;font-weight:900;color:${col}">${opProd>0?num(opProd):'—'}</div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:1px">Production totale</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${opReps.length} rapport${opReps.length!==1?'s':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+  // HTML derniers rapports
+  const stCols = {ok:'var(--ok)',warn:'var(--warn)',panne:'var(--danger)',arret:'var(--muted2)'};
+  const stLbls = {ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'};
+  const recentHtml = recent5.length === 0
+    ? `<div style="text-align:center;color:var(--muted);padding:24px;font-size:13px">Aucun rapport enregistré pour cette machine</div>`
+    : `<div class="table-wrap"><table>
+        <thead><tr>
+          <th>Date</th><th>Poste</th><th>Opérateur</th>
+          <th>Production</th><th>Statut</th><th>Note</th>
+        </tr></thead>
+        <tbody>${recent5.map(r=>`<tr>
+          <td style="font-weight:700;white-space:nowrap">${formatDate(r.date)}</td>
+          <td>${r.shift||'—'}</td>
+          <td><span style="color:${m.color};font-weight:600">● ${esc(r.operatorName||'—')}</span></td>
+          <td><span style="font-family:var(--font-display);font-size:15px;font-weight:900;color:${m.color}">${num(r.fields?.prod||0)}</span></td>
+          <td><span style="color:${stCols[r.status]||'var(--muted)'};font-weight:600">${stLbls[r.status]||r.status}</span></td>
+          <td style="color:var(--muted);font-size:12px;font-style:italic">${esc(r.note||'')}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+
+  container.innerHTML = `
+    <!-- BANDEAU MACHINE -->
+    <div style="background:linear-gradient(135deg,${m.color}20,${m.color}08);border:1.5px solid ${m.color}50;border-radius:20px;padding:22px 20px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+        <div style="width:76px;height:76px;border-radius:20px;background:${m.color}22;border:2px solid ${m.color}55;display:flex;align-items:center;justify-content:center;font-size:38px;flex-shrink:0">${def.emoji}</div>
+        <div style="flex:1;min-width:180px">
+          <div style="font-family:var(--font-display);font-size:30px;font-weight:900;color:var(--text);line-height:1">${machineId}</div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:${m.color};margin:5px 0 10px">Machine de production — AP Industry Eau Vitale</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7">${def.desc}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:900;color:${m.color}">${num(totalProd)||'0'}</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">Production totale</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--text)">${reps.length}</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">Rapports total</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--ok)">${okCount}</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">✅ Rapports OK</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--danger)">${panneCount}</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">🔴 Pannes / Arrêts</div>
+      </div>
+    </div>
+
+    <!-- RÔLE TECHNICIEN -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="color:${m.color}">🎯 Rôle du technicien</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.75;margin:0 0 12px">${def.role}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        ${def.champs.map(c=>`<span style="background:${m.color}18;border:1px solid ${m.color}44;color:${m.color};border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700">${c}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- OPÉRATEURS -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="color:${m.color}">👷 Opérateur${ops.length!==1?'s':''} assigné${ops.length!==1?'s':''}</div>
+      <div style="display:flex;flex-direction:column;gap:10px">${opsHtml}</div>
+    </div>
+
+    <!-- DERNIERS RAPPORTS -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div class="card-title" style="color:${m.color};margin-bottom:0">📋 5 derniers rapports</div>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('historique');setTimeout(()=>{const s=document.getElementById('filterMachine');if(s){s.value='${machineId}';renderHistory();}},200)">Voir tout →</button>
+      </div>
+      ${recentHtml}
+    </div>
+  `;
+}
 
 window.exportTotalCSV = function() {
   const fm = document.getElementById('totalFilterMonth')?.value||'';
