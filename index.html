@@ -1175,7 +1175,11 @@ tbody td,
 
     <!-- LISTE RAPIDE DES UTILISATEURS -->
     <div id="quickUserList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:380px;overflow-y:auto">
-      <div style="text-align:center;color:#7a8599;padding:20px;font-size:13px">⏳ Chargement des utilisateurs...</div>
+      <div style="text-align:center;color:#7a8599;padding:16px;font-size:13px">
+        ⏳ Chargement des utilisateurs...<br>
+        <span style="font-size:11px;color:#aab0bb">Si cela prend trop longtemps, utilisez<br>
+        <span onclick="switchMode('advanced')" style="color:#0099cc;cursor:pointer;text-decoration:underline">la connexion administrateur</span></span>
+      </div>
     </div>
 
     <div class="login-err" id="loginErr" style="color:#dc2626;font-size:12px;text-align:center;min-height:16px"></div>
@@ -2882,8 +2886,21 @@ function getLast14Days() {
 
 // ══════════ BUILD LOGIN ══════════
 function loadDynamicUsers() {
+  // Timeout de sécurité : si Firebase ne répond pas en 6s, afficher quand même
+  const timeoutId = setTimeout(() => {
+    const wrap = document.getElementById('quickUserList');
+    if (wrap && wrap.innerHTML.includes('Chargement')) {
+      wrap.innerHTML = `
+        <div style="text-align:center;padding:16px 10px">
+          <div style="font-size:13px;color:#e35d6a;margin-bottom:10px">⚠️ Connexion lente ou hors ligne</div>
+          <div style="font-size:12px;color:#7a8599;margin-bottom:14px">Utilisez la connexion administrateur ci-dessous</div>
+        </div>`;
+    }
+  }, 6000);
+
   const uRef = ref(db, 'userProfiles');
   onValue(uRef, snap => {
+    clearTimeout(timeoutId);
     const profiles = snap.val() || {};
     const fromDB = Object.values(profiles).map(p => ({
       email: p.email, name: p.name, role: p.role,
@@ -2898,6 +2915,10 @@ function loadDynamicUsers() {
     buildLogin();
     // Si connecté, re-render chat pour afficher nouvelles photos
     if (currentUser) renderChat();
+  }, err => {
+    clearTimeout(timeoutId);
+    const wrap = document.getElementById('quickUserList');
+    if (wrap) wrap.innerHTML = `<div style="text-align:center;padding:16px;font-size:12px;color:#e35d6a">⚠️ Erreur de connexion Firebase.<br>Vérifiez votre connexion internet.</div>`;
   });
 }
 
