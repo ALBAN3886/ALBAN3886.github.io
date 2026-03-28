@@ -2460,7 +2460,7 @@ tbody td,
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, verifyPasswordResetCode, confirmPasswordReset }
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, verifyPasswordResetCode, confirmPasswordReset }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get, push, onValue, update, remove, serverTimestamp, off }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -2480,9 +2480,11 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
-// Garder la session sur cet appareil même après fermeture / réouverture
-setPersistence(auth, browserLocalPersistence).catch(err => {
-  console.warn('Auth persistence error', err);
+// Garder la session — avec fallback pour WebView APK
+setPersistence(auth, browserLocalPersistence).catch(() => {
+  setPersistence(auth, browserSessionPersistence).catch(e => {
+    console.warn('Auth persistence fallback failed', e);
+  });
 });
 
 const USER_CREDS_KEY = 'userCreds';
@@ -3112,20 +3114,47 @@ window.doLogin = async function() {
   const email = document.getElementById('emailInput').value.trim();
   const pwd   = document.getElementById('pwdInput').value;
   const err   = document.getElementById('loginErr');
+  err.style.color = 'var(--danger)';
   if (!email) { err.textContent = 'Entrez votre adresse e-mail.'; return; }
   if (!pwd)   { err.textContent = 'Entrez votre mot de passe.'; return; }
   const btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = 'Connexion...';
+  btn.disabled = true; btn.textContent = '⏳ Connexion...';
+  err.textContent = '';
+
+  // Timeout de sécurité pour APK WebView
+  let timedOut = false;
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    btn.disabled = false; btn.textContent = 'CONNEXION →';
+    err.textContent = '⏱️ Délai dépassé. Vérifiez votre connexion internet et réessayez.';
+  }, 15000);
+
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pwd);
+    if (timedOut) return;
+    clearTimeout(timeoutId);
     saveCredential(email, pwd);
     rememberLastEmail(email);
     err.textContent = '';
-    // Sauvegarder aussi dans Firebase pour que l'Admin puisse le voir
-    try { await update(ref(db, `userProfiles/${cred.user.uid}`), { _pwd: pwd }); } catch(e) {}
+    // Sauvegarder dans Firebase en arrière-plan
+    update(ref(db, `userProfiles/${cred.user.uid}`), { _pwd: pwd }).catch(()=>{});
   } catch(e) {
-    err.textContent = 'Email ou mot de passe incorrect.';
+    if (timedOut) return;
+    clearTimeout(timeoutId);
     btn.disabled = false; btn.textContent = 'CONNEXION →';
+    const code = e.code || '';
+    if (code.includes('wrong-password') || code.includes('invalid-credential') || code.includes('invalid-login')) {
+      err.textContent = '❌ Mot de passe incorrect.';
+    } else if (code.includes('user-not-found')) {
+      err.textContent = '❌ Aucun compte avec cet email.';
+    } else if (code.includes('network') || code.includes('timeout') || code.includes('unavailable')) {
+      err.textContent = '🌐 Erreur réseau. Vérifiez votre connexion internet.';
+    } else if (code.includes('too-many-requests')) {
+      err.textContent = '⛔ Trop de tentatives. Attendez quelques minutes.';
+    } else {
+      err.textContent = '❌ Erreur : ' + (e.message || code || 'Connexion impossible.');
+    }
+    console.error('Login error:', e.code, e.message);
   }
 };
 
