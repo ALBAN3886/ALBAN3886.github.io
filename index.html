@@ -1177,8 +1177,15 @@ tbody td,
     <div id="quickUserList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:380px;overflow-y:auto">
       <div style="text-align:center;color:#7a8599;padding:16px;font-size:13px">
         ⏳ Chargement des utilisateurs...<br>
-        <span style="font-size:11px;color:#aab0bb">Si cela prend trop longtemps, utilisez<br>
-        <span onclick="switchMode('advanced')" style="color:#0099cc;cursor:pointer;text-decoration:underline">la connexion administrateur</span></span>
+        <span style="font-size:11px;color:#aab0bb">Si cela prend trop longtemps :<br>
+        <span onclick="(function(){
+          var l=document.getElementById('quickUserList');
+          var a=document.getElementById('modeAdvanced');
+          if(l){l.style.display='none';}
+          if(a){a.style.display='block';}
+          var s=document.querySelector('.login-logo .sub');
+          if(s){s.textContent='Connexion administrateur';}
+        })()" style="color:#0099cc;cursor:pointer;text-decoration:underline;font-size:12px;font-weight:700">👉 Connexion administrateur</span></span>
       </div>
     </div>
 
@@ -1186,7 +1193,19 @@ tbody td,
 
     <!-- Lien admin discret -->
     <div style="text-align:center;margin-top:12px;border-top:1px solid #e2e6ed;padding-top:12px">
-      <span onclick="switchMode('advanced')" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
+      <span onclick="(function(){
+        var l=document.getElementById('quickUserList');
+        var a=document.getElementById('modeAdvanced');
+        var r=document.getElementById('modeRegister');
+        var f=document.getElementById('modeForgot');
+        if(l){l.style.display='none';}
+        if(r){r.style.display='none';}
+        if(f){f.style.display='none';}
+        if(a){a.style.display='block';}
+        var s=document.querySelector('.login-logo .sub');
+        if(s){s.textContent='Connexion administrateur';}
+        setTimeout(function(){var e=document.getElementById('emailInput');if(e)e.focus();},100);
+      })()" style="font-size:11px;color:#aab0bb;cursor:pointer">⚙️ Connexion administrateur</span>
     </div>
     <div style="text-align:center;margin-top:8px">
       <span id="registerAccessLink" onclick="switchMode('register')" style="display:none;font-size:11px;color:#0099cc;cursor:pointer;text-decoration:underline">✚ Créer un nouveau compte</span>
@@ -3065,10 +3084,10 @@ window.switchMode = function(mode) {
   const forg = document.getElementById('modeForgot');
   const list = document.getElementById('quickUserList');
   const sub  = document.querySelector('.login-logo .sub');
-  if (adv)  adv.style.display  = mode === 'advanced'  ? '' : 'none';
-  if (reg)  reg.style.display  = mode === 'register'  ? '' : 'none';
-  if (forg) forg.style.display = mode === 'forgot'    ? '' : 'none';
-  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? '' : 'none';
+  if (adv)  adv.style.display  = mode === 'advanced'  ? 'block' : 'none';
+  if (reg)  reg.style.display  = mode === 'register'  ? 'block' : 'none';
+  if (forg) forg.style.display = mode === 'forgot'    ? 'block' : 'none';
+  if (list) list.style.display = (mode === 'quick' || mode === 'login') ? 'flex' : 'none';
   if (sub)  sub.textContent    = (mode === 'quick' || mode === 'login')
     ? 'Choisissez votre nom pour continuer'
     : mode === 'advanced' ? 'Connexion administrateur'
