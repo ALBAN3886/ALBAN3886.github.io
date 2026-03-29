@@ -5069,33 +5069,51 @@ window.exportPDF = function() {
       </div>
     </div>
 
-    <!-- PROGRAMME DU PERSONNEL -->
+    <!-- TOTAL MENSUEL -->
     ${(()=>{
-      const pData = programmeData;
-      if(!pData||(!(pData.groupeA&&pData.groupeA.length)&&!(pData.groupeB&&pData.groupeB.length)))return'';
-      const todayMon=getMondayOf(today());
-      const off=getWeekOffset(todayMon);
-      const hA=HORAIRES[getHoraireIndex('A',off)];
-      const hB=HORAIRES[getHoraireIndex('B',off)];
-      const dl=new Date(todayMon+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-      function mkGrp(list,grp,h,col){
-        if(!list||!list.length)return'';
-        const rows=list.map((e,i)=>'<tr style="border-bottom:1px solid rgba(255,255,255,.05);'+(i%2===0?'background:rgba(255,255,255,.03)':'')+'"><td style="padding:5px 8px;text-align:center;color:'+col+';font-weight:800;width:28px">'+(i+1)+'</td><td style="padding:5px 8px;color:#8eb8d8;font-size:10px">'+esc(e.poste)+(e.numero?' <b style=color:'+col+'>'+esc(e.numero)+'</b>':'')+'</td><td style="padding:5px 8px;font-weight:700;color:#e8f4fd">'+esc(e.nom)+'</td></tr>').join('');
-        return '<div style="flex:1;min-width:240px;background:'+col+'18;border:1px solid '+col+'33;border-radius:10px;overflow:hidden">'
-          +'<div style="padding:8px 12px;background:'+col+'22;border-bottom:1px solid '+col+'33;display:flex;align-items:center;justify-content:space-between">'
-          +'<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;color:'+col+'">GROUPE '+grp+' — '+h.icon+' '+h.label+'</span>'
-          +'<span style="font-size:10px;color:rgba(200,230,255,.5)">'+list.length+' agents</span></div>'
-          +'<table style="width:100%;border-collapse:collapse;font-size:11px">'
-          +'<thead><tr style="background:rgba(255,255,255,.06)"><th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5);text-align:center;width:28px">#</th>'
-          +'<th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5)">Poste</th>'
-          +'<th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5)">Nom</th></tr></thead>'
-          +'<tbody>'+rows+'</tbody></table></div>';
-      }
-      return '<div style="margin-bottom:26px">'
-        +'<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#00b4ff;margin-bottom:12px">PROGRAMME DU PERSONNEL</div>'
-        +'<div style="font-size:11px;color:rgba(200,230,255,.45);margin-bottom:8px;text-transform:capitalize">'+dl+'</div>'
-        +'<div style="display:flex;gap:10px;flex-wrap:wrap">'+mkGrp(pData.groupeA,'A',hA,'#38bdf8')+mkGrp(pData.groupeB,'B',hB,'#fbbf24')+'</div>'
-        +'</div>';
+      const moisCourantPDF = today().substring(0,7);
+      const allRepsArrPDF = Object.values(allReports||{});
+      const embMoisPDF = allRepsArrPDF.filter(r=>r.machine==='Emballage'&&r.date&&r.date.startsWith(moisCourantPDF));
+      const b19MoisPDF  = allRepsArrPDF.filter(r=>r.machine==='B19'&&r.date&&r.date.startsWith(moisCourantPDF));
+      const totalEmbPDF = embMoisPDF.reduce((s,r)=>s+(r.fields?.prod||0),0);
+      const totalB19PDF = b19MoisPDF.reduce((s,r)=>s+(r.fields?.prod||0),0);
+      const totalCombPDF = totalEmbPDF+totalB19PDF;
+      const totalDechetsPDF = allRepsArrPDF.filter(r=>r.date&&r.date.startsWith(moisCourantPDF)).reduce((s,r)=>s+(parseFloat(r.fields?.dechets)||0),0);
+      const joursTpdf = new Set([...embMoisPDF,...b19MoisPDF].map(r=>r.date)).size;
+      const moisLabelPDF = new Date(moisCourantPDF+'-15').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+      const moisLabelCapPDF = moisLabelPDF.charAt(0).toUpperCase()+moisLabelPDF.slice(1);
+      const numFrPDF = n => n.toLocaleString('fr-FR');
+      return `<div style="margin-bottom:26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:16px 18px;backdrop-filter:blur(8px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px">
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:rgba(180,220,255,.6);font-weight:700;font-family:'Barlow Condensed',sans-serif;">📊 Total mensuel</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff;margin-top:3px">${moisLabelCapPDF}</div>
+          </div>
+          <div style="font-size:11px;color:rgba(200,230,255,.55);background:rgba(255,255,255,.08);border-radius:20px;padding:4px 14px;border:1px solid rgba(255,255,255,.12);font-weight:600">${joursTpdf} jours travaillés</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="background:rgba(242,124,87,.15);border:1px solid rgba(242,124,87,.38);border-radius:11px;padding:12px 14px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#fba07a;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">📦 Emballage</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fba07a;line-height:1">${numFrPDF(totalEmbPDF)}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">cartons</div>
+          </div>
+          <div style="background:rgba(124,108,255,.15);border:1px solid rgba(124,108,255,.38);border-radius:11px;padding:12px 14px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#a99aff;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">⚙️ B19</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#a99aff;line-height:1">${numFrPDF(totalB19PDF)}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">production</div>
+          </div>
+          <div style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.38);border-radius:11px;padding:12px 14px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#a5b4fc;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">🔢 Total</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#a5b4fc;line-height:1">${numFrPDF(totalCombPDF)}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">combiné</div>
+          </div>
+          <div style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.38);border-radius:11px;padding:12px 14px">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#fca5a5;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">🗑️ Déchets</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fca5a5;line-height:1">${totalDechetsPDF%1===0?numFrPDF(totalDechetsPDF):totalDechetsPDF.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:2})}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">kg total</div>
+          </div>
+        </div>
+      </div>`;
     })()}
 
     <!-- STATS -->
@@ -7596,39 +7614,6 @@ window.printProgramme = function() {
             <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00b4ff;font-weight:700">Imprimé le</div>
             <div style="font-size:13px;font-weight:700;color:#e8f4fd;margin-top:2px">${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
             <div style="font-size:11px;color:rgba(200,230,255,.5);margin-top:4px">Par ${currentUConf?.name||'Admin'}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BLOC TOTAL MENSUEL (style image) -->
-      <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:16px 18px;margin-bottom:20px;backdrop-filter:blur(8px)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px">
-          <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:rgba(180,220,255,.6);font-weight:700;font-family:'Barlow Condensed',sans-serif;">📊 Total mensuel</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#fff;margin-top:3px">${moisLabelCap}</div>
-          </div>
-          <div style="font-size:11px;color:rgba(200,230,255,.55);background:rgba(255,255,255,.08);border-radius:20px;padding:4px 14px;border:1px solid rgba(255,255,255,.12);font-weight:600">${joursT} jours travaillés</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-          <div style="background:rgba(242,124,87,.15);border:1px solid rgba(242,124,87,.38);border-radius:11px;padding:12px 14px">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#fba07a;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">📦 Emballage</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fba07a;line-height:1">${numFr(totalEmb)}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">cartons</div>
-          </div>
-          <div style="background:rgba(124,108,255,.15);border:1px solid rgba(124,108,255,.38);border-radius:11px;padding:12px 14px">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#a99aff;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">⚙️ B19</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#a99aff;line-height:1">${numFr(totalB19)}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">production</div>
-          </div>
-          <div style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.38);border-radius:11px;padding:12px 14px">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#a5b4fc;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">🔢 Total</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#a5b4fc;line-height:1">${numFr(totalComb)}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">combiné</div>
-          </div>
-          <div style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.38);border-radius:11px;padding:12px 14px">
-            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#fca5a5;font-weight:800;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;">🗑️ Déchets</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fca5a5;line-height:1">${totalDechets%1===0?numFr(totalDechets):totalDechets.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:2})}</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px">kg total</div>
           </div>
         </div>
       </div>
