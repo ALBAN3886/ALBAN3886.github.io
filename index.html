@@ -168,6 +168,56 @@ body.theme-sand {
   --wallpaper-overlay-to:   rgba(255,248,238,.34);
 }
 
+body.theme-night {
+  --bg:#0d1117; --bg2:rgba(22,27,34,.88); --surface:rgba(33,38,45,.82);
+  --card:rgba(40,45,55,.90); --border:rgba(48,54,61,.70); --border2:rgba(68,76,86,.85);
+  --text:#e6edf3; --muted:#8b949e; --muted2:#6e7681;
+  --soufflage:#58a6ff; --remplissage:#3fb950; --etiquette:#d29922;
+  --emballage:#f78166; --b19:#bc8cff; --admin:#bc8cff;
+  --ok:#3fb950; --warn:#d29922; --danger:#f85149;
+  --wallpaper-overlay-from:rgba(13,17,23,.75); --wallpaper-overlay-mid:rgba(22,27,34,.60); --wallpaper-overlay-to:rgba(13,17,23,.78);
+}
+
+body.theme-ocean {
+  --bg:#050d1a; --bg2:rgba(5,20,45,.90); --surface:rgba(8,30,62,.84);
+  --card:rgba(10,36,72,.92); --border:rgba(0,100,200,.32); --border2:rgba(0,140,255,.48);
+  --text:#c8e6ff; --muted:#5b9bd5; --muted2:#4080b8;
+  --soufflage:#00c8ff; --remplissage:#00e5b0; --etiquette:#ffb300;
+  --emballage:#ff6b35; --b19:#a78bfa; --admin:#a78bfa;
+  --ok:#00e5b0; --warn:#ffb300; --danger:#ff4757;
+  --wallpaper-overlay-from:rgba(5,13,26,.75); --wallpaper-overlay-mid:rgba(5,20,45,.60); --wallpaper-overlay-to:rgba(5,13,26,.78);
+}
+
+body.theme-volcano {
+  --bg:#120a0a; --bg2:rgba(30,12,10,.90); --surface:rgba(45,18,14,.84);
+  --card:rgba(55,22,18,.92); --border:rgba(180,40,20,.30); --border2:rgba(220,60,30,.48);
+  --text:#ffe8e0; --muted:#c47060; --muted2:#a05848;
+  --soufflage:#ff6b35; --remplissage:#ff9500; --etiquette:#ffd60a;
+  --emballage:#ff3860; --b19:#c77dff; --admin:#c77dff;
+  --ok:#06d6a0; --warn:#ffd60a; --danger:#ff3860;
+  --wallpaper-overlay-from:rgba(18,10,10,.75); --wallpaper-overlay-mid:rgba(30,12,10,.60); --wallpaper-overlay-to:rgba(18,10,10,.78);
+}
+
+body.theme-forest {
+  --bg:#060f0a; --bg2:rgba(8,22,14,.90); --surface:rgba(12,32,20,.84);
+  --card:rgba(16,40,25,.92); --border:rgba(30,100,50,.34); --border2:rgba(40,140,70,.50);
+  --text:#d4edda; --muted:#5a9e72; --muted2:#448060;
+  --soufflage:#2ddc8a; --remplissage:#00b4d8; --etiquette:#90e0ef;
+  --emballage:#f4a261; --b19:#a8dadc; --admin:#a8dadc;
+  --ok:#2ddc8a; --warn:#f4a261; --danger:#e63946;
+  --wallpaper-overlay-from:rgba(6,15,10,.75); --wallpaper-overlay-mid:rgba(8,22,14,.60); --wallpaper-overlay-to:rgba(6,15,10,.78);
+}
+
+body.theme-purple {
+  --bg:#0c0618; --bg2:rgba(18,8,35,.90); --surface:rgba(28,14,52,.84);
+  --card:rgba(35,18,65,.92); --border:rgba(100,50,200,.32); --border2:rgba(140,80,255,.50);
+  --text:#ede0ff; --muted:#9d78d8; --muted2:#7a56b8;
+  --soufflage:#c084fc; --remplissage:#34d399; --etiquette:#fbbf24;
+  --emballage:#fb7185; --b19:#38bdf8; --admin:#38bdf8;
+  --ok:#34d399; --warn:#fbbf24; --danger:#fb7185;
+  --wallpaper-overlay-from:rgba(12,6,24,.75); --wallpaper-overlay-mid:rgba(18,8,35,.60); --wallpaper-overlay-to:rgba(12,6,24,.78);
+}
+
 /* ══ ACCORDÉON ADMIN ══ */
 .admin-accordion { margin-bottom:10px; border-radius:14px; border:1px solid var(--border); overflow:hidden; transition:all .3s; }
 .admin-accordion-header {
@@ -2044,6 +2094,83 @@ tbody td,
             </div>
           </div>
 
+          <div style="grid-column:1/-1;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)">🌙 Thèmes sombres</div>
+
+          <div onclick="applyTheme('night')" id="theme-night" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0d1117,#161b22);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#f85149"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#d29922"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#3fb950"></div>
+              </div>
+              <div style="height:4px;background:rgba(48,54,61,.80);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(40,45,55,.90);border-radius:2px;width:70%;border:1px solid rgba(68,76,86,.60)"></div>
+            </div>
+            <div style="background:#0d1117;padding:8px 12px;font-size:12px;font-weight:700;color:#58a6ff;display:flex;align-items:center;justify-content:space-between">
+              🌑 GitHub Night <span id="check-night" style="color:#3fb950;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('ocean')" id="theme-ocean" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#050d1a,#0a2440);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff4757"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffb300"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#00e5b0"></div>
+              </div>
+              <div style="height:4px;background:rgba(0,100,200,.42);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(10,36,72,.90);border-radius:2px;width:70%;border:1px solid rgba(0,140,255,.32)"></div>
+            </div>
+            <div style="background:#050d1a;padding:8px 12px;font-size:12px;font-weight:700;color:#00c8ff;display:flex;align-items:center;justify-content:space-between">
+              🌊 Deep Ocean <span id="check-ocean" style="color:#00e5b0;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('volcano')" id="theme-volcano" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#120a0a,#2d1610);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ff3860"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#ffd60a"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#06d6a0"></div>
+              </div>
+              <div style="height:4px;background:rgba(180,40,20,.42);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(55,22,18,.90);border-radius:2px;width:70%;border:1px solid rgba(220,60,30,.32)"></div>
+            </div>
+            <div style="background:#120a0a;padding:8px 12px;font-size:12px;font-weight:700;color:#ff6b35;display:flex;align-items:center;justify-content:space-between">
+              🌋 Volcanique <span id="check-volcano" style="color:#06d6a0;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('forest')" id="theme-forest" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#060f0a,#0c2814);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#e63946"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#f4a261"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#2ddc8a"></div>
+              </div>
+              <div style="height:4px;background:rgba(30,100,50,.44);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(16,40,25,.90);border-radius:2px;width:70%;border:1px solid rgba(40,140,70,.32)"></div>
+            </div>
+            <div style="background:#060f0a;padding:8px 12px;font-size:12px;font-weight:700;color:#2ddc8a;display:flex;align-items:center;justify-content:space-between">
+              🌲 Forêt nuit <span id="check-forest" style="color:#00b4d8;display:none">✓</span>
+            </div>
+          </div>
+
+          <div onclick="applyTheme('purple')" id="theme-purple" style="border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent">
+            <div style="background:linear-gradient(135deg,#0c0618,#1e1040);padding:14px 12px">
+              <div style="display:flex;gap:4px;margin-bottom:8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#fb7185"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#fbbf24"></div>
+                <div style="width:8px;height:8px;border-radius:50%;background:#34d399"></div>
+              </div>
+              <div style="height:4px;background:rgba(100,50,200,.42);border-radius:2px;margin-bottom:4px"></div>
+              <div style="height:4px;background:rgba(35,18,65,.90);border-radius:2px;width:70%;border:1px solid rgba(140,80,255,.32)"></div>
+            </div>
+            <div style="background:#0c0618;padding:8px 12px;font-size:12px;font-weight:700;color:#c084fc;display:flex;align-items:center;justify-content:space-between">
+              🔮 Cosmos violet <span id="check-purple" style="color:#34d399;display:none">✓</span>
+            </div>
+          </div>
+
         </div>
         </div></div></div>
 
@@ -3620,7 +3747,6 @@ function setupListeners() {
         groupeB: data.groupeB || (data.shiftB ? data.shiftB : getDefaultGroupeB()),
       };
     } else {
-      // Charger les employés par défaut si Firebase est vide
       programmeData = { groupeA: getDefaultGroupeA(), groupeB: getDefaultGroupeB() };
     }
     renderProgShifts();
@@ -4939,6 +5065,35 @@ window.exportPDF = function() {
       </div>
     </div>
 
+    <!-- PROGRAMME DU PERSONNEL -->
+    ${(()=>{
+      const pData = programmeData;
+      if(!pData||(!(pData.groupeA&&pData.groupeA.length)&&!(pData.groupeB&&pData.groupeB.length)))return'';
+      const todayMon=getMondayOf(today());
+      const off=getWeekOffset(todayMon);
+      const hA=HORAIRES[getHoraireIndex('A',off)];
+      const hB=HORAIRES[getHoraireIndex('B',off)];
+      const dl=new Date(todayMon+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      function mkGrp(list,grp,h,col){
+        if(!list||!list.length)return'';
+        const rows=list.map((e,i)=>'<tr style="border-bottom:1px solid rgba(255,255,255,.05);'+(i%2===0?'background:rgba(255,255,255,.03)':'')+'"><td style="padding:5px 8px;text-align:center;color:'+col+';font-weight:800;width:28px">'+(i+1)+'</td><td style="padding:5px 8px;color:#8eb8d8;font-size:10px">'+esc(e.poste)+(e.numero?' <b style=color:'+col+'>'+esc(e.numero)+'</b>':'')+'</td><td style="padding:5px 8px;font-weight:700;color:#e8f4fd">'+esc(e.nom)+'</td></tr>').join('');
+        return '<div style="flex:1;min-width:240px;background:'+col+'18;border:1px solid '+col+'33;border-radius:10px;overflow:hidden">'
+          +'<div style="padding:8px 12px;background:'+col+'22;border-bottom:1px solid '+col+'33;display:flex;align-items:center;justify-content:space-between">'
+          +'<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:900;color:'+col+'">GROUPE '+grp+' — '+h.icon+' '+h.label+'</span>'
+          +'<span style="font-size:10px;color:rgba(200,230,255,.5)">'+list.length+' agents</span></div>'
+          +'<table style="width:100%;border-collapse:collapse;font-size:11px">'
+          +'<thead><tr style="background:rgba(255,255,255,.06)"><th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5);text-align:center;width:28px">#</th>'
+          +'<th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5)">Poste</th>'
+          +'<th style="padding:4px 8px;font-size:9px;color:rgba(160,220,255,.5)">Nom</th></tr></thead>'
+          +'<tbody>'+rows+'</tbody></table></div>';
+      }
+      return '<div style="margin-bottom:26px">'
+        +'<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#00b4ff;margin-bottom:12px">PROGRAMME DU PERSONNEL</div>'
+        +'<div style="font-size:11px;color:rgba(200,230,255,.45);margin-bottom:8px;text-transform:capitalize">'+dl+'</div>'
+        +'<div style="display:flex;gap:10px;flex-wrap:wrap">'+mkGrp(pData.groupeA,'A',hA,'#38bdf8')+mkGrp(pData.groupeB,'B',hB,'#fbbf24')+'</div>'
+        +'</div>';
+    })()}
+
     <!-- STATS -->
     ${(()=>{
       const total = rows.length;
@@ -5950,7 +6105,7 @@ onValue(ref(db, 'system/productionFormat'), snap => {
 });
 
 // ══════════ GESTION DES THÈMES ══════════
-const THEMES = ['light','arctic','rosegold','mint','sand'];
+const THEMES = ['light','arctic','rosegold','mint','sand','night','ocean','volcano','forest','purple'];
 
 function normalizeTheme(theme) {
   if (THEMES.includes(theme)) return theme;
@@ -5975,11 +6130,8 @@ function applyThemeUI(theme) {
   const activeCheck = document.getElementById('check-'+safeTheme);
   if (activeCard) {
     const colors = {
-      light:'rgba(0,167,214,.85)',
-      arctic:'rgba(26,159,224,.85)',
-      rosegold:'rgba(219,122,165,.85)',
-      mint:'rgba(29,185,166,.85)',
-      sand:'rgba(215,155,57,.85)'
+      light:'rgba(0,167,214,.85)',arctic:'rgba(26,159,224,.85)',rosegold:'rgba(219,122,165,.85)',mint:'rgba(29,185,166,.85)',sand:'rgba(215,155,57,.85)',
+      night:'rgba(88,166,255,.85)',ocean:'rgba(0,200,255,.85)',volcano:'rgba(255,107,53,.85)',forest:'rgba(45,220,138,.85)',purple:'rgba(192,132,252,.85)'
     };
     activeCard.style.border = `2px solid ${colors[safeTheme] || 'rgba(0,167,214,.85)'}`;
     activeCard.style.boxShadow = `0 0 0 3px ${colors[safeTheme] || 'rgba(0,167,214,.24)'}33`;
@@ -5988,11 +6140,8 @@ function applyThemeUI(theme) {
 
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   const metaColors = {
-    light:'#00a7d6',
-    arctic:'#1a9fe0',
-    rosegold:'#db7aa5',
-    mint:'#1db9a6',
-    sand:'#d79b39'
+    light:'#00a7d6',arctic:'#1a9fe0',rosegold:'#db7aa5',mint:'#1db9a6',sand:'#d79b39',
+    night:'#58a6ff',ocean:'#00c8ff',volcano:'#ff6b35',forest:'#2ddc8a',purple:'#c084fc'
   };
   if (metaTheme) metaTheme.setAttribute('content', metaColors[safeTheme] || '#00a7d6');
 }
@@ -7195,40 +7344,40 @@ window.switchProgTab = function(grp) {
 
 function getDefaultGroupeA() {
   return [
-    {poste:'SOUFFLAGE',             numero:'N1', nom:'BITEROU GNIMDOU FERNAND'},
-    {poste:'SOUTIREUSE',            numero:'N1', nom:'ELOH KOKOU ELIKPLIM'},
-    {poste:'ETIQUETTE',             numero:'N1', nom:'ADEHENOU KOMI HUBERT'},
-    {poste:'FARDELEUSE',            numero:'N1', nom:'VIGBEDOR AMEN'},
-    {poste:'LABORATORY/FILTRATION', numero:'N1', nom:'ONOUADJE BAYEDJE'},
-    {poste:'18.9LTR MACHINE',       numero:'N1', nom:'TANGBIAKE MINGOULIB'},
-    {poste:'MAINTENANCE',           numero:'N1', nom:'AMOUZOU EKOE'},
-    {poste:'MAINTENANCE',           numero:'N2', nom:'AMAVI AYI SIDOINE'},
-    {poste:'MAINTENANCE',           numero:'N3', nom:'EKLOU HOSSENYO LUC'},
-    {poste:'MAGASINIER',            numero:'N1', nom:'KOUEVI KOFFI BIOVA'},
-    {poste:'AGENT DE ENTRETIEN',    numero:'N1', nom:'LAWSON FOLLY'},
-    {poste:'AGENT DE ENTRETIEN',    numero:'N2', nom:'AKPOME PULCHERIE'},
-    {poste:'AGENT DE ENTRETIEN',    numero:'N3', nom:'AYISSOU FOLLY'},
+    {poste:'SOUFFLAGE',             nom:'BITEROU GNIMDOU FERNAND'},
+    {poste:'SOUTIREUSE',            nom:'ELOH KOKOU ELIKPLIM'},
+    {poste:'ETIQUETTE',             nom:'ADEHENOU KOMI HUBERT'},
+    {poste:'FARDELEUSE',            nom:'VIGBEDOR AMEN'},
+    {poste:'LABORATORY/FILTRATION', nom:'ONOUADJE BAYEDJE'},
+    {poste:'18.9LTR MACHINE',       nom:'TANGBIAKE MINGOULIB'},
+    {poste:'MAINTENANCE',           nom:'AMOUZOU EKOE'},
+    {poste:'MAINTENANCE',           nom:'AMAVI AYI SIDOINE'},
+    {poste:'MAINTENANCE',           nom:'EKLOU HOSSENYO LUC'},
+    {poste:'MAGASINIER',            nom:'KOUEVI KOFFI BIOVA'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'LAWSON FOLLY'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AKPOME PULCHERIE'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AYISSOU FOLLY'},
   ];
 }
 function getDefaultGroupeB() {
   return [
-    {poste:'SOUFFLAGE',             numero:'N1', nom:'OUROTCHEBA TOYI'},
-    {poste:'SOUTIREUSE',            numero:'N1', nom:'ADOKOU YAWOVI PROSPER'},
-    {poste:'ETIQUETTE',             numero:'N1', nom:'SETOGLO KODJO DANIEL'},
-    {poste:'ETIQUETTE',             numero:'N2', nom:'PIKEZI ESSOWASSAM MAGANIM'},
-    {poste:'FARDELEUSE',            numero:'N1', nom:'AKOUETE MESSAN'},
-    {poste:'FARDELEUSE',            numero:'N2', nom:'LOTTRO ORSEL AMAKA'},
-    {poste:'18.9LTR MACHINE',       numero:'N1', nom:'APETI FULBERTE'},
-    {poste:'ELECTRICIAN',           numero:'N1', nom:'KETEKU KOMLA'},
-    {poste:'MAINTENANCE',           numero:'N1', nom:'APETI ABLAM JEAN-MARIE'},
-    {poste:'LABOR',                 numero:'N1', nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
-    {poste:'LABOR',                 numero:'N2', nom:'AMETCHONOU TRINITE'},
-    {poste:'LABOR',                 numero:'N3', nom:'HOUNSOU KOFFIVI SAMUEL'},
-    {poste:'LABOR',                 numero:'N4', nom:'AMETCHOUN HOLALE'},
-    {poste:'MAGASINIER',            numero:'N1', nom:'AFANOU MESSAN'},
-    {poste:'AGENT DE ENTRETIEN',    numero:'N1', nom:'AKAKPO SEDJI YESU'},
-    {poste:'AGENT DE ENTRETIEN',    numero:'N2', nom:'YATE KOKOVI'},
-    {poste:'JARDINNIER',            numero:'N1', nom:'MESSANVI MESSAN'},
+    {poste:'SOUFFLAGE',             nom:'OUROTCHEBA TOYI'},
+    {poste:'SOUTIREUSE',            nom:'ADOKOU YAWOVI PROSPER'},
+    {poste:'ETIQUETTE',             nom:'SETOGLO KODJO DANIEL'},
+    {poste:'ETIQUETTE',             nom:'PIKEZI ESSOWASSAM MAGANIM'},
+    {poste:'FARDELEUSE',            nom:'AKOUETE MESSAN'},
+    {poste:'FARDELEUSE',            nom:'LOTTRO ORSEL AMAKA'},
+    {poste:'18.9LTR MACHINE',       nom:'APETI FULBERTE'},
+    {poste:'ELECTRICIAN',           nom:'KETEKU KOMLA'},
+    {poste:'MAINTENANCE',           nom:'APETI ABLAM JEAN-MARIE'},
+    {poste:'LABOR',                 nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
+    {poste:'LABOR',                 nom:'AMETCHONOU TRINITE'},
+    {poste:'LABOR',                 nom:'HOUNSOU KOFFIVI SAMUEL'},
+    {poste:'LABOR',                 nom:'AMETCHOUN HOLALE'},
+    {poste:'MAGASINIER',            nom:'AFANOU MESSAN'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AKAKPO SEDJI YESU'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'YATE KOKOVI'},
+    {poste:'JARDINNIER',            nom:'MESSANVI MESSAN'},
   ];
 }
 
@@ -7342,74 +7491,56 @@ function renderProgrammeBanner(data) {
   const hB=HORAIRES[getHoraireIndex('B',offset)];
   const dateFmt=new Date(todayMonday+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const dateLabel=dateFmt.charAt(0).toUpperCase()+dateFmt.slice(1);
-
-  const renderTable=(list,grpLabel,grpLetter,horaire,accentColor,badgeBg,badgeText)=>{
+  const renderTable=(list,grpLetter,horaire,accentColor,badgeBg)=>{
     if(!list||!list.length)return'';
     const rows=list.map((e,i)=>`
-      <tr>
-        <td style="padding:7px 10px;font-size:12px;font-weight:800;color:${accentColor};text-align:center;width:32px">${i+1}</td>
+      <tr style="border-bottom:1px solid rgba(255,255,255,.05);${i%2===0?'background:rgba(255,255,255,.03)':''}">
+        <td style="padding:7px 10px;font-size:12px;font-weight:800;color:${accentColor};text-align:center;width:30px">${i+1}</td>
         <td style="padding:7px 10px;width:38%">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:700;color:#c8d8e8;text-transform:uppercase;letter-spacing:.04em">${esc(e.poste)}</span>
-            ${e.numero?`<span style="font-size:10px;font-weight:800;background:${badgeBg};color:${badgeText};border-radius:4px;padding:1px 6px;letter-spacing:.04em">${esc(e.numero)}</span>`:''}
-          </div>
+          <span style="font-size:11px;font-weight:700;color:#c8d8e8;text-transform:uppercase">${esc(e.poste)}</span>
+          ${e.numero?`<span style="margin-left:5px;font-size:10px;font-weight:800;background:${badgeBg};color:${accentColor};border-radius:4px;padding:1px 6px">${esc(e.numero)}</span>`:''}
         </td>
-        <td style="padding:7px 10px;font-family:var(--font-display);font-size:13px;font-weight:900;color:#ffffff;letter-spacing:.02em">${esc(e.nom)}</td>
+        <td style="padding:7px 10px;font-family:var(--font-display);font-size:13px;font-weight:900;color:#fff">${esc(e.nom)}</td>
       </tr>`).join('');
-    return `
-      <div style="flex:1;min-width:300px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden">
-        <!-- Header groupe -->
-        <div style="padding:10px 14px;background:linear-gradient(90deg,${accentColor}22,transparent);border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:10px;height:10px;border-radius:50%;background:${accentColor};box-shadow:0 0 8px ${accentColor}88"></div>
-            <span style="font-family:var(--font-display);font-size:15px;font-weight:900;color:#fff;letter-spacing:.06em">GROUPE ${grpLetter}</span>
-            <span style="font-size:11px;color:rgba(255,255,255,.45)">${list.length} agents</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);border-radius:20px;padding:4px 10px">
-            <span style="font-size:13px">${horaire.icon}</span>
-            <span style="font-size:11px;font-weight:800;color:${horaire.color};letter-spacing:.04em">${horaire.label}</span>
-          </div>
+    return `<div style="flex:1;min-width:300px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden">
+      <div style="padding:10px 14px;background:linear-gradient(90deg,${accentColor}20,transparent);border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:9px;height:9px;border-radius:50%;background:${accentColor};box-shadow:0 0 8px ${accentColor}99"></div>
+          <span style="font-family:var(--font-display);font-size:15px;font-weight:900;color:#fff;letter-spacing:.06em">GROUPE ${grpLetter}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.4)">${list.length} agents</span>
         </div>
-        <!-- Table -->
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr style="background:rgba(255,255,255,.06)">
-              <th style="padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);text-align:center;width:32px">N°</th>
-              <th style="padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);text-align:left">Poste</th>
-              <th style="padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);text-align:left">Nom</th>
-            </tr>
-          </thead>
-          <tbody style="divide-y:rgba(255,255,255,.05)">${rows}</tbody>
-        </table>
-      </div>`;
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.3);border-radius:20px;padding:3px 10px">
+          <span>${horaire.icon}</span>
+          <span style="font-size:11px;font-weight:800;color:${horaire.color}">${horaire.label}</span>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:rgba(255,255,255,.05)">
+          <th style="padding:5px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);text-align:center;width:30px">N°</th>
+          <th style="padding:5px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35)">Poste</th>
+          <th style="padding:5px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35)">Nom</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
   };
-
   banner.style.display='block';
   banner.innerHTML=`
     <div style="background:linear-gradient(135deg,#060e1f 0%,#0b1a35 50%,#0d2040 100%);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)">
-
-      <!-- ── TOP BAR ── -->
       <div style="padding:14px 20px;background:linear-gradient(90deg,rgba(0,140,255,.12),rgba(255,160,0,.06));border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
         <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:36px;height:36px;background:linear-gradient(135deg,#0099cc,#0055aa);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(0,153,204,.4)">📋</div>
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#0099cc,#0055aa);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📋</div>
           <div>
             <div style="font-family:var(--font-display);font-size:16px;font-weight:900;color:#fff;letter-spacing:.08em;text-transform:uppercase">Programme du Personnel</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px">${dateLabel}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">${dateLabel}</div>
           </div>
         </div>
-        ${(currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur')?`
-        <button onclick="deleteProgramme()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 14px;color:#f87171;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;transition:all .2s" onmouseover="this.style.background='rgba(239,68,68,.25)'" onmouseout="this.style.background='rgba(239,68,68,.15)'">
-          ✕ Masquer
-        </button>`:''}
+        ${(currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur')?`<button onclick="deleteProgramme()" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:6px 14px;color:#f87171;cursor:pointer;font-size:12px;font-weight:700">✕ Masquer</button>`:''}
       </div>
-
-      <!-- ── GROUPES ── -->
       <div style="padding:14px;display:flex;gap:12px;flex-wrap:wrap">
-        ${renderTable(data.groupeA,'GROUPE A','A',hA,'#38bdf8','rgba(56,189,248,.2)','#38bdf8')}
-        ${renderTable(data.groupeB,'GROUPE B','B',hB,'#fbbf24','rgba(251,191,36,.2)','#fbbf24')}
+        ${renderTable(data.groupeA,'A',hA,'#38bdf8','rgba(56,189,248,.2)')}
+        ${renderTable(data.groupeB,'B',hB,'#fbbf24','rgba(251,191,36,.2)')}
       </div>
-
-      ${data.publishedBy?`<div style="padding:6px 20px 10px;font-size:10px;color:rgba(255,255,255,.25);text-align:right">Publié par ${esc(data.publishedBy)}</div>`:''}
+      ${data.publishedBy?`<div style="padding:4px 20px 10px;font-size:10px;color:rgba(255,255,255,.22);text-align:right">Publié par ${esc(data.publishedBy)}</div>`:''}
     </div>`;
 }
 
@@ -7503,31 +7634,6 @@ window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
 
-<!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
-<div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
-    <button onclick="closeAdminPwdModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
-    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)">🔑 Changer le mot de passe</div>
-    <div id="adminPwdModalUser" style="font-size:13px;color:var(--muted);margin-bottom:14px"></div>
-    <div id="adminCurrentPwdInfo"></div>
-    <div class="form-label">Nouveau mot de passe</div>
-    <div class="password-wrap" style="margin-bottom:14px">
-      <input type="password" class="form-input" id="adminNewPwd" placeholder="Minimum 6 caractères" style="margin-bottom:0">
-      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd',this)">👁</button>
-    </div>
-    <div class="form-label">Confirmer le mot de passe</div>
-    <div class="password-wrap" style="margin-bottom:16px">
-      <input type="password" class="form-input" id="adminNewPwd2" placeholder="Répéter le mot de passe" style="margin-bottom:0">
-      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd2',this)">👁</button>
-    </div>
-    <div id="adminPwdMsg" style="font-size:13px;min-height:18px;margin-bottom:12px"></div>
-    <button onclick="applyAdminPasswordChange()" id="adminPwdBtn" style="width:100%;padding:13px;background:var(--admin);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em">
-      🔒 Appliquer le nouveau mot de passe
-    </button>
-  </div>
-</div>
-
-
 <!-- ══ MODALE PROGRAMME — AJOUTER/MODIFIER EMPLOYÉ ══ -->
 <div id="addEmployeeModal" onclick="if(event.target===this)closeAddEmployeeModal()" style="display:none;position:fixed;inset:0;z-index:3100;background:rgba(10,20,40,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
@@ -7535,14 +7641,8 @@ window.addEventListener('resize', applyDesktopScale);
     <div id="addEmpModalTitle" style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:16px;color:var(--text)">➕ Ajouter un employé</div>
 
     <div style="display:flex;gap:10px;margin-bottom:12px">
-      <div style="flex:1">
-        <div class="form-label">Poste / Désignation</div>
-        <input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE..." style="text-transform:uppercase;margin-bottom:0">
-      </div>
-      <div style="width:80px">
-        <div class="form-label">N° Poste</div>
-        <input type="text" class="form-input" id="empNumero" placeholder="N1" style="text-transform:uppercase;margin-bottom:0">
-      </div>
+      <div style="flex:1"><div class="form-label">Poste / Désignation</div><input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE..." style="text-transform:uppercase;margin-bottom:0"></div>
+      <div style="width:80px"><div class="form-label">N° Poste</div><input type="text" class="form-input" id="empNumero" placeholder="N1" style="text-transform:uppercase;margin-bottom:0"></div>
     </div>
 
     <div class="form-label">Nom complet</div>
@@ -7564,6 +7664,31 @@ window.addEventListener('resize', applyDesktopScale);
         Annuler
       </button>
     </div>
+  </div>
+</div>
+
+
+<!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
+<div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
+    <button onclick="closeAdminPwdModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)">🔑 Changer le mot de passe</div>
+    <div id="adminPwdModalUser" style="font-size:13px;color:var(--muted);margin-bottom:14px"></div>
+    <div id="adminCurrentPwdInfo"></div>
+    <div class="form-label">Nouveau mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:14px">
+      <input type="password" class="form-input" id="adminNewPwd" placeholder="Minimum 6 caractères" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd',this)">👁</button>
+    </div>
+    <div class="form-label">Confirmer le mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:16px">
+      <input type="password" class="form-input" id="adminNewPwd2" placeholder="Répéter le mot de passe" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd2',this)">👁</button>
+    </div>
+    <div id="adminPwdMsg" style="font-size:13px;min-height:18px;margin-bottom:12px"></div>
+    <button onclick="applyAdminPasswordChange()" id="adminPwdBtn" style="width:100%;padding:13px;background:var(--admin);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em">
+      🔒 Appliquer le nouveau mot de passe
+    </button>
   </div>
 </div>
 
