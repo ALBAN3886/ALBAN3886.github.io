@@ -2252,42 +2252,56 @@ tbody td,
         <div class="admin-accordion-body" id="acc-body-programme">
         <div style="padding-top:16px">
 
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Gérez les équipes Shift A et Shift B. Ajoutez, déplacez ou supprimez des employés, puis publiez le programme pour l'afficher dans le tableau de bord.</p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+            Deux groupes fixes (A et B) avec rotation hebdomadaire sur 3 horaires : <strong style="color:var(--text)">06h–14h → 14h–22h → 22h–06h</strong>. Sélectionnez la semaine de départ du Groupe A pour calculer automatiquement le cycle.
+          </p>
 
-          <!-- Sélecteur de date -->
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-            <div>
-              <div class="form-label">Date du programme</div>
-              <input type="date" class="form-input" id="progDate" style="max-width:200px">
+          <!-- Semaine de référence + horaire actuel Groupe A -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+            <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">⚙️ Configuration du cycle</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+              <div>
+                <div class="form-label">Semaine de référence (lundi)</div>
+                <input type="date" class="form-input" id="cycleRefDate" style="max-width:190px" onchange="updateCyclePreview()">
+              </div>
+              <div>
+                <div class="form-label">Horaire Groupe A cette semaine-là</div>
+                <select class="form-input" id="cycleRefHoraire" style="max-width:200px" onchange="updateCyclePreview()">
+                  <option value="0">🌅 06h00 – 14h00</option>
+                  <option value="1">🌆 14h00 – 22h00</option>
+                  <option value="2">🌙 22h00 – 06h00</option>
+                </select>
+              </div>
+              <div>
+                <button class="btn btn-primary" onclick="saveCycleConfig()" style="background:var(--etiquette);border-color:var(--etiquette)">💾 Enregistrer</button>
+                <span id="cycleOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600;margin-left:8px">✓ Sauvegardé !</span>
+              </div>
             </div>
-            <div style="margin-top:18px">
-              <button class="btn btn-primary" onclick="publishProgramme()" style="background:var(--etiquette);border-color:var(--etiquette)">📢 Publier le programme</button>
-              <button class="btn btn-ghost btn-sm" onclick="deleteProgramme()" style="border-color:rgba(239,68,68,.3);color:var(--danger);margin-left:8px">🗑️ Supprimer</button>
-              <span id="progOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600;margin-left:10px">✓ Publié !</span>
-            </div>
+            <!-- Aperçu semaine courante -->
+            <div id="cyclePreview" style="margin-top:12px;padding:10px 14px;background:var(--card);border-radius:8px;font-size:13px;display:none"></div>
           </div>
 
-          <!-- Shifts A et B -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="progShiftsGrid">
+          <!-- Onglets Groupe A / Groupe B -->
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button id="tab-grpA" onclick="switchProgTab('A')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--soufflage);background:var(--soufflage);color:#fff;font-weight:700;font-size:13px;cursor:pointer">🔵 Groupe A</button>
+            <button id="tab-grpB" onclick="switchProgTab('B')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">🟡 Groupe B</button>
+          </div>
 
-            <!-- SHIFT A -->
-            <div style="background:var(--surface);border:1.5px solid rgba(0,167,214,.3);border-radius:14px;padding:14px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-                <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--soufflage)">🔵 SHIFT A <span style="font-size:12px;font-weight:500;color:var(--muted)">(06:00–14:00)</span></div>
-                <button onclick="openAddEmployeeModal('A')" style="background:var(--soufflage);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer">+ Ajouter</button>
-              </div>
-              <div id="prog-shift-A" style="display:flex;flex-direction:column;gap:6px"></div>
+          <!-- Liste employés groupe actif -->
+          <div style="background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div id="progGroupTitle" style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--soufflage)">🔵 GROUPE A</div>
+              <button onclick="openAddEmployeeModal(activeProgTab)" style="background:var(--soufflage);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer" id="btnAddEmp">+ Ajouter</button>
             </div>
+            <div id="prog-shift-A" style="display:flex;flex-direction:column;gap:6px"></div>
+            <div id="prog-shift-B" style="display:flex;flex-direction:column;gap:6px;display:none"></div>
+          </div>
 
-            <!-- SHIFT B -->
-            <div style="background:var(--surface);border:1.5px solid rgba(226,154,47,.3);border-radius:14px;padding:14px">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-                <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:var(--etiquette)">🟡 SHIFT B <span style="font-size:12px;font-weight:500;color:var(--muted)">(08:00–16:00)</span></div>
-                <button onclick="openAddEmployeeModal('B')" style="background:var(--etiquette);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer">+ Ajouter</button>
-              </div>
-              <div id="prog-shift-B" style="display:flex;flex-direction:column;gap:6px"></div>
-            </div>
-
+          <!-- Bouton publier -->
+          <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="publishProgramme()" style="background:var(--etiquette);border-color:var(--etiquette)">📢 Publier le programme</button>
+            <button class="btn btn-ghost btn-sm" onclick="deleteProgramme()" style="border-color:rgba(239,68,68,.3);color:var(--danger)">🗑️ Masquer</button>
+            <span id="progOk" style="display:none;color:var(--ok);font-size:13px;font-weight:600">✓ Publié !</span>
           </div>
 
         </div></div></div>
@@ -3602,15 +3616,34 @@ function setupListeners() {
     const data = snap.val();
     renderProgrammeBanner(data || {});
     if (data) {
-      programmeData = { shiftA: data.shiftA||[], shiftB: data.shiftB||[], date: data.date||'' };
+      programmeData = {
+        groupeA: data.groupeA || (data.shiftA ? data.shiftA : getDefaultGroupeA()),
+        groupeB: data.groupeB || (data.shiftB ? data.shiftB : getDefaultGroupeB()),
+      };
       renderProgShifts();
-      const d = document.getElementById('progDate');
-      if (d && data.date) d.value = data.date;
     }
   });
   listeners.push({ ref:progRef, fn:progL });
 
-  // Initialiser la date du programme dans l'admin
+  // Config cycle programme — temps réel
+  const cfgRef = ref(db,'programmeConfig');
+  const cfgL = onValue(cfgRef, snap => {
+    const cfg = snap.val();
+    if (cfg) {
+      cycleConfig = { refDate: cfg.refDate||'', refHoraire: parseInt(cfg.refHoraire)||0 };
+      // Mettre à jour les champs dans l'admin si ouverts
+      const rd = document.getElementById('cycleRefDate');
+      const rh = document.getElementById('cycleRefHoraire');
+      if (rd && cfg.refDate) rd.value = cfg.refDate;
+      if (rh) rh.value = String(cycleConfig.refHoraire);
+      window.updateCyclePreview?.();
+      // Re-render banner avec les bons horaires
+      renderProgrammeBanner(programmeData);
+    }
+  });
+  listeners.push({ ref:cfgRef, fn:cfgL });
+
+  // Initialiser l'aperçu cycle
   initProgDate();
 
   // Groupe chargé à la demande à l'ouverture de la messagerie
@@ -7053,308 +7086,295 @@ async function renderMachinePage(machineKey) {
 }
 
 // ══════════════════════════════════════════════════════
-// ══ MODULE PROGRAMME DU PERSONNEL ══
+// ══ MODULE PROGRAMME DU PERSONNEL — CYCLE 3 HORAIRES ══
 // ══════════════════════════════════════════════════════
 
-// ── Données locales du programme ──
-let programmeData = { shiftA: [], shiftB: [], date: '' };
-let editingEmpShift = 'A';
-let editingEmpIndex = -1; // -1 = ajout, >=0 = modification
-
-const POSTES_CONNUS = [
-  'SOUFFLAGE','SOUTIREUSE','ETIQUETTE','FARDELEUSE',
-  'LABORATORY/FILTRATION','18.9LTR MACHINE','MAINTENANCE',
-  'ELECTRICIAN','MAGASINIER','AGENT DE ENTRETIEN','JARDINNIER','LABOR'
+const HORAIRES = [
+  { label:'06h00 – 14h00', short:'06h–14h', icon:'🌅', color:'#00c8ff' },
+  { label:'14h00 – 22h00', short:'14h–22h', icon:'🌆', color:'#f59e0b' },
+  { label:'22h00 – 06h00', short:'22h–06h', icon:'🌙', color:'#a78bfa' },
 ];
 
-// ── Initialiser la date du jour dans le champ ──
-function initProgDate() {
-  const d = document.getElementById('progDate');
-  if (d && !d.value) d.value = today();
+let programmeData = { groupeA: [], groupeB: [] };
+let cycleConfig   = { refDate: '', refHoraire: 0 };
+let activeProgTab = 'A';
+let editingEmpGrp = 'A';
+let editingEmpIdx = -1;
+
+function getMondayOf(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const day = d.getDay();
+  const diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0,10);
 }
 
-// ── Charger le programme depuis Firebase ──
-function loadProgramme() {
-  const pRef = ref(db,'programme');
-  onValue(pRef, snap => {
-    const data = snap.val();
-    if (data) {
-      programmeData = {
-        shiftA: data.shiftA || [],
-        shiftB: data.shiftB || [],
-        date:   data.date   || ''
-      };
-    } else {
-      // Initialiser avec les noms des images si vide
-      programmeData = { shiftA: getDefaultShiftA(), shiftB: getDefaultShiftB(), date: today() };
-    }
-    renderProgShifts();
-    renderProgrammeBanner(programmeData);
-    const d = document.getElementById('progDate');
-    if (d && programmeData.date) d.value = programmeData.date;
+function getHoraireIndex(groupe, weekOffset) {
+  const baseA = ((cycleConfig.refHoraire + weekOffset) % 3 + 3) % 3;
+  const baseB = (baseA + 1) % 3;
+  return groupe === 'A' ? baseA : baseB;
+}
+
+function getWeekOffset(mondayStr) {
+  if (!cycleConfig.refDate) return 0;
+  const ref  = new Date(cycleConfig.refDate + 'T12:00:00');
+  const curr = new Date(mondayStr + 'T12:00:00');
+  return Math.round((curr - ref) / (7 * 86400000));
+}
+
+window.updateCyclePreview = function() {
+  const preview = document.getElementById('cyclePreview');
+  const refDate = document.getElementById('cycleRefDate')?.value;
+  const refH    = parseInt(document.getElementById('cycleRefHoraire')?.value || '0');
+  if (!preview || !refDate) { if(preview) preview.style.display='none'; return; }
+  cycleConfig = { refDate: getMondayOf(refDate), refHoraire: refH };
+  const todayMonday = getMondayOf(today());
+  const offset = getWeekOffset(todayMonday);
+  const hA = HORAIRES[getHoraireIndex('A', offset)];
+  const hB = HORAIRES[getHoraireIndex('B', offset)];
+  const nextMonday = new Date(todayMonday + 'T12:00:00');
+  nextMonday.setDate(nextMonday.getDate() + 7);
+  const nOffset = getWeekOffset(nextMonday.toISOString().slice(0,10));
+  const nhA = HORAIRES[getHoraireIndex('A', nOffset)];
+  const nhB = HORAIRES[getHoraireIndex('B', nOffset)];
+  preview.style.display = 'block';
+  preview.innerHTML = `
+    <div style="font-weight:700;color:var(--text);margin-bottom:6px">📅 Semaine en cours :</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div>🔵 <strong>Groupe A</strong> → <span style="color:${hA.color};font-weight:700">${hA.icon} ${hA.label}</span></div>
+      <div>🟡 <strong>Groupe B</strong> → <span style="color:${hB.color};font-weight:700">${hB.icon} ${hB.label}</span></div>
+    </div>
+    <div style="font-weight:700;color:var(--text);margin-top:8px;margin-bottom:4px">📅 Semaine prochaine :</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div>🔵 <strong>Groupe A</strong> → <span style="color:${nhA.color};font-weight:700">${nhA.icon} ${nhA.label}</span></div>
+      <div>🟡 <strong>Groupe B</strong> → <span style="color:${nhB.color};font-weight:700">${nhB.icon} ${nhB.label}</span></div>
+    </div>`;
+};
+
+window.saveCycleConfig = async function() {
+  const refDate = document.getElementById('cycleRefDate')?.value;
+  const refH    = parseInt(document.getElementById('cycleRefHoraire')?.value || '0');
+  if (!refDate) { alert('Choisissez une date de référence.'); return; }
+  cycleConfig = { refDate: getMondayOf(refDate), refHoraire: refH };
+  await set(ref(db,'programmeConfig'), cycleConfig);
+  const ok = document.getElementById('cycleOk');
+  if (ok) { ok.style.display='inline'; setTimeout(()=>ok.style.display='none', 3000); }
+  window.updateCyclePreview();
+};
+
+window.switchProgTab = function(grp) {
+  activeProgTab = grp;
+  const colors = { A:'var(--soufflage)', B:'var(--etiquette)' };
+  ['A','B'].forEach(g => {
+    const btn = document.getElementById('tab-grp'+g);
+    if (!btn) return;
+    const active = g === grp;
+    btn.style.background  = active ? colors[g] : 'none';
+    btn.style.color       = active ? '#fff' : 'var(--muted)';
+    btn.style.borderColor = active ? colors[g] : 'var(--border)';
   });
-}
+  const elA = document.getElementById('prog-shift-A');
+  const elB = document.getElementById('prog-shift-B');
+  const title  = document.getElementById('progGroupTitle');
+  const btnAdd = document.getElementById('btnAddEmp');
+  if (grp === 'A') {
+    if(elA){ elA.style.display='flex'; elA.style.flexDirection='column'; elA.style.gap='6px'; }
+    if(elB) elB.style.display='none';
+    if(title){ title.textContent='🔵 GROUPE A'; title.style.color='var(--soufflage)'; }
+    if(btnAdd) btnAdd.style.background='var(--soufflage)';
+  } else {
+    if(elA) elA.style.display='none';
+    if(elB){ elB.style.display='flex'; elB.style.flexDirection='column'; elB.style.gap='6px'; }
+    if(title){ title.textContent='🟡 GROUPE B'; title.style.color='var(--etiquette)'; }
+    if(btnAdd) btnAdd.style.background='var(--etiquette)';
+  }
+};
 
-function getDefaultShiftA() {
+function getDefaultGroupeA() {
   return [
-    {poste:'SOUFFLAGE',          nom:'BITEROU GNIMDOU FERNAND'},
-    {poste:'SOUTIREUSE',         nom:'ELOH KOKOU ELIKPLIM'},
-    {poste:'ETIQUETTE',          nom:'ADEHENOU KOMI HUBERT'},
-    {poste:'FARDELEUSE',         nom:'VIGBEDOR AMEN'},
+    {poste:'SOUFFLAGE',             nom:'BITEROU GNIMDOU FERNAND'},
+    {poste:'SOUTIREUSE',            nom:'ELOH KOKOU ELIKPLIM'},
+    {poste:'ETIQUETTE',             nom:'ADEHENOU KOMI HUBERT'},
+    {poste:'FARDELEUSE',            nom:'VIGBEDOR AMEN'},
     {poste:'LABORATORY/FILTRATION', nom:'ONOUADJE BAYEDJE'},
-    {poste:'18.9LTR MACHINE',    nom:'TANGBIAKE MINGOULIB'},
-    {poste:'MAINTENANCE',        nom:'AMOUZOU EKOE'},
-    {poste:'MAINTENANCE',        nom:'AMAVI AYI SIDOINE'},
-    {poste:'MAINTENANCE',        nom:'EKLOU HOSSENYO LUC'},
-    {poste:'MAGASINIER',         nom:'KOUEVI KOFFI BIOVA'},
-    {poste:'AGENT DE ENTRETIEN', nom:'LAWSON FOLLY'},
-    {poste:'AGENT DE ENTRETIEN', nom:'AKPOME PULCHERIE'},
-    {poste:'AGENT DE ENTRETIEN', nom:'AYISSOU FOLLY'},
+    {poste:'18.9LTR MACHINE',       nom:'TANGBIAKE MINGOULIB'},
+    {poste:'MAINTENANCE',           nom:'AMOUZOU EKOE'},
+    {poste:'MAINTENANCE',           nom:'AMAVI AYI SIDOINE'},
+    {poste:'MAINTENANCE',           nom:'EKLOU HOSSENYO LUC'},
+    {poste:'MAGASINIER',            nom:'KOUEVI KOFFI BIOVA'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'LAWSON FOLLY'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AKPOME PULCHERIE'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AYISSOU FOLLY'},
   ];
 }
-function getDefaultShiftB() {
+function getDefaultGroupeB() {
   return [
-    {poste:'SOUFFLAGE',          nom:'OUROTCHEBA TOYI'},
-    {poste:'SOUTIREUSE',         nom:'ADOKOU YAWOVI PROSPER'},
-    {poste:'ETIQUETTE',          nom:'SETOGLO KODJO DANIEL'},
-    {poste:'ETIQUETTE',          nom:'PIKEZI ESSOWASSAM MAGANIM'},
-    {poste:'FARDELEUSE',         nom:'AKOUETE MESSAN'},
-    {poste:'FARDELEUSE',         nom:'LOTTRO ORSEL AMAKA'},
-    {poste:'18.9LTR MACHINE',    nom:'APETI FULBERTE'},
-    {poste:'ELECTRICIAN',        nom:'KETEKU KOMLA'},
-    {poste:'MAINTENANCE',        nom:'APETI ABLAM JEAN-MARIE'},
-    {poste:'LABOR',              nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
-    {poste:'LABOR',              nom:'AMETCHONOU TRINITE'},
-    {poste:'LABOR',              nom:'HOUNSOU KOFFIVI SAMUEL'},
-    {poste:'LABOR',              nom:'AMETCHOUN HOLALE'},
-    {poste:'MAGASINIER',         nom:'AFANOU MESSAN'},
-    {poste:'AGENT DE ENTRETIEN', nom:'AKAKPO SEDJI YESU'},
-    {poste:'AGENT DE ENTRETIEN', nom:'YATE KOKOVI'},
-    {poste:'JARDINNIER',         nom:'MESSANVI MESSAN'},
+    {poste:'SOUFFLAGE',             nom:'OUROTCHEBA TOYI'},
+    {poste:'SOUTIREUSE',            nom:'ADOKOU YAWOVI PROSPER'},
+    {poste:'ETIQUETTE',             nom:'SETOGLO KODJO DANIEL'},
+    {poste:'ETIQUETTE',             nom:'PIKEZI ESSOWASSAM MAGANIM'},
+    {poste:'FARDELEUSE',            nom:'AKOUETE MESSAN'},
+    {poste:'FARDELEUSE',            nom:'LOTTRO ORSEL AMAKA'},
+    {poste:'18.9LTR MACHINE',       nom:'APETI FULBERTE'},
+    {poste:'ELECTRICIAN',           nom:'KETEKU KOMLA'},
+    {poste:'MAINTENANCE',           nom:'APETI ABLAM JEAN-MARIE'},
+    {poste:'LABOR',                 nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
+    {poste:'LABOR',                 nom:'AMETCHONOU TRINITE'},
+    {poste:'LABOR',                 nom:'HOUNSOU KOFFIVI SAMUEL'},
+    {poste:'LABOR',                 nom:'AMETCHOUN HOLALE'},
+    {poste:'MAGASINIER',            nom:'AFANOU MESSAN'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'AKAKPO SEDJI YESU'},
+    {poste:'AGENT DE ENTRETIEN',    nom:'YATE KOKOVI'},
+    {poste:'JARDINNIER',            nom:'MESSANVI MESSAN'},
   ];
 }
 
-// ── Afficher les listes dans l'admin ──
 function renderProgShifts() {
-  renderProgList('A', programmeData.shiftA);
-  renderProgList('B', programmeData.shiftB);
+  renderProgList('A', programmeData.groupeA || []);
+  renderProgList('B', programmeData.groupeB || []);
 }
 
-function renderProgList(shift, list) {
-  const el = document.getElementById(`prog-shift-${shift}`);
+function renderProgList(grp, list) {
+  const el = document.getElementById('prog-shift-'+grp);
   if (!el) return;
-  if (!list || list.length === 0) {
-    el.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">Aucun employé — cliquez sur + Ajouter</div>`;
+  if (!list || !list.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">Aucun employé — cliquez + Ajouter</div>';
     return;
   }
   el.innerHTML = list.map((emp, i) => `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:6px">
-      <!-- Numéro -->
       <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--muted);min-width:20px">${i+1}</div>
-      <!-- Contenu -->
       <div style="flex:1;min-width:0">
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:1px">${esc(emp.poste)}</div>
         <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(emp.nom)}</div>
       </div>
-      <!-- Boutons déplacer ↑↓ -->
       <div style="display:flex;flex-direction:column;gap:2px">
-        <button onclick="moveEmp('${shift}',${i},-1)" ${i===0?'disabled':''} style="background:var(--surface);border:1px solid var(--border);border-radius:5px;width:22px;height:20px;font-size:10px;cursor:pointer;color:var(--muted);line-height:1;${i===0?'opacity:.3':''}">↑</button>
-        <button onclick="moveEmp('${shift}',${i},1)" ${i===list.length-1?'disabled':''} style="background:var(--surface);border:1px solid var(--border);border-radius:5px;width:22px;height:20px;font-size:10px;cursor:pointer;color:var(--muted);line-height:1;${i===list.length-1?'opacity:.3':''}">↓</button>
+        <button onclick="moveEmp('${grp}',${i},-1)" ${i===0?'disabled':''} style="background:var(--surface);border:1px solid var(--border);border-radius:5px;width:22px;height:20px;font-size:10px;cursor:pointer;color:var(--muted);${i===0?'opacity:.3':''}">↑</button>
+        <button onclick="moveEmp('${grp}',${i},1)" ${i===list.length-1?'disabled':''} style="background:var(--surface);border:1px solid var(--border);border-radius:5px;width:22px;height:20px;font-size:10px;cursor:pointer;color:var(--muted);${i===list.length-1?'opacity:.3':''}">↓</button>
       </div>
-      <!-- Bouton modifier -->
-      <button onclick="openEditEmployeeModal('${shift}',${i})" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:var(--muted)">✏️</button>
-      <!-- Bouton changer de shift -->
-      <button onclick="moveEmpToOtherShift('${shift}',${i})" title="Déplacer vers Shift ${shift==='A'?'B':'A'}" style="background:${shift==='A'?'rgba(226,154,47,.12)':'rgba(0,167,214,.12)'};border:1px solid ${shift==='A'?'rgba(226,154,47,.3)':'rgba(0,167,214,.3)'};border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:${shift==='A'?'var(--etiquette)':'var(--soufflage)'}">→${shift==='A'?'B':'A'}</button>
-      <!-- Bouton supprimer -->
-      <button onclick="deleteEmp('${shift}',${i})" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:var(--danger)">✕</button>
-    </div>
-  `).join('');
+      <button onclick="openEditEmployeeModal('${grp}',${i})" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:var(--muted)">✏️</button>
+      <button onclick="moveEmpToOtherGrp('${grp}',${i})" title="Déplacer vers Groupe ${grp==='A'?'B':'A'}" style="background:${grp==='A'?'rgba(226,154,47,.12)':'rgba(0,167,214,.12)'};border:1px solid ${grp==='A'?'rgba(226,154,47,.3)':'rgba(0,167,214,.3)'};border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:${grp==='A'?'var(--etiquette)':'var(--soufflage)'}">→${grp==='A'?'B':'A'}</button>
+      <button onclick="deleteEmp('${grp}',${i})" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:6px;padding:4px 7px;font-size:11px;cursor:pointer;color:var(--danger)">✕</button>
+    </div>`).join('');
 }
 
-// ── Déplacer un employé dans la liste ──
-window.moveEmp = function(shift, index, dir) {
-  const list = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-  const newIdx = index + dir;
-  if (newIdx < 0 || newIdx >= list.length) return;
-  [list[index], list[newIdx]] = [list[newIdx], list[index]];
-  renderProgShifts();
+window.moveEmp = function(grp, i, dir) {
+  const list = grp==='A' ? programmeData.groupeA : programmeData.groupeB;
+  const ni = i+dir; if(ni<0||ni>=list.length) return;
+  [list[i],list[ni]]=[list[ni],list[i]]; renderProgShifts();
 };
-
-// ── Déplacer un employé vers l'autre shift ──
-window.moveEmpToOtherShift = function(shift, index) {
-  const from = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-  const to   = shift === 'A' ? programmeData.shiftB : programmeData.shiftA;
-  const [emp] = from.splice(index, 1);
-  to.push(emp);
-  renderProgShifts();
+window.moveEmpToOtherGrp = function(grp, i) {
+  const from = grp==='A' ? programmeData.groupeA : programmeData.groupeB;
+  const to   = grp==='A' ? programmeData.groupeB : programmeData.groupeA;
+  const [emp] = from.splice(i,1); to.push(emp); renderProgShifts();
 };
-
-// ── Supprimer un employé ──
-window.deleteEmp = function(shift, index) {
+window.deleteEmp = function(grp, i) {
   if (!confirm('Supprimer cet employé du programme ?')) return;
-  const list = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-  list.splice(index, 1);
-  renderProgShifts();
+  (grp==='A' ? programmeData.groupeA : programmeData.groupeB).splice(i,1); renderProgShifts();
 };
-
-// ── Ouvrir modale ajout ──
-window.openAddEmployeeModal = function(shift) {
-  editingEmpShift = shift;
-  editingEmpIndex = -1;
-  document.getElementById('addEmpModalTitle').textContent = `➕ Ajouter dans Shift ${shift}`;
-  document.getElementById('empPoste').value = '';
-  document.getElementById('empNom').value   = '';
-  document.getElementById('empShift').value = shift;
-  document.getElementById('addEmpMsg').textContent = '';
-  const m = document.getElementById('addEmployeeModal');
-  m.style.display = 'flex';
+window.openAddEmployeeModal = function(grp) {
+  editingEmpGrp=grp; editingEmpIdx=-1;
+  document.getElementById('addEmpModalTitle').textContent='➕ Ajouter dans Groupe '+grp;
+  document.getElementById('empPoste').value='';
+  document.getElementById('empNom').value='';
+  document.getElementById('empShift').value=grp;
+  document.getElementById('addEmpMsg').textContent='';
+  document.getElementById('addEmployeeModal').style.display='flex';
 };
-
-// ── Ouvrir modale modification ──
-window.openEditEmployeeModal = function(shift, index) {
-  editingEmpShift = shift;
-  editingEmpIndex = index;
-  const list = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-  const emp = list[index];
-  document.getElementById('addEmpModalTitle').textContent = '✏️ Modifier l\'employé';
-  document.getElementById('empPoste').value = emp.poste;
-  document.getElementById('empNom').value   = emp.nom;
-  document.getElementById('empShift').value = shift;
-  document.getElementById('addEmpMsg').textContent = '';
-  const m = document.getElementById('addEmployeeModal');
-  m.style.display = 'flex';
+window.openEditEmployeeModal = function(grp, i) {
+  editingEmpGrp=grp; editingEmpIdx=i;
+  const emp=(grp==='A'?programmeData.groupeA:programmeData.groupeB)[i];
+  document.getElementById('addEmpModalTitle').textContent="✏️ Modifier l'employé";
+  document.getElementById('empPoste').value=emp.poste;
+  document.getElementById('empNom').value=emp.nom;
+  document.getElementById('empShift').value=grp;
+  document.getElementById('addEmpMsg').textContent='';
+  document.getElementById('addEmployeeModal').style.display='flex';
 };
-
 window.closeAddEmployeeModal = function() {
-  document.getElementById('addEmployeeModal').style.display = 'none';
+  document.getElementById('addEmployeeModal').style.display='none';
 };
-
-// ── Sauvegarder l'ajout/modification ──
 window.saveEmployee = function() {
-  const poste = document.getElementById('empPoste').value.trim().toUpperCase();
-  const nom   = document.getElementById('empNom').value.trim().toUpperCase();
-  const shift = document.getElementById('empShift').value;
-  const msg   = document.getElementById('addEmpMsg');
-  if (!poste || !nom) { msg.textContent = 'Veuillez remplir le poste et le nom.'; return; }
-
-  if (editingEmpIndex >= 0) {
-    // Modification — peut changer de shift
-    const fromList = editingEmpShift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-    if (shift !== editingEmpShift) {
-      // Déplacer vers l'autre shift
-      fromList.splice(editingEmpIndex, 1);
-      const toList = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-      toList.push({poste, nom});
-    } else {
-      fromList[editingEmpIndex] = {poste, nom};
-    }
+  const poste=document.getElementById('empPoste').value.trim().toUpperCase();
+  const nom=document.getElementById('empNom').value.trim().toUpperCase();
+  const grp=document.getElementById('empShift').value;
+  const msg=document.getElementById('addEmpMsg');
+  if(!poste||!nom){msg.textContent='Veuillez remplir le poste et le nom.';return;}
+  if(editingEmpIdx>=0){
+    const fromList=editingEmpGrp==='A'?programmeData.groupeA:programmeData.groupeB;
+    if(grp!==editingEmpGrp){fromList.splice(editingEmpIdx,1);(grp==='A'?programmeData.groupeA:programmeData.groupeB).push({poste,nom});}
+    else{fromList[editingEmpIdx]={poste,nom};}
   } else {
-    // Ajout
-    const list = shift === 'A' ? programmeData.shiftA : programmeData.shiftB;
-    list.push({poste, nom});
+    (grp==='A'?programmeData.groupeA:programmeData.groupeB).push({poste,nom});
   }
-
-  renderProgShifts();
-  closeAddEmployeeModal();
+  renderProgShifts(); window.closeAddEmployeeModal();
 };
 
-// ── Publier le programme dans Firebase ──
 window.publishProgramme = async function() {
-  const dateVal = document.getElementById('progDate')?.value || today();
-  programmeData.date = dateVal;
   try {
-    await set(ref(db,'programme'), {
-      shiftA: programmeData.shiftA,
-      shiftB: programmeData.shiftB,
-      date:   dateVal,
-      active: true,
-      publishedBy: currentUConf?.name || 'Admin',
-      ts: Date.now()
+    await set(ref(db,'programme'),{
+      groupeA:programmeData.groupeA, groupeB:programmeData.groupeB,
+      active:true, publishedBy:currentUConf?.name||'Admin', ts:Date.now()
     });
-    const ok = document.getElementById('progOk');
-    if (ok) { ok.style.display='inline'; setTimeout(()=>ok.style.display='none', 3000); }
-  } catch(e) { alert('Erreur publication : '+e.message); }
+    const ok=document.getElementById('progOk');
+    if(ok){ok.style.display='inline';setTimeout(()=>ok.style.display='none',3000);}
+  } catch(e){alert('Erreur : '+e.message);}
 };
-
-// ── Supprimer le programme ──
 window.deleteProgramme = async function() {
-  if (!confirm('Supprimer le programme affiché ?')) return;
-  await remove(ref(db,'programme'));
+  if(!confirm('Masquer le programme ?'))return;
+  await set(ref(db,'programme'),{active:false});
 };
 
-// ── Afficher le programme dans le dashboard ──
 function renderProgrammeBanner(data) {
-  const banner = document.getElementById('programmeBanner');
-  if (!banner) return;
-  if (!data || !data.active || (!data.shiftA?.length && !data.shiftB?.length)) {
-    banner.style.display = 'none'; return;
-  }
-
-  const dateLabel = data.date
-    ? new Date(data.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
-    : '';
-
-  const renderShiftTable = (list, shiftLabel, timeLabel, color) => {
-    if (!list || !list.length) return '';
-    return `
-      <div style="flex:1;min-width:260px">
-        <div style="font-family:var(--font-display);font-size:14px;font-weight:800;color:${color};text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding:6px 10px;background:rgba(255,255,255,.08);border-radius:8px">
-          ${shiftLabel} <span style="font-size:11px;font-weight:500;opacity:.8">${timeLabel}</span>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead>
-            <tr style="background:rgba(255,255,255,.12)">
-              <th style="padding:5px 8px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.75">N°</th>
-              <th style="padding:5px 8px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.75">Poste</th>
-              <th style="padding:5px 8px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.75">Nom</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${list.map((e,i)=>`
-              <tr style="border-bottom:1px solid rgba(255,255,255,.08);${i%2===0?'background:rgba(255,255,255,.04)':''}">
-                <td style="padding:5px 8px;font-weight:700;opacity:.7">${i+1}</td>
-                <td style="padding:5px 8px;font-weight:600;font-size:11px">${esc(e.poste)}</td>
-                <td style="padding:5px 8px;font-weight:700">${esc(e.nom)}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
+  const banner=document.getElementById('programmeBanner');
+  if(!banner)return;
+  if(!data||!data.active){banner.style.display='none';return;}
+  const todayMonday=getMondayOf(today());
+  const offset=getWeekOffset(todayMonday);
+  const hA=HORAIRES[getHoraireIndex('A',offset)];
+  const hB=HORAIRES[getHoraireIndex('B',offset)];
+  const dateLabel=new Date(todayMonday+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const renderTable=(list,titre,horaire,color)=>{
+    if(!list||!list.length)return'';
+    return `<div style="flex:1;min-width:260px">
+      <div style="font-family:var(--font-display);font-size:14px;font-weight:900;margin-bottom:6px;padding:7px 12px;background:rgba(255,255,255,.10);border-radius:8px;display:flex;align-items:center;justify-content:space-between">
+        <span style="color:${color}">${titre}</span>
+        <span style="font-size:12px;font-weight:700;color:${horaire.color}">${horaire.icon} ${horaire.label}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:rgba(255,255,255,.12)">
+          <th style="padding:5px 7px;text-align:left;font-size:10px;opacity:.7;text-transform:uppercase">N°</th>
+          <th style="padding:5px 7px;text-align:left;font-size:10px;opacity:.7;text-transform:uppercase">Poste</th>
+          <th style="padding:5px 7px;text-align:left;font-size:10px;opacity:.7;text-transform:uppercase">Nom</th>
+        </tr></thead>
+        <tbody>${list.map((e,i)=>`<tr style="border-bottom:1px solid rgba(255,255,255,.07);${i%2===0?'background:rgba(255,255,255,.04)':''}">
+          <td style="padding:5px 7px;opacity:.6;font-weight:700">${i+1}</td>
+          <td style="padding:5px 7px;font-size:11px;font-weight:600">${esc(e.poste)}</td>
+          <td style="padding:5px 7px;font-weight:700">${esc(e.nom)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
   };
-
-  banner.style.display = 'block';
-  banner.innerHTML = `
-    <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2240 50%,#0a1628 100%);padding:16px 18px;color:#fff;border-radius:14px">
-      <!-- En-tête -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+  banner.style.display='block';
+  banner.innerHTML=`
+    <div style="background:linear-gradient(135deg,#0a1628 0%,#0d2240 60%,#0a1628 100%);padding:16px 18px;color:#fff;border-radius:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-family:var(--font-display);font-size:18px;font-weight:900;letter-spacing:.04em">📋 PROGRAMME DU PERSONNEL</div>
-          ${dateLabel?`<div style="font-size:12px;opacity:.7;margin-top:2px;text-transform:capitalize">${dateLabel}</div>`:''}
+          <div style="font-family:var(--font-display);font-size:17px;font-weight:900;letter-spacing:.04em">📋 PROGRAMME DU PERSONNEL</div>
+          <div style="font-size:11px;opacity:.6;margin-top:2px;text-transform:capitalize">Semaine du ${dateLabel}</div>
         </div>
-        ${(currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur')?`<button onclick="deleteProgramme()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 12px;color:#fff;cursor:pointer;font-size:12px">✕ Masquer</button>`:''}
+        ${(currentUConf?.role==='Admin'||currentUConf?.role==='Superviseur')?`<button onclick="deleteProgramme()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 12px;color:#fff;cursor:pointer;font-size:12px">✕ Masquer</button>`:''}
       </div>
-      <!-- Shifts -->
-      <div style="display:flex;gap:16px;flex-wrap:wrap">
-        ${renderShiftTable(data.shiftA,'SHIFT "A"','(06:00)-(14:00)','#00c8ff')}
-        ${renderShiftTable(data.shiftB,'SHIFT "B"','(08:00)-(16:00)','#fbbf24')}
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        ${renderTable(data.groupeA,'🔵 GROUPE A',hA,'#00c8ff')}
+        ${renderTable(data.groupeB,'🟡 GROUPE B',hB,'#fbbf24')}
       </div>
-      <!-- Footer -->
-      ${data.publishedBy?`<div style="margin-top:10px;font-size:11px;opacity:.5;text-align:right">Publié par ${esc(data.publishedBy)}</div>`:''}
+      ${data.publishedBy?`<div style="margin-top:8px;font-size:10px;opacity:.4;text-align:right">Publié par ${esc(data.publishedBy)}</div>`:''}
     </div>`;
 }
 
-// ── Écouter Firebase pour le programme ──
-function listenProgramme() {
-  onValue(ref(db,'programme'), snap => {
-    const data = snap.val();
-    renderProgrammeBanner(data || {});
-    if (data) {
-      programmeData = { shiftA: data.shiftA||[], shiftB: data.shiftB||[], date: data.date||'' };
-      renderProgShifts();
-      const d = document.getElementById('progDate');
-      if (d && data.date) d.value = data.date;
-    }
-  });
-}
+function initProgDate() { window.updateCyclePreview(); }
+function listenProgramme() {}
+
 
 window.exportTotalCSV = function() {
   const fm = document.getElementById('totalFilterMonth')?.value||'';
