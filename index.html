@@ -2253,7 +2253,7 @@ tbody td,
         <div style="padding-top:16px">
 
           <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-            Deux groupes fixes (A et B) avec rotation hebdomadaire sur 3 horaires : <strong style="color:var(--text)">06h–14h → 14h–22h → 22h–06h</strong>. Sélectionnez la semaine de départ du Groupe A pour calculer automatiquement le cycle.
+            Deux groupes fixes (A et B) avec rotation hebdomadaire sur 2 horaires : <strong style="color:var(--text)">06h–14h → 08h–16h</strong>. Sélectionnez la semaine de départ du Groupe A pour calculer automatiquement le cycle.
           </p>
 
           <!-- Semaine de référence + horaire actuel Groupe A -->
@@ -2268,8 +2268,7 @@ tbody td,
                 <div class="form-label">Horaire Groupe A cette semaine-là</div>
                 <select class="form-input" id="cycleRefHoraire" style="max-width:200px" onchange="updateCyclePreview()">
                   <option value="0">🌅 06h00 – 14h00</option>
-                  <option value="1">🌆 14h00 – 22h00</option>
-                  <option value="2">🌙 22h00 – 06h00</option>
+                  <option value="1">☀️ 08h00 – 16h00</option>
                 </select>
               </div>
               <div>
@@ -3615,13 +3614,16 @@ function setupListeners() {
   const progL = onValue(progRef, snap => {
     const data = snap.val();
     renderProgrammeBanner(data || {});
-    if (data) {
+    if (data && (data.groupeA || data.groupeB || data.shiftA || data.shiftB)) {
       programmeData = {
         groupeA: data.groupeA || (data.shiftA ? data.shiftA : getDefaultGroupeA()),
         groupeB: data.groupeB || (data.shiftB ? data.shiftB : getDefaultGroupeB()),
       };
-      renderProgShifts();
+    } else {
+      // Charger les employés par défaut si Firebase est vide
+      programmeData = { groupeA: getDefaultGroupeA(), groupeB: getDefaultGroupeB() };
     }
+    renderProgShifts();
   });
   listeners.push({ ref:progRef, fn:progL });
 
@@ -7091,8 +7093,7 @@ async function renderMachinePage(machineKey) {
 
 const HORAIRES = [
   { label:'06h00 – 14h00', short:'06h–14h', icon:'🌅', color:'#00c8ff' },
-  { label:'14h00 – 22h00', short:'14h–22h', icon:'🌆', color:'#f59e0b' },
-  { label:'22h00 – 06h00', short:'22h–06h', icon:'🌙', color:'#a78bfa' },
+  { label:'08h00 – 16h00', short:'08h–16h', icon:'☀️', color:'#f59e0b' },
 ];
 
 let programmeData = { groupeA: [], groupeB: [] };
@@ -7110,8 +7111,8 @@ function getMondayOf(dateStr) {
 }
 
 function getHoraireIndex(groupe, weekOffset) {
-  const baseA = ((cycleConfig.refHoraire + weekOffset) % 3 + 3) % 3;
-  const baseB = (baseA + 1) % 3;
+  const baseA = ((cycleConfig.refHoraire + weekOffset) % 2 + 2) % 2;
+  const baseB = (baseA + 1) % 2;
   return groupe === 'A' ? baseA : baseB;
 }
 
@@ -7192,40 +7193,40 @@ window.switchProgTab = function(grp) {
 
 function getDefaultGroupeA() {
   return [
-    {poste:'SOUFFLAGE',             nom:'BITEROU GNIMDOU FERNAND'},
-    {poste:'SOUTIREUSE',            nom:'ELOH KOKOU ELIKPLIM'},
-    {poste:'ETIQUETTE',             nom:'ADEHENOU KOMI HUBERT'},
-    {poste:'FARDELEUSE',            nom:'VIGBEDOR AMEN'},
-    {poste:'LABORATORY/FILTRATION', nom:'ONOUADJE BAYEDJE'},
-    {poste:'18.9LTR MACHINE',       nom:'TANGBIAKE MINGOULIB'},
-    {poste:'MAINTENANCE',           nom:'AMOUZOU EKOE'},
-    {poste:'MAINTENANCE',           nom:'AMAVI AYI SIDOINE'},
-    {poste:'MAINTENANCE',           nom:'EKLOU HOSSENYO LUC'},
-    {poste:'MAGASINIER',            nom:'KOUEVI KOFFI BIOVA'},
-    {poste:'AGENT DE ENTRETIEN',    nom:'LAWSON FOLLY'},
-    {poste:'AGENT DE ENTRETIEN',    nom:'AKPOME PULCHERIE'},
-    {poste:'AGENT DE ENTRETIEN',    nom:'AYISSOU FOLLY'},
+    {poste:'SOUFFLAGE',             numero:'N1', nom:'BITEROU GNIMDOU FERNAND'},
+    {poste:'SOUTIREUSE',            numero:'N1', nom:'ELOH KOKOU ELIKPLIM'},
+    {poste:'ETIQUETTE',             numero:'N1', nom:'ADEHENOU KOMI HUBERT'},
+    {poste:'FARDELEUSE',            numero:'N1', nom:'VIGBEDOR AMEN'},
+    {poste:'LABORATORY/FILTRATION', numero:'N1', nom:'ONOUADJE BAYEDJE'},
+    {poste:'18.9LTR MACHINE',       numero:'N1', nom:'TANGBIAKE MINGOULIB'},
+    {poste:'MAINTENANCE',           numero:'N1', nom:'AMOUZOU EKOE'},
+    {poste:'MAINTENANCE',           numero:'N2', nom:'AMAVI AYI SIDOINE'},
+    {poste:'MAINTENANCE',           numero:'N3', nom:'EKLOU HOSSENYO LUC'},
+    {poste:'MAGASINIER',            numero:'N1', nom:'KOUEVI KOFFI BIOVA'},
+    {poste:'AGENT DE ENTRETIEN',    numero:'N1', nom:'LAWSON FOLLY'},
+    {poste:'AGENT DE ENTRETIEN',    numero:'N2', nom:'AKPOME PULCHERIE'},
+    {poste:'AGENT DE ENTRETIEN',    numero:'N3', nom:'AYISSOU FOLLY'},
   ];
 }
 function getDefaultGroupeB() {
   return [
-    {poste:'SOUFFLAGE',             nom:'OUROTCHEBA TOYI'},
-    {poste:'SOUTIREUSE',            nom:'ADOKOU YAWOVI PROSPER'},
-    {poste:'ETIQUETTE',             nom:'SETOGLO KODJO DANIEL'},
-    {poste:'ETIQUETTE',             nom:'PIKEZI ESSOWASSAM MAGANIM'},
-    {poste:'FARDELEUSE',            nom:'AKOUETE MESSAN'},
-    {poste:'FARDELEUSE',            nom:'LOTTRO ORSEL AMAKA'},
-    {poste:'18.9LTR MACHINE',       nom:'APETI FULBERTE'},
-    {poste:'ELECTRICIAN',           nom:'KETEKU KOMLA'},
-    {poste:'MAINTENANCE',           nom:'APETI ABLAM JEAN-MARIE'},
-    {poste:'LABOR',                 nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
-    {poste:'LABOR',                 nom:'AMETCHONOU TRINITE'},
-    {poste:'LABOR',                 nom:'HOUNSOU KOFFIVI SAMUEL'},
-    {poste:'LABOR',                 nom:'AMETCHOUN HOLALE'},
-    {poste:'MAGASINIER',            nom:'AFANOU MESSAN'},
-    {poste:'AGENT DE ENTRETIEN',    nom:'AKAKPO SEDJI YESU'},
-    {poste:'AGENT DE ENTRETIEN',    nom:'YATE KOKOVI'},
-    {poste:'JARDINNIER',            nom:'MESSANVI MESSAN'},
+    {poste:'SOUFFLAGE',             numero:'N1', nom:'OUROTCHEBA TOYI'},
+    {poste:'SOUTIREUSE',            numero:'N1', nom:'ADOKOU YAWOVI PROSPER'},
+    {poste:'ETIQUETTE',             numero:'N1', nom:'SETOGLO KODJO DANIEL'},
+    {poste:'ETIQUETTE',             numero:'N2', nom:'PIKEZI ESSOWASSAM MAGANIM'},
+    {poste:'FARDELEUSE',            numero:'N1', nom:'AKOUETE MESSAN'},
+    {poste:'FARDELEUSE',            numero:'N2', nom:'LOTTRO ORSEL AMAKA'},
+    {poste:'18.9LTR MACHINE',       numero:'N1', nom:'APETI FULBERTE'},
+    {poste:'ELECTRICIAN',           numero:'N1', nom:'KETEKU KOMLA'},
+    {poste:'MAINTENANCE',           numero:'N1', nom:'APETI ABLAM JEAN-MARIE'},
+    {poste:'LABOR',                 numero:'N1', nom:'DOSSEKPLI AKOUETE (DAMAGE CONTROLLER)'},
+    {poste:'LABOR',                 numero:'N2', nom:'AMETCHONOU TRINITE'},
+    {poste:'LABOR',                 numero:'N3', nom:'HOUNSOU KOFFIVI SAMUEL'},
+    {poste:'LABOR',                 numero:'N4', nom:'AMETCHOUN HOLALE'},
+    {poste:'MAGASINIER',            numero:'N1', nom:'AFANOU MESSAN'},
+    {poste:'AGENT DE ENTRETIEN',    numero:'N1', nom:'AKAKPO SEDJI YESU'},
+    {poste:'AGENT DE ENTRETIEN',    numero:'N2', nom:'YATE KOKOVI'},
+    {poste:'JARDINNIER',            numero:'N1', nom:'MESSANVI MESSAN'},
   ];
 }
 
@@ -7245,7 +7246,7 @@ function renderProgList(grp, list) {
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:6px">
       <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--muted);min-width:20px">${i+1}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:1px">${esc(emp.poste)}</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:1px">${esc(emp.poste)}${emp.numero?' <span style="background:rgba(0,153,204,.15);color:var(--soufflage);border-radius:4px;padding:1px 5px;font-weight:700">'+esc(emp.numero)+'</span>':''}</div>
         <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(emp.nom)}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:2px">
@@ -7276,6 +7277,7 @@ window.openAddEmployeeModal = function(grp) {
   editingEmpGrp=grp; editingEmpIdx=-1;
   document.getElementById('addEmpModalTitle').textContent='➕ Ajouter dans Groupe '+grp;
   document.getElementById('empPoste').value='';
+  document.getElementById('empNumero').value='';
   document.getElementById('empNom').value='';
   document.getElementById('empShift').value=grp;
   document.getElementById('addEmpMsg').textContent='';
@@ -7286,6 +7288,7 @@ window.openEditEmployeeModal = function(grp, i) {
   const emp=(grp==='A'?programmeData.groupeA:programmeData.groupeB)[i];
   document.getElementById('addEmpModalTitle').textContent="✏️ Modifier l'employé";
   document.getElementById('empPoste').value=emp.poste;
+  document.getElementById('empNumero').value=emp.numero||'';
   document.getElementById('empNom').value=emp.nom;
   document.getElementById('empShift').value=grp;
   document.getElementById('addEmpMsg').textContent='';
@@ -7296,16 +7299,18 @@ window.closeAddEmployeeModal = function() {
 };
 window.saveEmployee = function() {
   const poste=document.getElementById('empPoste').value.trim().toUpperCase();
+  const numero=document.getElementById('empNumero').value.trim().toUpperCase();
   const nom=document.getElementById('empNom').value.trim().toUpperCase();
   const grp=document.getElementById('empShift').value;
   const msg=document.getElementById('addEmpMsg');
   if(!poste||!nom){msg.textContent='Veuillez remplir le poste et le nom.';return;}
+  const empObj={poste,numero,nom};
   if(editingEmpIdx>=0){
     const fromList=editingEmpGrp==='A'?programmeData.groupeA:programmeData.groupeB;
-    if(grp!==editingEmpGrp){fromList.splice(editingEmpIdx,1);(grp==='A'?programmeData.groupeA:programmeData.groupeB).push({poste,nom});}
-    else{fromList[editingEmpIdx]={poste,nom};}
+    if(grp!==editingEmpGrp){fromList.splice(editingEmpIdx,1);(grp==='A'?programmeData.groupeA:programmeData.groupeB).push(empObj);}
+    else{fromList[editingEmpIdx]=empObj;}
   } else {
-    (grp==='A'?programmeData.groupeA:programmeData.groupeB).push({poste,nom});
+    (grp==='A'?programmeData.groupeA:programmeData.groupeB).push(empObj);
   }
   renderProgShifts(); window.closeAddEmployeeModal();
 };
@@ -7349,7 +7354,7 @@ function renderProgrammeBanner(data) {
         </tr></thead>
         <tbody>${list.map((e,i)=>`<tr style="border-bottom:1px solid rgba(255,255,255,.07);${i%2===0?'background:rgba(255,255,255,.04)':''}">
           <td style="padding:5px 7px;opacity:.6;font-weight:700">${i+1}</td>
-          <td style="padding:5px 7px;font-size:11px;font-weight:600">${esc(e.poste)}</td>
+          <td style="padding:5px 7px;font-size:11px;font-weight:600">${esc(e.poste)}${e.numero?' <span style=\"font-size:10px;background:rgba(255,255,255,.15);border-radius:3px;padding:1px 4px\">'+esc(e.numero)+'</span>':''}</td>
           <td style="padding:5px 7px;font-weight:700">${esc(e.nom)}</td>
         </tr>`).join('')}</tbody>
       </table></div>`;
@@ -7393,8 +7398,16 @@ window.exportTotalCSV = function() {
     <button onclick="closeAddEmployeeModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
     <div id="addEmpModalTitle" style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:16px;color:var(--text)">➕ Ajouter un employé</div>
 
-    <div class="form-label">Poste / Désignation</div>
-    <input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE, MAINTENANCE..." style="margin-bottom:12px;text-transform:uppercase">
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1">
+        <div class="form-label">Poste / Désignation</div>
+        <input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE..." style="text-transform:uppercase;margin-bottom:0">
+      </div>
+      <div style="width:80px">
+        <div class="form-label">N° Poste</div>
+        <input type="text" class="form-input" id="empNumero" placeholder="N1" style="text-transform:uppercase;margin-bottom:0">
+      </div>
+    </div>
 
     <div class="form-label">Nom complet</div>
     <input type="text" class="form-input" id="empNom" placeholder="Ex: OUROTCHEBA TOYI" style="margin-bottom:12px;text-transform:uppercase">
