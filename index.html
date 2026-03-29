@@ -7392,69 +7392,6 @@ window.exportTotalCSV = function() {
 };
 
 </script>
-<!-- ══ MODALE PROGRAMME — AJOUTER/MODIFIER EMPLOYÉ ══ -->
-<div id="addEmployeeModal" onclick="if(event.target===this)closeAddEmployeeModal()" style="display:none;position:fixed;inset:0;z-index:3100;background:rgba(10,20,40,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
-    <button onclick="closeAddEmployeeModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
-    <div id="addEmpModalTitle" style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:16px;color:var(--text)">➕ Ajouter un employé</div>
-
-    <div style="display:flex;gap:10px;margin-bottom:12px">
-      <div style="flex:1">
-        <div class="form-label">Poste / Désignation</div>
-        <input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE..." style="text-transform:uppercase;margin-bottom:0">
-      </div>
-      <div style="width:80px">
-        <div class="form-label">N° Poste</div>
-        <input type="text" class="form-input" id="empNumero" placeholder="N1" style="text-transform:uppercase;margin-bottom:0">
-      </div>
-    </div>
-
-    <div class="form-label">Nom complet</div>
-    <input type="text" class="form-input" id="empNom" placeholder="Ex: OUROTCHEBA TOYI" style="margin-bottom:12px;text-transform:uppercase">
-
-    <div class="form-label">Shift</div>
-    <select class="form-input" id="empShift" style="margin-bottom:16px">
-      <option value="A">🔵 Shift A (06:00–14:00)</option>
-      <option value="B">🟡 Shift B (08:00–16:00)</option>
-    </select>
-
-    <div id="addEmpMsg" style="font-size:13px;min-height:16px;margin-bottom:10px;color:var(--danger)"></div>
-
-    <div style="display:flex;gap:10px">
-      <button onclick="saveEmployee()" style="flex:1;padding:12px;background:var(--etiquette);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:15px;font-weight:700;cursor:pointer">
-        💾 Enregistrer
-      </button>
-      <button onclick="closeAddEmployeeModal()" style="padding:12px 18px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer">
-        Annuler
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
-<div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
-    <button onclick="closeAdminPwdModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
-    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)">🔑 Changer le mot de passe</div>
-    <div id="adminPwdModalUser" style="font-size:13px;color:var(--muted);margin-bottom:14px"></div>
-    <div id="adminCurrentPwdInfo"></div>
-    <div class="form-label">Nouveau mot de passe</div>
-    <div class="password-wrap" style="margin-bottom:14px">
-      <input type="password" class="form-input" id="adminNewPwd" placeholder="Minimum 6 caractères" style="margin-bottom:0">
-      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd',this)">👁</button>
-    </div>
-    <div class="form-label">Confirmer le mot de passe</div>
-    <div class="password-wrap" style="margin-bottom:16px">
-      <input type="password" class="form-input" id="adminNewPwd2" placeholder="Répéter le mot de passe" style="margin-bottom:0">
-      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd2',this)">👁</button>
-    </div>
-    <div id="adminPwdMsg" style="font-size:13px;min-height:18px;margin-bottom:12px"></div>
-    <button onclick="applyAdminPasswordChange()" id="adminPwdBtn" style="width:100%;padding:13px;background:var(--admin);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em">
-      🔒 Appliquer le nouveau mot de passe
-    </button>
-  </div>
-</div>
-
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
 // ── Enregistrer le Service Worker sans casser le cache à chaque ouverture ──
@@ -7529,6 +7466,71 @@ applyDesktopScale();
 window.addEventListener('resize', applyDesktopScale);
 </script>
 </div><!-- end app-scaler -->
+
+<!-- ══ MODALE ADMIN — CHANGER MOT DE PASSE ══ -->
+<div id="adminPwdModal" onclick="if(event.target===this)closeAdminPwdModal()" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(10,20,40,.60);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px 28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
+    <button onclick="closeAdminPwdModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+    <div style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)">🔑 Changer le mot de passe</div>
+    <div id="adminPwdModalUser" style="font-size:13px;color:var(--muted);margin-bottom:14px"></div>
+    <div id="adminCurrentPwdInfo"></div>
+    <div class="form-label">Nouveau mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:14px">
+      <input type="password" class="form-input" id="adminNewPwd" placeholder="Minimum 6 caractères" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd',this)">👁</button>
+    </div>
+    <div class="form-label">Confirmer le mot de passe</div>
+    <div class="password-wrap" style="margin-bottom:16px">
+      <input type="password" class="form-input" id="adminNewPwd2" placeholder="Répéter le mot de passe" style="margin-bottom:0">
+      <button type="button" class="toggle-pwd" onclick="togglePwdVisibility('adminNewPwd2',this)">👁</button>
+    </div>
+    <div id="adminPwdMsg" style="font-size:13px;min-height:18px;margin-bottom:12px"></div>
+    <button onclick="applyAdminPasswordChange()" id="adminPwdBtn" style="width:100%;padding:13px;background:var(--admin);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.04em">
+      🔒 Appliquer le nouveau mot de passe
+    </button>
+  </div>
+</div>
+
+
+<!-- ══ MODALE PROGRAMME — AJOUTER/MODIFIER EMPLOYÉ ══ -->
+<div id="addEmployeeModal" onclick="if(event.target===this)closeAddEmployeeModal()" style="display:none;position:fixed;inset:0;z-index:3100;background:rgba(10,20,40,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:fadeUp .25s ease;position:relative">
+    <button onclick="closeAddEmployeeModal()" style="position:absolute;top:14px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+    <div id="addEmpModalTitle" style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:16px;color:var(--text)">➕ Ajouter un employé</div>
+
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1">
+        <div class="form-label">Poste / Désignation</div>
+        <input type="text" class="form-input" id="empPoste" placeholder="Ex: SOUFFLEUSE..." style="text-transform:uppercase;margin-bottom:0">
+      </div>
+      <div style="width:80px">
+        <div class="form-label">N° Poste</div>
+        <input type="text" class="form-input" id="empNumero" placeholder="N1" style="text-transform:uppercase;margin-bottom:0">
+      </div>
+    </div>
+
+    <div class="form-label">Nom complet</div>
+    <input type="text" class="form-input" id="empNom" placeholder="Ex: OUROTCHEBA TOYI" style="margin-bottom:12px;text-transform:uppercase">
+
+    <div class="form-label">Shift</div>
+    <select class="form-input" id="empShift" style="margin-bottom:16px">
+      <option value="A">🔵 Shift A (06:00–14:00)</option>
+      <option value="B">🟡 Shift B (08:00–16:00)</option>
+    </select>
+
+    <div id="addEmpMsg" style="font-size:13px;min-height:16px;margin-bottom:10px;color:var(--danger)"></div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="saveEmployee()" style="flex:1;padding:12px;background:var(--etiquette);color:#fff;border:none;border-radius:10px;font-family:var(--font-display);font-size:15px;font-weight:700;cursor:pointer">
+        💾 Enregistrer
+      </button>
+      <button onclick="closeAddEmployeeModal()" style="padding:12px 18px;background:var(--surface);color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer">
+        Annuler
+      </button>
+    </div>
+  </div>
+</div>
+
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
