@@ -4672,9 +4672,30 @@ window.clearAlerts = async function() {
 
 // ══════════ EXPORT ══════════
 window.exportExcel = function() {
+  // ── Calcul Total Mensuel ──
+  const now = new Date();
+  const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const moisLabel = now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  const allRepsArr = Object.values(allReports);
+  const embMonth = allRepsArr.filter(r=>r.machine==='Emballage'&&r.date.startsWith(curMonth)).reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
+  const b19Month = allRepsArr.filter(r=>r.machine==='B19'&&r.date.startsWith(curMonth)).reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
+  const combinedMonth = embMonth + b19Month;
+  const dechetsMonth = allRepsArr.filter(r=>r.date.startsWith(curMonth)).reduce((s,r)=>s+(parseFloat(r.fields?.dechets)||0),0);
+  const joursMonth = [...new Set(allRepsArr.filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&r.date.startsWith(curMonth)).map(r=>r.date))].length;
+
+  const summaryRows = [
+    [`=== TOTAL MENSUEL — ${moisLabel.toUpperCase()} ===`],
+    [`Emballage (cartons)`,embMonth],
+    [`B19 (production)`,b19Month],
+    [`Total combiné`,combinedMonth],
+    [`Déchets (kg)`,dechetsMonth],
+    [`Jours travaillés`,joursMonth],
+    [],
+  ];
+
   const headers = ['Date','Machine','Opérateur','Poste','Production','Statut','Note'];
-  const rows = Object.values(allReports).map(r=>[r.date,r.machine,r.operatorName,r.shift,r.fields?.prod||0,r.status,`"${r.note||''}"`]);
-  const csv = [headers,...rows].map(r=>r.join(';')).join('\n');
+  const rows = allRepsArr.map(r=>[r.date,r.machine,r.operatorName,r.shift,r.fields?.prod||0,r.status,`"${r.note||''}"`]);
+  const csv = [...summaryRows.map(r=>r.join(';')), [headers,...rows].map(r=>r.join(';')).join('\n')].join('\n');
   const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`rapport_${today()}.csv`; a.click();
 };
@@ -4683,6 +4704,17 @@ window.exportPDF = function() {
   const rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
   const wallpaper = 'https://www.genspark.ai/api/files/s/SQEvmg2r';
   const exportDate = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  // ── Calcul Total Mensuel pour le PDF ──
+  const nowPdf = new Date();
+  const curMonthPdf = `${nowPdf.getFullYear()}-${String(nowPdf.getMonth()+1).padStart(2,'0')}`;
+  const moisLabelPdf = nowPdf.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  const allRepsArrPdf = Object.values(allReports);
+  const pdfEmbMonth = allRepsArrPdf.filter(r=>r.machine==='Emballage'&&r.date.startsWith(curMonthPdf)).reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
+  const pdfB19Month = allRepsArrPdf.filter(r=>r.machine==='B19'&&r.date.startsWith(curMonthPdf)).reduce((s,r)=>s+(parseInt(r.fields?.prod)||0),0);
+  const pdfCombined = pdfEmbMonth + pdfB19Month;
+  const pdfDechets  = allRepsArrPdf.filter(r=>r.date.startsWith(curMonthPdf)).reduce((s,r)=>s+(parseFloat(r.fields?.dechets)||0),0);
+  const pdfJours    = [...new Set(allRepsArrPdf.filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&r.date.startsWith(curMonthPdf)).map(r=>r.date))].length;
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport AP Industry Eau Vitale</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
@@ -4865,6 +4897,36 @@ window.exportPDF = function() {
         </div>
       </div>`;
     })()}
+
+    <!-- TOTAL MENSUEL -->
+    <div class="section-title" style="margin-top:28px">📊 Total Mensuel — ${moisLabelPdf.charAt(0).toUpperCase()+moisLabelPdf.slice(1)}</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:26px;">
+      <div style="background:rgba(242,124,87,.10);border:1px solid rgba(242,124,87,.30);border-radius:12px;padding:14px 12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#f27c57;font-weight:700;margin-bottom:6px;">📦 Emballage</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;">${pdfEmbMonth.toLocaleString('fr-FR')}</div>
+        <div style="font-size:10px;color:rgba(200,230,255,.5);margin-top:2px;">cartons</div>
+      </div>
+      <div style="background:rgba(124,108,255,.10);border:1px solid rgba(124,108,255,.30);border-radius:12px;padding:14px 12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#7c6cff;font-weight:700;margin-bottom:6px;">🔷 B19</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;">${pdfB19Month.toLocaleString('fr-FR')}</div>
+        <div style="font-size:10px;color:rgba(200,230,255,.5);margin-top:2px;">production</div>
+      </div>
+      <div style="background:rgba(0,180,255,.10);border:1px solid rgba(0,180,255,.30);border-radius:12px;padding:14px 12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#00b4ff;font-weight:700;margin-bottom:6px;">📈 Total</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;">${pdfCombined.toLocaleString('fr-FR')}</div>
+        <div style="font-size:10px;color:rgba(200,230,255,.5);margin-top:2px;">combiné</div>
+      </div>
+      <div style="background:rgba(248,113,113,.10);border:1px solid rgba(248,113,113,.30);border-radius:12px;padding:14px 12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#f87171;font-weight:700;margin-bottom:6px;">🗑️ Déchets</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#f87171;">${pdfDechets.toLocaleString('fr-FR',{maximumFractionDigits:2})}</div>
+        <div style="font-size:10px;color:rgba(200,230,255,.5);margin-top:2px;">kg total</div>
+      </div>
+      <div style="background:rgba(20,184,106,.10);border:1px solid rgba(20,184,106,.30);border-radius:12px;padding:14px 12px;text-align:center;">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#14b86a;font-weight:700;margin-bottom:6px;">📅 Jours</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;">${pdfJours}</div>
+        <div style="font-size:10px;color:rgba(200,230,255,.5);margin-top:2px;">travaillés</div>
+      </div>
+    </div>
 
     <!-- TABLEAU -->
     <div class="section-title">Détail des rapports</div>
