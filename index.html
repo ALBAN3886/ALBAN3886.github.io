@@ -2407,20 +2407,24 @@ tbody td,
             <div id="cyclePreview" style="margin-top:12px;padding:10px 14px;background:var(--card);border-radius:8px;font-size:13px;display:none"></div>
           </div>
 
-          <!-- Onglets Groupe A / Groupe B -->
-          <div style="display:flex;gap:8px;margin-bottom:12px">
+          <!-- Onglets Groupe A / Groupe B / Tous -->
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
             <button id="tab-grpA" onclick="switchProgTab('A')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--soufflage);background:var(--soufflage);color:#fff;font-weight:700;font-size:13px;cursor:pointer">🔵 Groupe A</button>
             <button id="tab-grpB" onclick="switchProgTab('B')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">🟡 Groupe B</button>
+            <button id="tab-grpAll" onclick="switchProgTab('ALL')" style="padding:8px 18px;border-radius:20px;border:2px solid var(--border);background:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer">👥 Tous</button>
+            <button onclick="printProgramme()" style="margin-left:auto;padding:7px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text);font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px">🖨️ Imprimer</button>
           </div>
 
           <!-- Liste employés groupe actif -->
           <div style="background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:14px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
               <div id="progGroupTitle" style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--soufflage)">🔵 GROUPE A</div>
-              <button onclick="openAddEmployeeModal(window.activeProgTab||'A')" style="background:var(--soufflage);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer" id="btnAddEmp">+ Ajouter</button>
+              <button onclick="openAddEmployeeModal(window.activeProgTab==='ALL'?'A':(window.activeProgTab||'A'))" style="background:var(--soufflage);color:#fff;border:none;border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer" id="btnAddEmp">+ Ajouter</button>
             </div>
             <div id="prog-shift-A" style="display:flex;flex-direction:column;gap:6px"></div>
             <div id="prog-shift-B" style="display:flex;flex-direction:column;gap:6px;display:none"></div>
+            <!-- Vue "Tous" : affiche les deux groupes côte à côte -->
+            <div id="prog-shift-ALL" style="display:none;gap:12px;flex-wrap:wrap"></div>
           </div>
 
           <!-- Bouton publier -->
@@ -7316,8 +7320,8 @@ window.saveCycleConfig = async function() {
 window.switchProgTab = function(grp) {
   activeProgTab = grp;
   window.activeProgTab = grp;
-  const colors = { A:'var(--soufflage)', B:'var(--etiquette)' };
-  ['A','B'].forEach(g => {
+  const colors = { A:'var(--soufflage)', B:'var(--etiquette)', ALL:'var(--remplissage)' };
+  ['A','B','ALL'].forEach(g => {
     const btn = document.getElementById('tab-grp'+g);
     if (!btn) return;
     const active = g === grp;
@@ -7325,22 +7329,61 @@ window.switchProgTab = function(grp) {
     btn.style.color       = active ? '#fff' : 'var(--muted)';
     btn.style.borderColor = active ? colors[g] : 'var(--border)';
   });
-  const elA = document.getElementById('prog-shift-A');
-  const elB = document.getElementById('prog-shift-B');
+  const elA   = document.getElementById('prog-shift-A');
+  const elB   = document.getElementById('prog-shift-B');
+  const elAll = document.getElementById('prog-shift-ALL');
   const title  = document.getElementById('progGroupTitle');
   const btnAdd = document.getElementById('btnAddEmp');
+
   if (grp === 'A') {
     if(elA){ elA.style.display='flex'; elA.style.flexDirection='column'; elA.style.gap='6px'; }
     if(elB) elB.style.display='none';
+    if(elAll) elAll.style.display='none';
     if(title){ title.textContent='🔵 GROUPE A'; title.style.color='var(--soufflage)'; }
-    if(btnAdd) btnAdd.style.background='var(--soufflage)';
-  } else {
+    if(btnAdd){ btnAdd.style.display=''; btnAdd.style.background='var(--soufflage)'; }
+  } else if (grp === 'B') {
     if(elA) elA.style.display='none';
     if(elB){ elB.style.display='flex'; elB.style.flexDirection='column'; elB.style.gap='6px'; }
+    if(elAll) elAll.style.display='none';
     if(title){ title.textContent='🟡 GROUPE B'; title.style.color='var(--etiquette)'; }
-    if(btnAdd) btnAdd.style.background='var(--etiquette)';
+    if(btnAdd){ btnAdd.style.display=''; btnAdd.style.background='var(--etiquette)'; }
+  } else {
+    // ALL view
+    if(elA) elA.style.display='none';
+    if(elB) elB.style.display='none';
+    if(elAll){ elAll.style.display='flex'; }
+    if(title){ title.textContent='👥 TOUS LES AGENTS'; title.style.color='var(--remplissage)'; }
+    if(btnAdd){ btnAdd.style.display=''; btnAdd.style.background='var(--remplissage)'; }
+    renderProgAll();
   }
 };
+
+function renderProgAll() {
+  const el = document.getElementById('prog-shift-ALL');
+  if (!el) return;
+  const listA = programmeData.groupeA || [];
+  const listB = programmeData.groupeB || [];
+  const mkCard = (list, grpLabel, color) => {
+    if (!list.length) return '';
+    const rows = list.map((e,i) => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;display:flex;align-items:center;gap:6px">
+        <div style="font-size:12px;font-weight:800;color:${color};min-width:20px;text-align:center">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;text-transform:uppercase;color:var(--muted)">${esc(e.poste)}${e.numero?' <span style="background:rgba(0,153,204,.15);color:'+color+';border-radius:3px;padding:0 4px;font-weight:700">'+esc(e.numero)+'</span>':''}</div>
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(e.nom)}</div>
+        </div>
+        <button onclick="deleteEmp('${grpLabel}',${i})" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:5px;padding:3px 6px;font-size:10px;cursor:pointer;color:var(--danger)">✕</button>
+      </div>`).join('');
+    return `<div style="flex:1;min-width:260px">
+      <div style="font-family:var(--font-display);font-size:13px;font-weight:800;color:${color};margin-bottom:8px;padding:6px 10px;background:${color}18;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+        <span>${grpLabel==='A'?'🔵 GROUPE A':'🟡 GROUPE B'}</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:600">${list.length} agents</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">${rows}</div>
+    </div>`;
+  };
+  el.innerHTML = mkCard(listA,'A','var(--soufflage)') + mkCard(listB,'B','var(--etiquette)');
+}
 
 function getDefaultGroupeA() {
   return [
@@ -7384,6 +7427,7 @@ function getDefaultGroupeB() {
 function renderProgShifts() {
   renderProgList('A', programmeData.groupeA || []);
   renderProgList('B', programmeData.groupeB || []);
+  if (activeProgTab === 'ALL') renderProgAll();
 }
 
 function renderProgList(grp, list) {
@@ -7464,6 +7508,109 @@ window.saveEmployee = function() {
     (grp==='A'?programmeData.groupeA:programmeData.groupeB).push(empObj);
   }
   renderProgShifts(); window.closeAddEmployeeModal();
+};
+
+window.printProgramme = function() {
+  const todayMonday = getMondayOf(today());
+  const offset = getWeekOffset(todayMonday);
+  const hA = HORAIRES[getHoraireIndex('A', offset)];
+  const hB = HORAIRES[getHoraireIndex('B', offset)];
+  const dateFmt = new Date(todayMonday+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dateLabel = dateFmt.charAt(0).toUpperCase()+dateFmt.slice(1);
+  const listA = programmeData.groupeA || [];
+  const listB = programmeData.groupeB || [];
+
+  function mkRows(list) {
+    return list.map((e,i) =>
+      '<tr style="border-bottom:1px solid #e8eef4;">'
+      +'<td style="padding:8px 10px;text-align:center;font-weight:800;color:#0077aa;font-size:13px">'+(i+1)+'</td>'
+      +'<td style="padding:8px 10px;font-size:12px;font-weight:600;color:#334;">'
+        +e.poste+(e.numero?' <span style="background:#e0f4ff;color:#0077aa;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800">'+e.numero+'</span>':'')
+      +'</td>'
+      +'<td style="padding:8px 10px;font-weight:700;font-size:13px;color:#1a2030">'+e.nom+'</td>'
+      +'</tr>'
+    ).join('');
+  }
+
+  function mkTable(list, grpLabel, horaire, color, bgColor) {
+    if (!list.length) return '';
+    return '<div style="flex:1;min-width:280px;border:2px solid '+color+';border-radius:12px;overflow:hidden;page-break-inside:avoid">'
+      +'<div style="background:'+bgColor+';padding:10px 14px;display:flex;align-items:center;justify-content:space-between">'
+        +'<div style="font-family:Arial,sans-serif;font-size:14px;font-weight:900;color:'+color+';letter-spacing:.04em">'+grpLabel+' ('+list.length+' agents)</div>'
+        +'<div style="font-size:12px;font-weight:700;color:#444">'+horaire.icon+' '+horaire.label+'</div>'
+      +'</div>'
+      +'<table style="width:100%;border-collapse:collapse">'
+        +'<thead><tr style="background:#f4f8fc">'
+          +'<th style="padding:6px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;text-align:center;width:36px">N°</th>'
+          +'<th style="padding:6px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;text-align:left">Poste</th>'
+          +'<th style="padding:6px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#888;text-align:left">Nom</th>'
+        +'</tr></thead>'
+        +'<tbody>'+mkRows(list)+'</tbody>'
+      +'</table>'
+    +'</div>';
+  }
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+    <title>Programme du Personnel — AP Industry Eau Vitale</title>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box;}
+      @page{margin:18mm 14mm;size:A4;}
+      body{font-family:Arial,sans-serif;background:#fff;color:#1a2030;font-size:13px;}
+      @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+    </style></head><body>
+
+    <!-- EN-TÊTE -->
+    <div style="border-bottom:3px solid #0077aa;padding-bottom:14px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:#0077aa;font-weight:700;margin-bottom:4px">AP Industry — Eau Vitale</div>
+        <div style="font-size:22px;font-weight:900;color:#1a2030;letter-spacing:.02em">Programme du Personnel</div>
+        <div style="font-size:12px;color:#666;margin-top:4px;text-transform:capitalize">${dateLabel}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.12em">Imprimé le</div>
+        <div style="font-size:13px;font-weight:700;color:#334;margin-top:2px">${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+        <div style="margin-top:6px;font-size:11px;color:#aaa">Par ${currentUConf?.name||'Admin'}</div>
+      </div>
+    </div>
+
+    <!-- RÉSUMÉ -->
+    <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px;background:#f0f8ff;border:1px solid #cce4ff;border-radius:10px;padding:10px 14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;color:#0077aa;font-weight:700;margin-bottom:3px">Groupe A</div>
+        <div style="font-size:24px;font-weight:900;color:#0077aa">${listA.length}</div>
+        <div style="font-size:10px;color:#666">agents · ${hA.icon} ${hA.label}</div>
+      </div>
+      <div style="flex:1;min-width:120px;background:#fffbea;border:1px solid #ffe080;border-radius:10px;padding:10px 14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;color:#b88000;font-weight:700;margin-bottom:3px">Groupe B</div>
+        <div style="font-size:24px;font-weight:900;color:#b88000">${listB.length}</div>
+        <div style="font-size:10px;color:#666">agents · ${hB.icon} ${hB.label}</div>
+      </div>
+      <div style="flex:1;min-width:120px;background:#f0fff4;border:1px solid #b0e8c8;border-radius:10px;padding:10px 14px;text-align:center">
+        <div style="font-size:10px;text-transform:uppercase;color:#1a8a50;font-weight:700;margin-bottom:3px">Total</div>
+        <div style="font-size:24px;font-weight:900;color:#1a8a50">${listA.length+listB.length}</div>
+        <div style="font-size:10px;color:#666">agents au total</div>
+      </div>
+    </div>
+
+    <!-- TABLEAUX CÔTE À CÔTE -->
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      ${mkTable(listA,'🔵 GROUPE A',hA,'#0077aa','#e8f4ff')}
+      ${mkTable(listB,'🟡 GROUPE B',hB,'#b88000','#fff8e0')}
+    </div>
+
+    <!-- PIED DE PAGE -->
+    <div style="margin-top:24px;padding-top:10px;border-top:1px solid #e0e8f0;display:flex;justify-content:space-between;font-size:10px;color:#aaa">
+      <span>Technicien AP Industry Eau Vitale</span>
+      <span>Document confidentiel — usage interne</span>
+      <span>${listA.length+listB.length} agents · Semaine du ${dateLabel}</span>
+    </div>
+
+    <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+    </body></html>`;
+
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
 };
 
 window.publishProgramme = async function() {
