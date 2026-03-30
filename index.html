@@ -236,6 +236,49 @@ body.theme-purple {
 html, body { height:100%; overflow:hidden; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); font-size:15px; }
 
+/* ══ TRANSITION FLUIDE ENTRE THÈMES ══ */
+body, body * {
+  transition:
+    background-color 0.35s ease,
+    border-color     0.35s ease,
+    color            0.20s ease,
+    box-shadow       0.35s ease !important;
+}
+/* Exclure les éléments qui ne doivent pas transitionner (animations propres) */
+body .loader-fill,
+body input,
+body textarea,
+body select,
+body .status-badge,
+body .presence-pill,
+body img,
+body video { transition: none !important; }
+
+/* ══ SKELETON LOADER ══ */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--surface) 50%, var(--border) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+.skeleton-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeleton-line { height: 14px; width: 100%; }
+.skeleton-line.short { width: 55%; }
+.skeleton-line.title { height: 22px; width: 70%; }
+.skeleton-val  { height: 36px; width: 45%; border-radius: 6px; }
+
 /* ══ FORCER MODE DESKTOP SUR MOBILE ══
    Le viewport meta width=1024 est ignoré par Chrome Android.
    On utilise JS pour calculer le zoom exact selon la largeur réelle.
@@ -1539,7 +1582,13 @@ tbody td,
         <div class="stat-box s4"><div class="slabel">📦 Emballage</div><div class="sval" id="gs4">—</div><div class="ssub" id="gs4date">—</div></div>
         <div class="stat-box s5"><div class="slabel">⚙️ B19</div><div class="sval" id="gs5">—</div><div class="ssub" id="gs5date">—</div></div>
       </div>
-      <div class="machines-grid" id="machineCards"><div class="empty"><div class="eico">⏳</div><p>Chargement...</p></div></div>
+      <div class="machines-grid" id="machineCards">
+        <div class="skeleton-card"><div class="skeleton skeleton-line title"></div><div class="skeleton skeleton-val"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-line title"></div><div class="skeleton skeleton-val"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-line title"></div><div class="skeleton skeleton-val"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-line title"></div><div class="skeleton skeleton-val"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-line title"></div><div class="skeleton skeleton-val"></div><div class="skeleton skeleton-line short"></div></div>
+      </div>
 
       <!-- TABLEAU CARTONS EMBALLAGE -->
       <div class="card" id="emballageCartonsCard">
@@ -4536,13 +4585,58 @@ function chartOpts() {
 // Cache photos par userId — chargé depuis userProfiles
 let photosCache = {}; // { uid: { photoURL, color, name } }
 
+/* ══ CACHE PHOTOS localStorage ══
+   Les URLs Firebase Storage sont mises en cache 24h pour éviter
+   les lectures répétées à chaque ouverture de session. */
+const PHOTOS_CACHE_KEY = 'ap_photos_cache';
+const PHOTOS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h en ms
+
+function savePhotosCacheLocal() {
+  try {
+    localStorage.setItem(PHOTOS_CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      data: photosCache
+    }));
+  } catch(e) {}
+}
+
+function loadPhotosCacheLocal() {
+  try {
+    const raw = localStorage.getItem(PHOTOS_CACHE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.ts > PHOTOS_CACHE_TTL) {
+      localStorage.removeItem(PHOTOS_CACHE_KEY);
+      return false;
+    }
+    photosCache = parsed.data || {};
+    return Object.keys(photosCache).length > 0;
+  } catch(e) { return false; }
+}
+
 async function loadPhotosCache() {
+  // Charger d'abord depuis localStorage (instantané)
+  const fromLocal = loadPhotosCacheLocal();
+  if (fromLocal) {
+    // Mise à jour silencieuse en arrière-plan si cache existant
+    try {
+      const snap = await get(ref(db, 'userProfiles'));
+      const profiles = snap.val() || {};
+      Object.entries(profiles).forEach(([uid, p]) => {
+        photosCache[uid] = { photoURL: p.photoURL||null, color: (MACHINE_MAP[p.role]||{}).color||'#888', name: p.name||'' };
+      });
+      savePhotosCacheLocal();
+    } catch(e) {}
+    return;
+  }
+  // Pas de cache : charger depuis Firebase
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
     Object.entries(profiles).forEach(([uid, p]) => {
       photosCache[uid] = { photoURL: p.photoURL||null, color: (MACHINE_MAP[p.role]||{}).color||'#888', name: p.name||'' };
     });
+    savePhotosCacheLocal();
   } catch(e) {}
 }
 
@@ -5229,9 +5323,10 @@ window.handlePhotoChange = function(event) {
     const dataURL = e.target.result;
     await set(ref(db, `userProfiles/${currentUser.uid}/photoURL`), dataURL);
     currentUConf.photoURL = dataURL;
-    // Mettre à jour le cache local
+    // Mettre à jour le cache mémoire + localStorage
     if (!photosCache[currentUser.uid]) photosCache[currentUser.uid] = {};
     photosCache[currentUser.uid].photoURL = dataURL;
+    savePhotosCacheLocal();
     // Mettre à jour avatar topbar
     const topAv = document.getElementById('myAvatarTop');
     if (topAv) topAv.innerHTML = `<img src="${dataURL}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
