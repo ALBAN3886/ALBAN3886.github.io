@@ -7592,11 +7592,12 @@ window.printProgramme = function() {
       @page{margin:0;size:A4;}
       body{font-family:'Barlow',Arial,sans-serif;background:#0d1b2a;color:#e8f4fd;min-height:100vh;position:relative;}
       .bg-wrap{position:fixed;inset:0;z-index:0;background:#060e1f;}
-      .bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,12,28,.85) 0%,rgba(8,22,50,.78) 50%,rgba(4,12,28,.90) 100%);}
+      .bg-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60%;max-width:400px;opacity:0.07;object-fit:contain;pointer-events:none;user-select:none;}
+      .bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,12,28,.82) 0%,rgba(8,22,50,.75) 50%,rgba(4,12,28,.87) 100%);}
       .page{position:relative;z-index:1;padding:32px 36px;}
       @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
     </style></head><body>
-    <div class="bg-wrap"><div class="bg-overlay"></div></div>
+    <div class="bg-wrap"><img src="${wallpaper}" class="bg-logo"><div class="bg-overlay"></div></div>
     <div class="page">
 
       <!-- EN-TÊTE -->
@@ -7736,7 +7737,7 @@ function renderProgrammeBanner(data) {
     <div style="position:relative;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)">
       <!-- Fond logo -->
       <div style="position:absolute;inset:0;z-index:0;background:#060e1f;"></div>
-      <img src="${_logoBannerSrc}" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);height:82%;max-height:150px;opacity:0.13;z-index:0;object-fit:contain;pointer-events:none;user-select:none;">
+      <img src="${_logoBannerSrc}" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:55%;max-width:360px;max-height:90%;opacity:0.09;z-index:0;object-fit:contain;pointer-events:none;user-select:none;">
       <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(135deg,rgba(4,12,28,.82) 0%,rgba(8,22,48,.75) 50%,rgba(4,12,28,.85) 100%);"></div>
       <!-- Contenu -->
       <div style="position:relative;z-index:2;">
