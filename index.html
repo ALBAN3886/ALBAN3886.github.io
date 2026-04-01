@@ -4165,7 +4165,8 @@ window.saveReport = async function() {
   btn.disabled = true; btn.textContent = 'Enregistrement...';
 
   const format = getEffectiveReportFormat(document.getElementById('f-format')?.value || '');
-  const reportKey = `${machine}_${date}_${shift}_${currentUser.uid}`;
+  // Clé unique par machine+technicien — chaque nouveau rapport remplace le précédent
+  const reportKey = `${machine}_${currentUser.uid}`;
   await set(ref(db, `reports/${reportKey}`), {
     id: reportKey, ts: serverTimestamp(),
     userId: currentUser.uid, operatorName: currentUConf.name,
@@ -5514,12 +5515,109 @@ async function renderMachinePage(machineKey) {
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <div class="card-title" style="color:${m.color};margin-bottom:0">📋 5 derniers rapports</div>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('historique');setTimeout(()=>{const s=document.getElementById('filterMachine');if(s){s.value='${machineId}';renderHistory();}},200)">Voir tout →</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="navigate('historique');setTimeout(()=>{const s=document.getElementById('filterMachine');if(s){s.value='${machineId}';renderHistory();}},200)">Voir tout →</button>
+          <button onclick="window.printMachinePage('${machineId}')" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:${m.color}18;border:1.5px solid ${m.color}55;color:${m.color};border-radius:10px;font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:all .18s" onmouseover="this.style.background='${m.color}30'" onmouseout="this.style.background='${m.color}18'">🖨️ Imprimer cette machine</button>
+        </div>
       </div>
       ${recentHtml}
     </div>
   `;
 }
+
+// ══════════ IMPRESSION PAGE MACHINE ══════════
+window.printMachinePage = function(machineId) {
+  const m   = MACHINES.find(x => x.id === machineId);
+  const defKey = machineId === 'Étiquette' ? 'Etiquette' : machineId;
+  const def = MACHINE_DEFS[defKey] || {};
+  if (!m) return;
+
+  const allRepsArr = Object.values(allReports);
+  const reps = allRepsArr
+    .filter(r => r.machine === machineId)
+    .sort((a,b) => (b.ts||0) - (a.ts||0))
+    .slice(0, 10);
+
+  const machReps   = allRepsArr.filter(r => r.machine === machineId);
+  const totalProd  = machReps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+  const okCount    = machReps.filter(r=>r.status==='ok').length;
+  const panneCount = machReps.filter(r=>r.status==='panne'||r.status==='arret').length;
+  const latestR    = reps[0];
+  const stLbls = {ok:'OK',warn:'Lent',panne:'Panne',arret:'Arret'};
+  const stSymb = {ok:'OK',warn:'Lent',panne:'PANNE',arret:'Arret'};
+
+  const fmt = d => d ? new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+  const num2 = n => (n||0).toLocaleString('fr-FR');
+
+  const rows = reps.map(r => '<tr>' +
+    '<td>' + fmt(r.date) + '</td>' +
+    '<td>' + (r.shift||'—') + '</td>' +
+    '<td>' + (r.operatorName||'—') + '</td>' +
+    '<td>' + (r.format ? r.format+' L' : '—') + '</td>' +
+    '<td style="font-weight:700;text-align:right">' + num2(r.fields?.prod) + '</td>' +
+    '<td>' + (stLbls[r.status]||r.status||'—') + '</td>' +
+    '<td style="font-size:11px;color:#666">' + (r.note||'—') + '</td>' +
+    '</tr>'
+  ).join('');
+
+  const now = new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const mColor = m.color;
+
+  const html = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">' +
+    '<title>Rapport ' + machineId + ' — AP Industry Eau Vitale</title>' +
+    '<style>' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'body{font-family:Arial,sans-serif;color:#1a2a3a;background:#fff;padding:24px 32px}' +
+    '.header{display:flex;align-items:center;gap:18px;border-bottom:3px solid ' + mColor + ';padding-bottom:14px;margin-bottom:20px}' +
+    '.icon{width:60px;height:60px;border-radius:14px;background:' + mColor + '22;border:2px solid ' + mColor + '55;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0}' +
+    '.co{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#888;font-weight:700}' +
+    'h1{font-size:26px;font-weight:900;color:#1a2a3a;line-height:1}' +
+    '.sub{font-size:12px;color:' + mColor + ';font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:3px}' +
+    '.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}' +
+    '.sbox{border:1.5px solid #e0e8f0;border-radius:10px;padding:14px;text-align:center}' +
+    '.sval{font-size:26px;font-weight:900;color:' + mColor + ';line-height:1}' +
+    '.slbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-top:4px;font-weight:700}' +
+    '.latest{background:' + mColor + '10;border:1.5px solid ' + mColor + '44;border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;gap:20px;flex-wrap:wrap}' +
+    '.latest .k{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#888;font-weight:700}' +
+    '.latest .v{font-size:15px;font-weight:800;color:#1a2a3a;margin-top:1px}' +
+    'table{width:100%;border-collapse:collapse;font-size:12px}' +
+    'thead tr{background:' + mColor + ';color:#fff}' +
+    'th{padding:9px 11px;text-align:left;font-weight:700;font-size:11px;letter-spacing:.04em}' +
+    'td{padding:8px 11px;border-bottom:1px solid #e8f0f8}' +
+    'tbody tr:nth-child(even){background:#f7fbff}' +
+    '.footer{margin-top:20px;text-align:center;font-size:10px;color:#aaa;border-top:1px solid #e0e8f0;padding-top:10px}' +
+    '@media print{body{padding:10px 18px} .no-print{display:none}}' +
+    '</style></head><body>' +
+    '<div class="header">' +
+    '<div class="icon">' + (def.emoji||'⚙️') + '</div>' +
+    '<div><div class="co">AP Industry Eau Vitale — Rapport de production</div>' +
+    '<h1>' + machineId + '</h1>' +
+    '<div class="sub">Machine de production — Imprime le ' + now + '</div></div></div>' +
+    '<div class="stats">' +
+    '<div class="sbox"><div class="sval">' + num2(totalProd) + '</div><div class="slbl">Production totale</div></div>' +
+    '<div class="sbox"><div class="sval">' + machReps.length + '</div><div class="slbl">Rapports total</div></div>' +
+    '<div class="sbox"><div class="sval" style="color:#14b86a">' + okCount + '</div><div class="slbl">Rapports OK</div></div>' +
+    '<div class="sbox"><div class="sval" style="color:#e35d6a">' + panneCount + '</div><div class="slbl">Pannes / Arrets</div></div>' +
+    '</div>' +
+    (latestR ? '<div class="latest">' +
+      '<div><div class="k">Dernier rapport</div><div class="v">' + fmt(latestR.date) + '</div></div>' +
+      '<div><div class="k">Operateur</div><div class="v">' + (latestR.operatorName||'—') + '</div></div>' +
+      '<div><div class="k">Poste</div><div class="v">' + (latestR.shift||'—') + '</div></div>' +
+      '<div><div class="k">Derniere production</div><div class="v" style="color:' + mColor + '">' + num2(latestR.fields?.prod) + '</div></div>' +
+      '<div><div class="k">Statut</div><div class="v">' + (stLbls[latestR.status]||'—') + '</div></div>' +
+      '</div>' : '') +
+    '<table><thead><tr>' +
+    '<th>Date</th><th>Poste</th><th>Operateur</th><th>Format</th><th style="text-align:right">Production</th><th>Statut</th><th>Note</th>' +
+    '</tr></thead><tbody>' + (rows || '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:20px">Aucun rapport enregistre</td></tr>') + '</tbody></table>' +
+    '<div class="footer">AP Industry Eau Vitale — Rapport machine ' + machineId + ' — ' + now + ' — Technicien : ' + (currentUConf?.name||'') + '</div>' +
+    '<div class="no-print" style="text-align:center;margin-top:18px">' +
+    '<button onclick="window.print()" style="padding:11px 28px;background:' + mColor + ';color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer">Imprimer</button>' +
+    '<button onclick="window.close()" style="margin-left:10px;padding:11px 20px;background:#f0f4f8;border:1px solid #cdd5e0;border-radius:9px;font-size:14px;cursor:pointer">Fermer</button>' +
+    '</div></body></html>';
+
+  const w = window.open('','_blank','width=900,height=700,scrollbars=yes');
+  if (w) { w.document.write(html); w.document.close(); setTimeout(function(){ w.print(); }, 400); }
+};
 
 // ══════════════════════════════════════════════════════
 // ══ MODULE PROGRAMME DU PERSONNEL — CYCLE 3 HORAIRES ══
