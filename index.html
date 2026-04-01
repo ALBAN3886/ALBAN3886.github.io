@@ -3862,6 +3862,17 @@ function getToday() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
+function getLatestReportForMachine(machine, reportsList = Object.values(allReports || {})) {
+  return [...reportsList]
+    .filter(r => r.machine === machine)
+    .sort((a,b) => {
+      const ta = typeof a?.ts === 'number' ? a.ts : 0;
+      const tb = typeof b?.ts === 'number' ? b.ts : 0;
+      if (tb !== ta) return tb - ta;
+      return String(b?.date || '').localeCompare(String(a?.date || ''));
+    })[0] || null;
+}
+
 // === GESTION DATE DASHBOARD ===
 let dashDateMode = 'auto';
 let dashFixedDate = '';
@@ -3955,16 +3966,13 @@ function renderDashboard() {
   const allReps = Object.values(allReports);
   const selReps = allReps.filter(r => r.date === selDate);
 
-  // Stats haut — uniquement la date sélectionnée, pas de fallback sur d'autres dates
-  function getBest(machine) {
-    return selReps.filter(r=>r.machine===machine).sort((a,b)=>(b.ts||0)-(a.ts||0))[0] || null;
-  }
-
-  const soufR = getBest('Soufflage');
-  const rempR = getBest('Remplissage');
-  const etiqR = getBest('Étiquette');
-  const embR  = getBest('Emballage');
-  const b19R  = getBest('B19');
+  // Affichage persistant du dernier rapport par machine, quelle que soit la date
+  const latestByMachine = Object.fromEntries(MACHINES.map(m => [m.id, getLatestReportForMachine(m.id, allReps)]));
+  const soufR = latestByMachine['Soufflage'];
+  const rempR = latestByMachine['Remplissage'];
+  const etiqR = latestByMachine['Étiquette'];
+  const embR  = latestByMachine['Emballage'];
+  const b19R  = latestByMachine['B19'];
 
   function setGs(id, dateId, r) {
     document.getElementById(id).textContent = r ? num(r.fields?.prod) : '—';
@@ -4006,11 +4014,10 @@ function renderDashboard() {
   const labelEl = document.getElementById('dashReportDateLabel');
   if (labelEl) labelEl.textContent = formatDate(selDate);
 
-  // Machine cards — rapports de la date sélectionnée
+  // Machine cards — toujours le dernier rapport de chaque machine
   const mc = document.getElementById('machineCards');
   mc.innerHTML = MACHINES.map(m => {
-    const mrs = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    const r = mrs[0];
+    const r = latestByMachine[m.id] || null;
     const status = r ? r.status : 'none';
     const sc = {ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[status]||'warn';
     const st = {ok:'✅ En fonctionnement',warn:'⚠️ Ralentissement',panne:'🔴 En panne',arret:'⏸️ Arrêt',none:'— Pas de rapport'}[status]||'—';
@@ -5464,6 +5471,9 @@ async function renderMachinePage(machineKey) {
           <div style="font-family:var(--font-display);font-size:30px;font-weight:900;color:var(--text);line-height:1">${machineId}</div>
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:${m.color};margin:5px 0 10px">Machine de production — AP Industry Eau Vitale</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.7">${def.desc}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+            <button class="btn btn-ghost btn-sm" onclick="printMachinePage('${machineKey}')" style="border-color:${m.color}55;color:${m.color};background:#fff">🖨️ Imprimer cette machine</button>
+          </div>
         </div>
       </div>
     </div>
@@ -5513,6 +5523,119 @@ async function renderMachinePage(machineKey) {
     </div>
   `;
 }
+
+window.printMachinePage = function(machineKey) {
+  const key = machineKey || (currentPage || '').replace('machine-','');
+  const machineId = key === 'Etiquette' ? 'Étiquette' : key;
+  const machineDefKey = machineId === 'Étiquette' ? 'Etiquette' : machineId;
+  const m = MACHINES.find(x => x.id === machineId);
+  const def = MACHINE_DEFS[machineDefKey] || {};
+  if (!m) return alert('Machine introuvable pour impression.');
+
+  const reps = Object.values(allReports || {})
+    .filter(r => r.machine === machineId)
+    .sort((a,b) => (b.ts||0) - (a.ts||0));
+
+  const latest = reps[0] || null;
+  const totalProd = reps.reduce((s,r) => s + (parseFloat(r.fields?.prod) || 0), 0);
+  const totalWaste = reps.reduce((s,r) => s + (parseFloat(r.fields?.dechets) || 0), 0);
+  const okCount = reps.filter(r => r.status === 'ok').length;
+  const panneCount = reps.filter(r => r.status === 'panne' || r.status === 'arret').length;
+  const operators = [...new Set(reps.map(r => r.operatorName).filter(Boolean))];
+
+  const safe = (v='') => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const exportDate = new Date().toLocaleDateString('fr-FR', {weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  const statusBadge = latest ? ({
+    ok:    '<span class="badge badge-ok">✅ OK</span>',
+    warn:  '<span class="badge badge-warn">⚠️ Lent</span>',
+    panne: '<span class="badge badge-panne">🔴 Panne</span>',
+    arret: '<span class="badge badge-stop">⏸️ Arrêt</span>'
+  }[latest.status] || '<span class="badge">—</span>') : '<span class="badge">Aucun rapport</span>';
+
+  const latestMeta = latest
+    ? `${safe(formatDate(latest.date))} · ${safe(latest.shift || '—')} · ${safe(latest.operatorName || '—')}`
+    : 'Aucun rapport enregistré';
+
+  const latestFields = latest
+    ? m.fields.map(f => `<div class="field"><span>${safe(f.label)}</span><strong>${num(latest.fields?.[f.key] || 0)} ${safe(f.unit || '')}</strong></div>`).join('')
+    : '<div class="empty">Aucune donnée récente disponible pour cette machine.</div>';
+
+  const rowsHtml = reps.slice(0, 10).map(r => `
+    <tr>
+      <td>${safe(formatDate(r.date))}</td>
+      <td>${safe(r.shift || '—')}</td>
+      <td>${safe(r.operatorName || '—')}</td>
+      <td class="num">${num(r.fields?.prod || 0)}</td>
+      <td class="num">${r.fields?.dechets !== undefined && r.fields?.dechets !== '' ? `${num(r.fields?.dechets)} kg` : '—'}</td>
+      <td>${({ok:'✅ OK',warn:'⚠️ Lent',panne:'🔴 Panne',arret:'⏸️ Arrêt'}[r.status] || safe(r.status || '—'))}</td>
+      <td>${safe(r.note || '')}</td>
+    </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:18px">Aucun rapport à imprimer</td></tr>';
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${safe('Impression machine — ' + machineId)}</title>
+  <style>
+    *{box-sizing:border-box} body{font-family:Arial,sans-serif;margin:0;background:#f8fafc;color:#0f172a}
+    .page{padding:28px 30px}.header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:2px solid #cbd5e1;padding-bottom:16px;margin-bottom:18px}
+    .title{font-size:28px;font-weight:800;margin:0;color:#0f172a}.sub{font-size:13px;color:#475569;margin-top:6px;line-height:1.6}.meta{font-size:12px;color:#475569;text-align:right}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.card{background:#fff;border:1px solid #dbeafe;border-radius:14px;padding:14px}.card .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700}.card .value{font-size:28px;font-weight:800;line-height:1.1;margin-top:6px}.card .subv{font-size:12px;color:#64748b;margin-top:6px}
+    .latest{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px;margin-bottom:16px}.latest-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.latest h2{margin:0;font-size:18px}.latest .meta2{margin-top:6px;font-size:13px;color:#475569}.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px}.field{border:1px solid #e2e8f0;border-radius:12px;padding:10px 12px;background:#f8fafc}.field span{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em}.field strong{display:block;font-size:18px;margin-top:6px}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid #cbd5e1;background:#f8fafc;color:#334155}.badge-ok{background:#dcfce7;color:#166534;border-color:#86efac}.badge-warn{background:#fef3c7;color:#92400e;border-color:#fcd34d}.badge-panne{background:#fee2e2;color:#991b1b;border-color:#fca5a5}.badge-stop{background:#e2e8f0;color:#475569;border-color:#cbd5e1}
+    .section{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px 18px}.section-title{font-size:18px;font-weight:800;margin:0 0 12px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:12px;font-weight:700}
+    table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:10px 12px;border-bottom:1px solid #e2e8f0;font-size:12px;vertical-align:top}th{background:#eff6ff;color:#334155;text-transform:uppercase;letter-spacing:.06em;font-size:11px;text-align:left}.num{text-align:right;font-weight:700}.foot{margin-top:14px;font-size:11px;color:#64748b;display:flex;justify-content:space-between;gap:10px}.empty{padding:16px;border:1px dashed #cbd5e1;border-radius:12px;color:#64748b;text-align:center;background:#f8fafc}
+    @media print{@page{size:A4 portrait;margin:12mm} body{background:#fff}.page{padding:0}}
+  </style></head><body><div class="page">
+    <div class="header">
+      <div>
+        <h1 class="title">${safe(machineId)}</h1>
+        <div class="sub">${safe(def.desc || '')}</div>
+        <div class="chips">${operators.map(name => `<span class="chip">${safe(name)}</span>`).join('') || '<span class="chip">Aucun opérateur identifié</span>'}</div>
+      </div>
+      <div class="meta">
+        <div><strong>Imprimé le :</strong> ${safe(exportDate)}</div>
+        <div><strong>Par :</strong> ${safe(currentUConf?.name || '—')}</div>
+        <div><strong>Machine :</strong> ${safe(machineId)}</div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="label">Production totale</div><div class="value">${num(totalProd)}</div><div class="subv">tous rapports confondus</div></div>
+      <div class="card"><div class="label">Rapports</div><div class="value">${reps.length}</div><div class="subv">historique machine</div></div>
+      <div class="card"><div class="label">Rapports OK</div><div class="value">${okCount}</div><div class="subv">fonctionnement normal</div></div>
+      <div class="card"><div class="label">Déchets cumulés</div><div class="value">${totalWaste ? num(totalWaste) : '0'} kg</div><div class="subv">pannes / arrêts : ${panneCount}</div></div>
+    </div>
+
+    <div class="latest">
+      <div class="latest-top">
+        <div>
+          <h2>Dernier rapport enregistré</h2>
+          <div class="meta2">${latestMeta}</div>
+        </div>
+        <div>${statusBadge}</div>
+      </div>
+      <div class="fields">${latestFields}</div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">10 derniers rapports</h3>
+      <table>
+        <thead><tr><th>Date</th><th>Poste</th><th>Opérateur</th><th>Production</th><th>Déchets</th><th>Statut</th><th>Note</th></tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      <span>AP Industry Eau Vitale — impression directe de la page machine</span>
+      <span>Le dernier rapport reste affiché tant qu'aucun nouveau rapport n'est saisi pour cette machine.</span>
+    </div>
+  </div></body></html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) return alert('Veuillez autoriser les fenêtres popup pour imprimer cette machine.');
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { try { w.print(); } catch(e) {} }, 350);
+};
 
 // ══════════════════════════════════════════════════════
 // ══ MODULE PROGRAMME DU PERSONNEL — CYCLE 3 HORAIRES ══
@@ -6178,6 +6301,7 @@ window.addEventListener('resize', applyDesktopScale);
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
