@@ -3998,11 +3998,14 @@ function renderDashboard() {
   const labelEl = document.getElementById('dashReportDateLabel');
   if (labelEl) labelEl.textContent = formatDate(selDate);
 
-  // Machine cards — rapports de la date sélectionnée
+  // Machine cards — dernier rapport connu par machine (date sélectionnée en priorité, sinon le plus récent toutes dates)
   const mc = document.getElementById('machineCards');
   mc.innerHTML = MACHINES.map(m => {
-    const mrs = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
-    const r = mrs[0];
+    // Priorité : rapport de la date sélectionnée. Sinon : dernier rapport toutes dates confondues.
+    const mrsDate = selReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const mrsAll  = allReps.filter(r=>r.machine===m.id).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    const r = mrsDate[0] || mrsAll[0] || null;
+    const isFallback = !mrsDate[0] && !!mrsAll[0]; // vrai si on affiche un rapport d'une autre date
     const status = r ? r.status : 'none';
     const sc = {ok:'ok',warn:'warn',panne:'danger',arret:'warn'}[status]||'warn';
     const st = {ok:'✅ En fonctionnement',warn:'⚠️ Ralentissement',panne:'🔴 En panne',arret:'⏸️ Arrêt',none:'— Pas de rapport'}[status]||'—';
@@ -4023,7 +4026,7 @@ function renderDashboard() {
         ${hasSecondField?`<div><div class="mm-label">${m.fields[1]?.label||''}</div><div class="mm-val">${r?num(r.fields?.[m.fields[1]?.key]):'—'}</div></div>`:'<div></div>'}
       </div>
       <div class="mc-footer">
-        <span>${r?formatDate(r.date)+' — '+r.shift:'Aucun rapport'}</span>
+        <span>${r?(isFallback?'<span style="color:var(--warn);font-size:11px">⚠️ Dernier connu — </span>':'')+formatDate(r.date)+' — '+r.shift:'Aucun rapport'}</span>
         <span>${r?timeAgo(r.ts):''}</span>
       </div>
     </div>`;
