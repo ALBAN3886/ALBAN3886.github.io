@@ -3972,25 +3972,39 @@ function renderDashboard() {
   setGs('gs4','gs4date',embR);
   setGs('gs5','gs5date',b19R);
 
-  // ── COMPTEUR B19 + EMBALLAGE mois en cours ──
+  // ── COMPTEUR B19 + EMBALLAGE — mois actif (fallback sur dernier mois avec données) ──
   const now = new Date();
   const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const allRepsAll = Object.values(allReports);
-  const embMonthTotal = allRepsAll.filter(r=>r.machine==='Emballage'&&r.date.startsWith(curMonth)).reduce((s,r)=>s+(r.fields?.prod||0),0);
-  const b19MonthTotal = allRepsAll.filter(r=>r.machine==='B19'&&r.date.startsWith(curMonth)).reduce((s,r)=>s+(r.fields?.prod||0),0);
-  const combined = embMonthTotal + b19MonthTotal;
-  const jours = [...new Set(allRepsAll.filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&r.date.startsWith(curMonth)).map(r=>r.date))].length;
-  const moisLabel = now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
 
-  document.getElementById('totalMoisLabel').textContent   = moisLabel.charAt(0).toUpperCase()+moisLabel.slice(1);
+  // Détermine le mois à afficher : mois courant si des rapports existent, sinon le dernier mois ayant des rapports
+  const hasThisMonth = allRepsAll.some(r => (r.machine==='Emballage'||r.machine==='B19') && r.date && r.date.startsWith(curMonth));
+  let activeMonth = curMonth;
+  if (!hasThisMonth) {
+    const months = [...new Set(allRepsAll.filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&r.date).map(r=>r.date.slice(0,7)))].sort();
+    if (months.length) activeMonth = months[months.length - 1];
+  }
+  const isFallbackMonth = activeMonth !== curMonth;
+
+  const embMonthTotal = allRepsAll.filter(r=>r.machine==='Emballage'&&r.date&&r.date.startsWith(activeMonth)).reduce((s,r)=>s+(r.fields?.prod||0),0);
+  const b19MonthTotal = allRepsAll.filter(r=>r.machine==='B19'&&r.date&&r.date.startsWith(activeMonth)).reduce((s,r)=>s+(r.fields?.prod||0),0);
+  const combined = embMonthTotal + b19MonthTotal;
+  const jours = [...new Set(allRepsAll.filter(r=>(r.machine==='Emballage'||r.machine==='B19')&&r.date&&r.date.startsWith(activeMonth)).map(r=>r.date))].length;
+
+  const [ay, am] = activeMonth.split('-').map(Number);
+  const activeDateObj = new Date(ay, am - 1, 1);
+  const moisLabel = activeDateObj.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  const moisLabelFull = moisLabel.charAt(0).toUpperCase() + moisLabel.slice(1) + (isFallbackMonth ? ' ⚠️' : '');
+
+  document.getElementById('totalMoisLabel').textContent   = moisLabelFull;
   document.getElementById('totalJoursTravailles').textContent = `${jours} jour${jours>1?'s':''} travaillé${jours>1?'s':''}`;
   document.getElementById('totalEmbDash').textContent     = embMonthTotal > 0 ? num(embMonthTotal) : '0';
   document.getElementById('totalB19Dash').textContent     = b19MonthTotal > 0 ? num(b19MonthTotal) : '0';
   document.getElementById('totalCombineDash').textContent = combined > 0 ? num(combined) : '0';
 
-  // Total déchets toutes machines du mois
+  // Total déchets — même mois actif
   const dechetsTotal = allRepsAll
-    .filter(r => r.date.startsWith(curMonth))
+    .filter(r => r.date && r.date.startsWith(activeMonth))
     .reduce((s,r) => s + (parseFloat(r.fields?.dechets) || 0), 0);
   document.getElementById('totalDechetsDash').textContent = dechetsTotal > 0 ? num(dechetsTotal) + ' kg' : '0';
 
