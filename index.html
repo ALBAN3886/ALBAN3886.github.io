@@ -5666,17 +5666,24 @@ async function sendEmailForReport(subject, message, machine, type) {
   return sent;
 }
 
-// ── Envoyer un email à TOUS les utilisateurs ──
+// ── Envoyer un email aux Admin/Superviseurs uniquement ──
 async function sendEmailToAllUsers(subject, message) {
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
-    const users = Object.values(profiles).filter(p => p.email);
+    // Envoyer seulement aux Admin et Superviseurs pour économiser les quotas
+    const users = Object.values(profiles).filter(p => p.email && (p.role === 'Admin' || p.role === 'Superviseur'));
     if (users.length === 0) {
-      showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
-      return 0;
+      // Fallback : envoyer à tous si aucun admin trouvé
+      const allUsers = Object.values(profiles).filter(p => p.email);
+      if (allUsers.length === 0) {
+        showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
+        return 0;
+      }
+      const ok = await sendEmail(allUsers[0].email, allUsers[0].name, subject, message);
+      return ok ? 1 : 0;
     }
-    showToast('📧 Envoi en cours à ' + users.length + ' utilisateur(s)...', 'info');
+    showToast('📧 Envoi en cours à ' + users.length + ' admin(s)...', 'info');
     let sent = 0;
     for (const u of users) {
       const ok = await sendEmail(u.email, u.name, subject, message);
