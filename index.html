@@ -5010,9 +5010,9 @@ window.exportPDF = function(machineFilter) {
       border:1px solid #1a5a7a;
       border-radius:12px;padding:14px 16px;
     }
-    .stat-card .s-label{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#7ecfee;margin-bottom:6px;}
-    .stat-card .s-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;}
-    .stat-card .s-sub{font-size:10px;color:#7a9aaa;margin-top:2px;}
+    .stat-card .s-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#7dd8ff;margin-bottom:6px;font-weight:700;}
+    .stat-card .s-val{font-family:'Barlow Condensed',Arial,sans-serif;font-size:28px;font-weight:900;color:#fff;}
+    .stat-card .s-sub{font-size:11px;color:#8ab4cc;margin-top:3px;}
     .stat-ok .s-val{color:#22d68a;}
     .stat-warn .s-val{color:#fbbf24;}
     .stat-panne .s-val{color:#f87171;}
@@ -5028,25 +5028,26 @@ window.exportPDF = function(machineFilter) {
     .section-title::after{content:'';flex:1;height:1px;background:rgba(0,180,255,.2);}
 
     table{width:100%;border-collapse:collapse;}
-    thead tr{background:rgba(0,153,204,.18);}
+    thead tr{background:rgba(0,153,204,.25);}
     th{
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
-      color:rgba(160,220,255,.75);padding:10px 12px;text-align:left;
-      border-bottom:1px solid rgba(0,180,255,.25);
+      font-family:'Barlow Condensed',Arial,sans-serif;
+      font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+      color:#7dd8ff;padding:10px 12px;text-align:left;
+      border-bottom:1px solid rgba(0,180,255,.35);
     }
     td{
-      padding:9px 12px;font-size:12px;color:#cce4f5;
-      border-bottom:1px solid rgba(255,255,255,.05);
+      padding:9px 12px;font-size:13px;color:#ddeeff;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      font-weight:500;
     }
-    tr:nth-child(even) td{background:rgba(255,255,255,.025);}
-    tr:hover td{background:rgba(0,153,204,.08);}
+    tr:nth-child(even) td{background:rgba(0,80,140,.18);}
+    tr:hover td{background:rgba(0,153,204,.12);}
 
-    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em;}
-    .badge-ok{background:rgba(34,214,138,.15);color:#22d68a;border:1px solid rgba(34,214,138,.3);}
-    .badge-warn{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
-    .badge-panne{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);}
-    .badge-arret{background:rgba(148,163,184,.15);color:#94a3b8;border:1px solid rgba(148,163,184,.3);}
+    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.04em;}
+    .badge-ok{background:rgba(34,214,138,.2);color:#22d68a;border:1px solid rgba(34,214,138,.4);}
+    .badge-warn{background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.4);}
+    .badge-panne{background:rgba(248,113,113,.2);color:#f87171;border:1px solid rgba(248,113,113,.4);}
+    .badge-arret{background:rgba(148,163,184,.2);color:#cbd5e1;border:1px solid rgba(148,163,184,.4);}
 
     .machine-pill{
       display:inline-block;padding:2px 8px;border-radius:6px;
@@ -5202,7 +5203,14 @@ window.exportPDF = function(machineFilter) {
     </div>
 
   </div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
+  <script>
+  // Attendre que les polices soient chargées avant d'imprimer
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => setTimeout(() => window.print(), 500));
+  } else {
+    window.onload = () => setTimeout(() => window.print(), 1500);
+  }
+  <\/script>
   </body></html>`;
   const w=window.open('','_blank'); w.document.write(html); w.document.close();
 };
