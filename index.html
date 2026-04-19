@@ -1642,6 +1642,21 @@ tbody td,
           <button class="toggle-switch" id="panneSwitch" onclick="togglePanne()"></button>
           <span>🚨 Signaler une panne — alerter tous les collègues immédiatement</span>
         </div>
+        <!-- ══ SÉLECTEUR DESTINATAIRES EMAIL ══ -->
+        <div style="margin:10px 0 6px 0">
+          <div class="form-label" style="margin-bottom:6px">📧 Envoyer l'email à :</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-admin-lbl">
+              <input type="radio" name="emailDest" id="dest-admin" value="admin" checked onchange="updateDestLabel()" style="accent-color:var(--admin)"> 👤 Admin uniquement
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-all-lbl">
+              <input type="radio" name="emailDest" id="dest-all" value="all" onchange="updateDestLabel()" style="accent-color:var(--ok)"> 👥 Tout le monde
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-none-lbl">
+              <input type="radio" name="emailDest" id="dest-none" value="none" onchange="updateDestLabel()" style="accent-color:var(--muted)"> 🔕 Ne pas envoyer
+            </label>
+          </div>
+        </div>
         <div class="btn-row">
           <button class="btn btn-primary" id="saveBtn" onclick="saveReport()">💾 Enregistrer le rapport</button>
           <button class="btn btn-ghost" onclick="clearForm()">Annuler</button>
@@ -4272,13 +4287,17 @@ window.saveReport = async function() {
     if (emailSettings.panne) {
       sendEmailForReport(
         `🚨 PANNE — Machine ${machine}`,
-        `Une panne a été signalée !\n\n` +
-        `Machine : ${machine}\n` +
-        `Signalée par : ${currentUConf.name}\n` +
-        `Date : ${date} — Poste : ${shift}\n` +
-        `Détail : ${note || 'Aucun détail fourni'}\n\n` +
-        `Connectez-vous sur l'application Technicien AP Industry Eau Vitale pour plus d'informations.`,
-        machine, 'panne'
+        `Une panne a été signalée sur la machine ${machine} par ${currentUConf.name}.`,
+        machine, 'panne', 'all',
+        {
+          machine:    machine,
+          operateur:  currentUConf.name,
+          date:       date,
+          poste:      shift,
+          production: '—',
+          statut:     '🔴 PANNE',
+          note:       note || 'Aucun détail fourni',
+        }
       );
     }
   } else if (status === 'warn') {
@@ -4312,21 +4331,26 @@ window.saveReport = async function() {
     isReport: true,
   });
 
-  // ── Email à tous : pour TOUS les rapports de toutes les machines ──
+  // ── Email : pour TOUS les rapports de toutes les machines ──
   if (emailSettings.rapport) {
-    sendEmailForReport(
-      `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
-      `Un nouveau rapport a été soumis.\n\n` +
-      `Machine : ${machine}\n` +
-      `Format : ${format ? format + ' L' : 'Non renseigné'}\n` +
-      `Opérateur : ${currentUConf.name}\n` +
-      `Date : ${date} — Poste : ${shift}\n` +
-      `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
-      `Statut : ${statusLabel}\n` +
-      `Détail : ${note || 'Aucun commentaire'}\n\n` +
-      `Connectez-vous sur l'application Technicien AP Industry Eau Vitale pour plus d'informations.`,
-      machine, 'rapport'
-    );
+    const destSel = document.querySelector('input[name="emailDest"]:checked');
+    const destFilter = destSel ? destSel.value : 'admin';
+    if (destFilter !== 'none') {
+      sendEmailForReport(
+        `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
+        `Un nouveau rapport a été soumis sur AP Industry Eau Vitale.`,
+        machine, 'rapport', destFilter,
+        {
+          machine:    machine,
+          operateur:  currentUConf.name,
+          date:       date,
+          poste:      shift,
+          production: Number(prodVal).toLocaleString('fr-FR') + (format ? ' (format ' + format + ' L)' : ''),
+          statut:     statusLabel,
+          note:       note || 'Aucun commentaire',
+        }
+      );
+    }
   }
 
   panneSwitchOn = false;
@@ -4521,15 +4545,17 @@ window.saveEditReport = async function() {
     if (emailSettings.rapport) {
       sendEmailForReport(
         `✏️ Rapport modifié — ${statusLabel} — Machine ${updated.machine}`,
-        `Un rapport a été modifié.\n\n` +
-        `Machine : ${updated.machine}\n` +
-        `Modifié par : ${currentUConf.name}\n` +
-        `Date : ${updated.date} — Poste : ${updated.shift}\n` +
-        `Production : ${Number(prodVal).toLocaleString('fr-FR')}\n` +
-        `Statut : ${statusLabel}\n` +
-        `Détail : ${updated.note || 'Aucun commentaire'}\n\n` +
-        `Connectez-vous sur l'application Technicien AP Industry Eau Vitale pour plus d'informations.`,
-        updated.machine, 'rapport'
+        `Un rapport a été modifié sur AP Industry Eau Vitale.`,
+        updated.machine, 'rapport', 'admin',
+        {
+          machine:    updated.machine,
+          operateur:  currentUConf.name,
+          date:       updated.date,
+          poste:      updated.shift,
+          production: Number(prodVal).toLocaleString('fr-FR'),
+          statut:     '✏️ Modifié — ' + statusLabel,
+          note:       updated.note || 'Aucun commentaire',
+        }
       );
     }
 
@@ -5661,7 +5687,7 @@ initEmailJS();
 let emailSettings = { panne: true, annonce: true, rapport: true };
 
 // ── Envoyer un email à une adresse ──
-async function sendEmail(toEmail, toName, subject, message) {
+async function sendEmail(toEmail, toName, subject, message, extraParams) {
   // S'assurer qu'EmailJS est initialisé
   if (typeof window.emailjs === 'undefined') {
     console.warn('EmailJS non chargé — email non envoyé à', toEmail);
@@ -5670,13 +5696,24 @@ async function sendEmail(toEmail, toName, subject, message) {
   try {
     // Ré-initialiser au cas où
     window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    const result = await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email: toEmail,
-      to_name:  toName || 'Utilisateur',
+    const params = {
+      to_email:   toEmail,
+      to_name:    toName || 'Utilisateur',
       subject,
       message,
-      from_name: 'Technicien AP Industry Eau Vitale',
-    });
+      from_name:  'Technicien AP Industry Eau Vitale',
+      // Variables séparées pour le template EmailJS
+      machine:    '',
+      operateur:  '',
+      date:       '',
+      poste:      '',
+      production: '',
+      statut:     '',
+      note:       'Aucun commentaire',
+      // Fusionner les paramètres spécifiques s'ils existent
+      ...(extraParams || {}),
+    };
+    const result = await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
     console.log('📧 Email envoyé à', toEmail, result.status);
     return true;
   } catch(e) {
@@ -5720,21 +5757,42 @@ async function incrementEmailCounter(machine, type) {
 }
 
 // ── Envoyer un email lié à un rapport (avec comptage) ──
-async function sendEmailForReport(subject, message, machine, type) {
-  const sent = await sendEmailToAllUsers(subject, message);
+async function sendEmailForReport(subject, message, machine, type, destFilter, extraParams) {
+  const sent = await sendEmailToAllUsers(subject, message, destFilter || 'admin', extraParams);
   if (sent > 0) {
     await incrementEmailCounter(machine, type || 'rapport');
   }
   return sent;
 }
 
+// ── Mettre à jour le style du label sélectionné ──
+window.updateDestLabel = function() {
+  ['admin','all','none'].forEach(v => {
+    const lbl = document.getElementById('dest-'+v+'-lbl');
+    const inp = document.getElementById('dest-'+v);
+    if (lbl && inp) {
+      lbl.style.borderColor = inp.checked ? 'var(--soufflage)' : 'var(--border2)';
+      lbl.style.background  = inp.checked ? 'rgba(0,153,204,.10)' : 'var(--surface)';
+      lbl.style.fontWeight  = inp.checked ? '700' : '400';
+    }
+  });
+};
+// Initialiser le style au chargement
+setTimeout(() => { if (typeof updateDestLabel === 'function') updateDestLabel(); }, 800);
+
 // ── Envoyer un email aux Admin/Superviseurs uniquement ──
-async function sendEmailToAllUsers(subject, message) {
+async function sendEmailToAllUsers(subject, message, destFilter, extraParams) {
+  const filter = destFilter || 'admin';
+  if (filter === 'none') return 0;
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
-    // Envoyer seulement aux Admin et Superviseurs pour économiser les quotas
-    const users = Object.values(profiles).filter(p => p.email && (p.role === 'Admin' || p.role === 'Superviseur'));
+    let users;
+    if (filter === 'all') {
+      users = Object.values(profiles).filter(p => p.email && p.approved);
+    } else {
+      users = Object.values(profiles).filter(p => p.email && (p.role === 'Admin' || p.role === 'Superviseur'));
+    }
     if (users.length === 0) {
       // Fallback : envoyer à tous si aucun admin trouvé
       const allUsers = Object.values(profiles).filter(p => p.email);
@@ -5742,13 +5800,14 @@ async function sendEmailToAllUsers(subject, message) {
         showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
         return 0;
       }
-      const ok = await sendEmail(allUsers[0].email, allUsers[0].name, subject, message);
+      const ok = await sendEmail(allUsers[0].email, allUsers[0].name, subject, message, extraParams);
       return ok ? 1 : 0;
     }
-    showToast('📧 Envoi en cours à ' + users.length + ' admin(s)...', 'info');
+    const label = filter === 'all' ? 'utilisateur(s)' : 'admin(s)';
+    showToast('📧 Envoi en cours à ' + users.length + ' ' + label + '...', 'info');
     let sent = 0;
     for (const u of users) {
-      const ok = await sendEmail(u.email, u.name, subject, message);
+      const ok = await sendEmail(u.email, u.name, subject, message, extraParams);
       if (ok) sent++;
       await new Promise(r => setTimeout(r, 200));
     }
