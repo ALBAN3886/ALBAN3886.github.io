@@ -2635,13 +2635,7 @@ tbody td,
         </div>
         <div class="admin-accordion-body" id="acc-body-sessions">
           <div style="padding-top:14px">
-            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-              <select id="sessionFilterUser" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
-                <option value="">👥 Tous les utilisateurs</option>
-              </select>
-              <select id="sessionFilterDate" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
-                <option value="">📅 Toutes les dates</option>
-              </select>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
               <button class="btn btn-ghost btn-sm" onclick="renderSessionHistory()" style="font-size:12px">🔄 Actualiser</button>
             </div>
             <div id="sessionHistoryList" style="font-size:13px;color:var(--muted)">Chargement...</div>
@@ -3784,6 +3778,20 @@ function initApp() {
   });
 
   // ── Enregistrer la session (heure connexion) ──
+  // Fermer d'abord toutes les sessions précédentes sans logoutAt (sessions fantômes)
+  try {
+    const prevSnap = await get(ref(db, 'sessions/' + currentUser.uid));
+    if (prevSnap.exists()) {
+      const prevSessions = prevSnap.val();
+      const now = Date.now();
+      for (const [key, s] of Object.entries(prevSessions)) {
+        if (!s.logoutAt) {
+          await update(ref(db, 'sessions/' + currentUser.uid + '/' + key), { logoutAt: now });
+        }
+      }
+    }
+  } catch(e) {}
+  // Créer la nouvelle session
   const _sessionKey = currentUser.uid + '_' + Date.now();
   window._currentSessionKey = _sessionKey;
   set(ref(db, 'sessions/' + currentUser.uid + '/' + _sessionKey), {
@@ -7970,81 +7978,73 @@ window.renderSessionHistory = async function() {
   if (!listEl) return;
   listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">⏳ Chargement...</div>';
   try {
-    const snap = await get(ref(db, 'sessions'));
-    const all = snap.val() || {};
-    const sessions = [];
-    for (const [uid, userSessions] of Object.entries(all)) {
-      for (const [key, s] of Object.entries(userSessions)) {
-        sessions.push({ uid, key, ...s });
+    const [sessSnap, profSnap] = await Promise.all([
+      get(ref(db, 'sessions')),
+      get(ref(db, 'userProfiles'))
+    ]);
+    const allSessions = sessSnap.val() || {};
+    const profiles    = profSnap.val() || {};
+
+    // Une ligne par utilisateur : prendre uniquement la session la plus récente
+    const rows = [];
+    for (const [uid, userSessions] of Object.entries(allSessions)) {
+      const list = Object.values(userSessions).sort((a,b)=>(b.loginAt||0)-(a.loginAt||0));
+      const last = list[0];
+      if (!last) continue;
+      const online = !last.logoutAt;
+      rows.push({ uid, ...last, online });
+    }
+    // Ajouter les utilisateurs sans aucune session (jamais connectés)
+    for (const [uid, p] of Object.entries(profiles)) {
+      if (!allSessions[uid] && p.approved) {
+        rows.push({ uid, name: p.name, role: p.role, online: false, loginAt: null, logoutAt: null, neverConnected: true });
       }
     }
-    sessions.sort((a, b) => (b.loginAt || 0) - (a.loginAt || 0));
-    if (sessions.length === 0) {
-      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session enregistrée.</div>';
-      return;
-    }
-    const filterUser = document.getElementById('sessionFilterUser');
-    const filterDate = document.getElementById('sessionFilterDate');
-    const selUser = filterUser ? filterUser.value : '';
-    const selDate = filterDate ? filterDate.value : '';
-    const names = [...new Set(sessions.map(s => s.name).filter(Boolean))].sort();
-    const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort().reverse();
-    if (filterUser) {
-      filterUser.innerHTML = '<option value="">👥 Tous les utilisateurs</option>' +
-        names.map(n => '<option value="' + n + '"' + (n===selUser?' selected':'') + '>' + n + '</option>').join('');
-    }
-    if (filterDate) {
-      filterDate.innerHTML = '<option value="">📅 Toutes les dates</option>' +
-        dates.map(d => '<option value="' + d + '"' + (d===selDate?' selected':'') + '>' + d + '</option>').join('');
-    }
-    const filtered = sessions.filter(s => {
-      if (selUser && s.name !== selUser) return false;
-      if (selDate && s.date !== selDate) return false;
-      return true;
-    });
-    if (filtered.length === 0) {
-      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session pour ce filtre.</div>';
-      return;
-    }
+    rows.sort((a,b) => (b.loginAt||0) - (a.loginAt||0));
+
     function fmtTime(ts) {
       if (!ts) return '—';
       const d = new Date(ts);
-      return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      return d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
     }
     function fmtDuration(a, b) {
       if (!a || !b) return '—';
       const diff = b - a;
       if (diff < 0) return '—';
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      return (h > 0 ? h + 'h ' : '') + m + 'min ' + s + 's';
+      const h = Math.floor(diff/3600000);
+      const m = Math.floor((diff%3600000)/60000);
+      return (h>0?h+'h ':'')+m+'min';
     }
-    let rows = '';
-    filtered.forEach(s => {
-      const online = !s.logoutAt;
-      rows += '<tr style="border-bottom:1px solid var(--border)">' +
-        '<td style="padding:8px 6px;font-weight:600;color:var(--text)">' + (s.name||'—') + '</td>' +
-        '<td style="padding:8px 6px;color:var(--muted);font-size:11px">' + (s.role||'—') + '</td>' +
-        '<td style="padding:8px 6px;color:var(--ok)">' + fmtTime(s.loginAt) + '</td>' +
-        '<td style="padding:8px 6px;color:' + (online ? 'var(--ok)' : 'var(--danger)') + '">' +
-          (online ? '🟢 En ligne' : fmtTime(s.logoutAt)) +
-        '</td>' +
-        '<td style="padding:8px 6px;color:var(--muted)">' + (online ? '⏳ En cours' : fmtDuration(s.loginAt, s.logoutAt)) + '</td>' +
+
+    let tableRows = '';
+    rows.forEach(s => {
+      const statusCell = s.neverConnected
+        ? '<span style="color:var(--muted2);font-size:11px">Jamais connecté</span>'
+        : s.online
+          ? '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite;display:inline-block"></span><b style="color:var(--ok)">En ligne</b></span>'
+          : '<span style="color:var(--danger)">' + fmtTime(s.logoutAt) + '</span>';
+      tableRows += '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:10px 8px;font-weight:700;color:var(--text)">' + (s.name||'—') + '</td>' +
+        '<td style="padding:10px 8px;color:var(--muted);font-size:11px">' + (s.role||'—') + '</td>' +
+        '<td style="padding:10px 8px;color:var(--ok);font-size:12px">' + (s.neverConnected ? '—' : fmtTime(s.loginAt)) + '</td>' +
+        '<td style="padding:10px 8px;font-size:12px">' + statusCell + '</td>' +
+        '<td style="padding:10px 8px;color:var(--muted);font-size:12px">' + (s.online||s.neverConnected ? '—' : fmtDuration(s.loginAt, s.logoutAt)) + '</td>' +
         '</tr>';
     });
-    listEl.innerHTML = '<div style="overflow-x:auto">' +
-      '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
-      '<thead><tr style="border-bottom:2px solid var(--border2);text-align:left">' +
-      '<th style="padding:8px 6px;color:var(--muted);font-weight:600">Utilisateur</th>' +
-      '<th style="padding:8px 6px;color:var(--muted);font-weight:600">Rôle</th>' +
-      '<th style="padding:8px 6px;color:var(--muted);font-weight:600">🟢 Connexion</th>' +
-      '<th style="padding:8px 6px;color:var(--muted);font-weight:600">🔴 Déconnexion</th>' +
-      '<th style="padding:8px 6px;color:var(--muted);font-weight:600">⏱ Durée</th>' +
-      '</tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<div style="margin-top:8px;font-size:11px;color:var(--muted2)">' + filtered.length + ' session(s) affichée(s)</div></div>';
+
+    listEl.innerHTML = rows.length === 0
+      ? '<div style="color:var(--muted)">Aucune donnée.</div>'
+      : '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">' +
+        '<thead><tr style="border-bottom:2px solid var(--border2);text-align:left">' +
+        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Utilisateur</th>' +
+        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Rôle</th>' +
+        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🟢 Dernière connexion</th>' +
+        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🔴 Déconnexion</th>' +
+        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">⏱ Durée</th>' +
+        '</tr></thead><tbody>' + tableRows + '</tbody></table>' +
+        '<div style="margin-top:8px;font-size:11px;color:var(--muted2)">' + rows.length + ' utilisateur(s)</div></div>';
   } catch(e) {
-    listEl.innerHTML = '<div style="color:var(--danger)">Erreur chargement : ' + e.message + '</div>';
+    listEl.innerHTML = '<div style="color:var(--danger)">Erreur : ' + e.message + '</div>';
   }
 };
 
