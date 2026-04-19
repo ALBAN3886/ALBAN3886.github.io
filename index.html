@@ -2635,7 +2635,13 @@ tbody td,
         </div>
         <div class="admin-accordion-body" id="acc-body-sessions">
           <div style="padding-top:14px">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+              <select id="sessionFilterUser" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
+                <option value="">👥 Tous les utilisateurs</option>
+              </select>
+              <select id="sessionFilterDate" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
+                <option value="">📅 Toutes les dates</option>
+              </select>
               <button class="btn btn-ghost btn-sm" onclick="renderSessionHistory()" style="font-size:12px">🔄 Actualiser</button>
             </div>
             <div id="sessionHistoryList" style="font-size:13px;color:var(--muted)">Chargement...</div>
@@ -3778,20 +3784,6 @@ function initApp() {
   });
 
   // ── Enregistrer la session (heure connexion) ──
-  // Fermer d'abord toutes les sessions précédentes sans logoutAt (sessions fantômes)
-  try {
-    const prevSnap = await get(ref(db, 'sessions/' + currentUser.uid));
-    if (prevSnap.exists()) {
-      const prevSessions = prevSnap.val();
-      const now = Date.now();
-      for (const [key, s] of Object.entries(prevSessions)) {
-        if (!s.logoutAt) {
-          await update(ref(db, 'sessions/' + currentUser.uid + '/' + key), { logoutAt: now });
-        }
-      }
-    }
-  } catch(e) {}
-  // Créer la nouvelle session
   const _sessionKey = currentUser.uid + '_' + Date.now();
   window._currentSessionKey = _sessionKey;
   set(ref(db, 'sessions/' + currentUser.uid + '/' + _sessionKey), {
@@ -7976,83 +7968,155 @@ window.exportTotalCSV = function() {
 window.renderSessionHistory = async function() {
   const listEl = document.getElementById('sessionHistoryList');
   if (!listEl) return;
-  listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">⏳ Chargement...</div>';
+  // Ne pas afficher "Chargement" si déjà du contenu (refresh silencieux)
+  if (!listEl.innerHTML || listEl.innerHTML.includes('Chargement')) {
+    listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">⏳ Chargement...</div>';
+  }
   try {
-    const [sessSnap, profSnap] = await Promise.all([
-      get(ref(db, 'sessions')),
-      get(ref(db, 'userProfiles'))
-    ]);
-    const allSessions = sessSnap.val() || {};
-    const profiles    = profSnap.val() || {};
-
-    // Une ligne par utilisateur : prendre uniquement la session la plus récente
-    const rows = [];
-    for (const [uid, userSessions] of Object.entries(allSessions)) {
-      const list = Object.values(userSessions).sort((a,b)=>(b.loginAt||0)-(a.loginAt||0));
-      const last = list[0];
-      if (!last) continue;
-      const online = !last.logoutAt;
-      rows.push({ uid, ...last, online });
-    }
-    // Ajouter les utilisateurs sans aucune session (jamais connectés)
-    for (const [uid, p] of Object.entries(profiles)) {
-      if (!allSessions[uid] && p.approved) {
-        rows.push({ uid, name: p.name, role: p.role, online: false, loginAt: null, logoutAt: null, neverConnected: true });
+    const snap = await get(ref(db, 'sessions'));
+    const all = snap.val() || {};
+    const sessions = [];
+    for (const [uid, userSessions] of Object.entries(all)) {
+      for (const [key, s] of Object.entries(userSessions)) {
+        sessions.push({ uid, key, ...s });
       }
     }
-    rows.sort((a,b) => (b.loginAt||0) - (a.loginAt||0));
-
+    sessions.sort((a, b) => (b.loginAt || 0) - (a.loginAt || 0));
+    if (sessions.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session enregistrée.</div>';
+      return;
+    }
+    const filterUser = document.getElementById('sessionFilterUser');
+    const filterDate = document.getElementById('sessionFilterDate');
+    const selUser = filterUser ? filterUser.value : '';
+    const selDate = filterDate ? filterDate.value : '';
+    const names = [...new Set(sessions.map(s => s.name).filter(Boolean))].sort();
+    const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort().reverse();
+    if (filterUser) {
+      filterUser.innerHTML = '<option value="">👥 Tous les utilisateurs</option>' +
+        names.map(n => '<option value="' + n + '"' + (n===selUser?' selected':'') + '>' + n + '</option>').join('');
+    }
+    if (filterDate) {
+      filterDate.innerHTML = '<option value="">📅 Toutes les dates</option>' +
+        dates.map(d => '<option value="' + d + '"' + (d===selDate?' selected':'') + '>' + d + '</option>').join('');
+    }
+    const filtered = sessions.filter(s => {
+      if (selUser && s.name !== selUser) return false;
+      if (selDate && s.date !== selDate) return false;
+      return true;
+    });
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session pour ce filtre.</div>';
+      return;
+    }
     function fmtTime(ts) {
       if (!ts) return '—';
       const d = new Date(ts);
-      return d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      return d.toLocaleDateString('fr-FR') + '<br><span style="font-size:11px;opacity:.8">' +
+        d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'}) + '</span>';
     }
     function fmtDuration(a, b) {
-      if (!a || !b) return '—';
-      const diff = b - a;
+      if (!a) return '—';
+      const now = Date.now();
+      const end = b || now;
+      const diff = end - a;
       if (diff < 0) return '—';
-      const h = Math.floor(diff/3600000);
-      const m = Math.floor((diff%3600000)/60000);
-      return (h>0?h+'h ':'')+m+'min';
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      return (h > 0 ? h + 'h ' : '') + m + 'min' + (h === 0 ? ' ' + s + 's' : '');
     }
-
-    let tableRows = '';
-    rows.forEach(s => {
-      const statusCell = s.neverConnected
-        ? '<span style="color:var(--muted2);font-size:11px">Jamais connecté</span>'
-        : s.online
-          ? '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite;display:inline-block"></span><b style="color:var(--ok)">En ligne</b></span>'
-          : '<span style="color:var(--danger)">' + fmtTime(s.logoutAt) + '</span>';
-      tableRows += '<tr style="border-bottom:1px solid var(--border)">' +
-        '<td style="padding:10px 8px;font-weight:700;color:var(--text)">' + (s.name||'—') + '</td>' +
-        '<td style="padding:10px 8px;color:var(--muted);font-size:11px">' + (s.role||'—') + '</td>' +
-        '<td style="padding:10px 8px;color:var(--ok);font-size:12px">' + (s.neverConnected ? '—' : fmtTime(s.loginAt)) + '</td>' +
-        '<td style="padding:10px 8px;font-size:12px">' + statusCell + '</td>' +
-        '<td style="padding:10px 8px;color:var(--muted);font-size:12px">' + (s.online||s.neverConnected ? '—' : fmtDuration(s.loginAt, s.logoutAt)) + '</td>' +
+    // Déterminer statut En ligne : priorité à Firebase Presence (temps réel)
+    function isUserOnline(session) {
+      // 1. Vérifier via presence (temps réel Firebase)
+      if (presence && typeof presence === 'object') {
+        const found = Object.values(presence).find(p => p.name === session.name && p.online);
+        if (found) return true;
+      }
+      // 2. Fallback : pas de logoutAt enregistré
+      return !session.logoutAt;
+    }
+    let rows = '';
+    filtered.forEach(s => {
+      const online = isUserOnline(s);
+      // Badge statut
+      const statusBadge = online
+        ? '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(20,184,106,.12);color:var(--ok);border:1px solid rgba(20,184,106,.3);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;animation:pulse 2s infinite"></span>En ligne</span>'
+        : '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(227,93,106,.08);color:var(--danger);border:1px solid rgba(227,93,106,.2);border-radius:20px;padding:2px 8px;font-size:11px;white-space:nowrap">⏹ ' + fmtTime(s.logoutAt) + '</span>';
+      const durationCell = online
+        ? '<span style="color:var(--ok);font-style:italic;font-size:11px">⏳ ' + fmtDuration(s.loginAt, null) + '</span>'
+        : '<span style="color:var(--muted)">' + fmtDuration(s.loginAt, s.logoutAt) + '</span>';
+      rows += '<tr style="border-bottom:1px solid var(--border)">' +
+        '<td style="padding:8px 6px;font-weight:700;color:var(--text);white-space:nowrap">' + (s.name||'—') + '</td>' +
+        '<td style="padding:8px 6px;color:var(--muted);font-size:11px;white-space:nowrap">' + (s.role||'—') + '</td>' +
+        '<td style="padding:8px 6px;color:var(--ok);white-space:nowrap">' + fmtTime(s.loginAt) + '</td>' +
+        '<td style="padding:8px 6px">' + statusBadge + '</td>' +
+        '<td style="padding:8px 6px;text-align:right">' + durationCell + '</td>' +
         '</tr>';
     });
-
-    listEl.innerHTML = rows.length === 0
-      ? '<div style="color:var(--muted)">Aucune donnée.</div>'
-      : '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">' +
-        '<thead><tr style="border-bottom:2px solid var(--border2);text-align:left">' +
-        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Utilisateur</th>' +
-        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Rôle</th>' +
-        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🟢 Dernière connexion</th>' +
-        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🔴 Déconnexion</th>' +
-        '<th style="padding:8px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">⏱ Durée</th>' +
-        '</tr></thead><tbody>' + tableRows + '</tbody></table>' +
-        '<div style="margin-top:8px;font-size:11px;color:var(--muted2)">' + rows.length + ' utilisateur(s)</div></div>';
+    // Compteur utilisateurs en ligne
+    const onlineNow = names.filter(n => presence && Object.values(presence).find(p => p.name===n && p.online)).length;
+    const lastUpdate = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    listEl.innerHTML = '<div style="overflow-x:auto">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">' +
+        '<span style="font-size:12px;color:var(--ok);font-weight:600">🟢 ' + onlineNow + ' utilisateur(s) en ligne maintenant</span>' +
+        '<span style="font-size:10px;color:var(--muted2)">Mis à jour : ' + lastUpdate + '</span>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+      '<thead><tr style="border-bottom:2px solid var(--border2);text-align:left;background:rgba(0,0,0,.02)">' +
+      '<th style="padding:8px 6px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Utilisateur</th>' +
+      '<th style="padding:8px 6px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">Rôle</th>' +
+      '<th style="padding:8px 6px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🟢 Connexion</th>' +
+      '<th style="padding:8px 6px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase">🔴 Déconnexion</th>' +
+      '<th style="padding:8px 6px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;text-align:right">⏱ Durée</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<div style="margin-top:8px;font-size:11px;color:var(--muted2)">' + filtered.length + ' session(s) affichée(s)</div></div>';
   } catch(e) {
-    listEl.innerHTML = '<div style="color:var(--danger)">Erreur : ' + e.message + '</div>';
+    listEl.innerHTML = '<div style="color:var(--danger)">Erreur chargement : ' + e.message + '</div>';
   }
 };
+
+// Auto-refresh toutes les 30 secondes si l'accordion sessions est ouvert
+let _sessionRefreshTimer = null;
+function _startSessionAutoRefresh() {
+  _stopSessionAutoRefresh();
+  _sessionRefreshTimer = setInterval(() => {
+    const body = document.getElementById('acc-body-sessions');
+    if (body && body.style.display !== 'none' && body.offsetParent !== null) {
+      window.renderSessionHistory();
+    }
+  }, 30000);
+}
+function _stopSessionAutoRefresh() {
+  if (_sessionRefreshTimer) { clearInterval(_sessionRefreshTimer); _sessionRefreshTimer = null; }
+}
 
 // Ouvrir l'historique quand l'accordion sessions s'ouvre
 const _origToggleAcc = window.toggleAccordion;
 window.toggleAccordion = function(id) {
   if (_origToggleAcc) _origToggleAcc(id);
-  if (id === 'sessions') setTimeout(() => window.renderSessionHistory(), 200);
+  if (id === 'sessions') {
+    setTimeout(() => {
+      window.renderSessionHistory();
+      _startSessionAutoRefresh();
+    }, 200);
+  } else {
+    // Optionnel : arrêter si on ferme
+  }
+};
+
+// Aussi, re-render quand presence change (statuts temps réel)
+const _origRenderPresence = window.renderPresence;
+window.renderPresence = function() {
+  if (_origRenderPresence) _origRenderPresence();
+  const body = document.getElementById('acc-body-sessions');
+  if (body && body.style.display !== 'none' && body.offsetParent !== null) {
+    // Re-render les statuts sans recharger Firebase (juste re-render avec données actuelles)
+    const listEl = document.getElementById('sessionHistoryList');
+    if (listEl && listEl.querySelector('table')) {
+      window.renderSessionHistory();
+    }
+  }
 };
 
 </script>
