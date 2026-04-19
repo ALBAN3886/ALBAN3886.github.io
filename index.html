@@ -1642,17 +1642,17 @@ tbody td,
           <button class="toggle-switch" id="panneSwitch" onclick="togglePanne()"></button>
           <span>🚨 Signaler une panne — alerter tous les collègues immédiatement</span>
         </div>
-        <!-- ══ SÉLECTEUR DESTINATAIRES EMAIL ══ -->
+        <!-- Sélecteur destinataires email -->
         <div style="margin:10px 0 6px 0">
           <div class="form-label" style="margin-bottom:6px">📧 Envoyer l'email à :</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-admin-lbl">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-admin-lbl">
               <input type="radio" name="emailDest" id="dest-admin" value="admin" checked onchange="updateDestLabel()" style="accent-color:var(--admin)"> 👤 Admin uniquement
             </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-all-lbl">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-all-lbl">
               <input type="radio" name="emailDest" id="dest-all" value="all" onchange="updateDestLabel()" style="accent-color:var(--ok)"> 👥 Tout le monde
             </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-none-lbl">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-none-lbl">
               <input type="radio" name="emailDest" id="dest-none" value="none" onchange="updateDestLabel()" style="accent-color:var(--muted)"> 🔕 Ne pas envoyer
             </label>
           </div>
@@ -2627,6 +2627,28 @@ tbody td,
         </div></div></div>
 
       <!-- FIREBASE -->
+      <!-- ══ HISTORIQUE DES SESSIONS ══ -->
+      <div class="admin-accordion" id="acc-sessions">
+        <div class="admin-accordion-header" onclick="toggleAccordion('sessions')">
+          <div class="acc-title" style="color:var(--ok)">🕐 Historique des connexions</div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="admin-accordion-body" id="acc-body-sessions">
+          <div style="padding-top:14px">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+              <select id="sessionFilterUser" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
+                <option value="">👥 Tous les utilisateurs</option>
+              </select>
+              <select id="sessionFilterDate" class="form-input" style="width:auto;padding:6px 10px;font-size:13px" onchange="renderSessionHistory()">
+                <option value="">📅 Toutes les dates</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="renderSessionHistory()" style="font-size:12px">🔄 Actualiser</button>
+            </div>
+            <div id="sessionHistoryList" style="font-size:13px;color:var(--muted)">Chargement...</div>
+          </div>
+        </div>
+      </div>
+
       <div class="admin-accordion" id="acc-firebase">
         <div class="admin-accordion-header" onclick="toggleAccordion('firebase')">
           <div class="acc-title" style="color:var(--soufflage)">📖 Supprimer les comptes Firebase</div>
@@ -3622,6 +3644,15 @@ window.logout = async function() {
     return;
   }
   try { await update(ref(db, `presence/${currentUser.uid}`), { online: false, ts: serverTimestamp() }); } catch(e){}
+  // ── Enregistrer heure de déconnexion ──
+  try {
+    if (currentUser && window._currentSessionKey) {
+      await update(ref(db, 'sessions/' + currentUser.uid + '/' + window._currentSessionKey), {
+        logoutAt: serverTimestamp()
+      });
+      window._currentSessionKey = null;
+    }
+  } catch(e) {}
   removeListeners();
   await signOut(auth);
   currentUser = null; currentUConf = null;
@@ -3750,6 +3781,17 @@ function initApp() {
   update(ref(db, `presence/${currentUser.uid}`), {
     online: true, name: currentUConf.name, color: currentUConf.color,
     role: currentUConf.role, machine: currentUConf.machine || '', ts: serverTimestamp()
+  });
+
+  // ── Enregistrer la session (heure connexion) ──
+  const _sessionKey = currentUser.uid + '_' + Date.now();
+  window._currentSessionKey = _sessionKey;
+  set(ref(db, 'sessions/' + currentUser.uid + '/' + _sessionKey), {
+    name:     currentUConf.name,
+    role:     currentUConf.role,
+    loginAt:  serverTimestamp(),
+    logoutAt: null,
+    date:     new Date().toISOString().slice(0,10),
   });
 
   // Chat system msg connexion — supprimé pour ne pas polluer le chat
@@ -4331,7 +4373,7 @@ window.saveReport = async function() {
     isReport: true,
   });
 
-  // ── Email : pour TOUS les rapports de toutes les machines ──
+  // ── Email rapport ──
   if (emailSettings.rapport) {
     const destSel = document.querySelector('input[name="emailDest"]:checked');
     const destFilter = destSel ? destSel.value : 'admin';
@@ -4541,7 +4583,7 @@ window.saveEditReport = async function() {
       });
     }
 
-    // ── Email pour TOUS les rapports modifiés (toggle rapport activé) ──
+    // ── Email rapport modifié ──
     if (emailSettings.rapport) {
       sendEmailForReport(
         `✏️ Rapport modifié — ${statusLabel} — Machine ${updated.machine}`,
@@ -5688,31 +5730,22 @@ let emailSettings = { panne: true, annonce: true, rapport: true };
 
 // ── Envoyer un email à une adresse ──
 async function sendEmail(toEmail, toName, subject, message, extraParams) {
-  // S'assurer qu'EmailJS est initialisé
   if (typeof window.emailjs === 'undefined') {
     console.warn('EmailJS non chargé — email non envoyé à', toEmail);
     return false;
   }
   try {
-    // Ré-initialiser au cas où
     window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    const params = {
+    const params = Object.assign({
       to_email:   toEmail,
       to_name:    toName || 'Utilisateur',
       subject,
       message,
       from_name:  'Technicien AP Industry Eau Vitale',
-      // Variables séparées pour le template EmailJS
-      machine:    '',
-      operateur:  '',
-      date:       '',
-      poste:      '',
-      production: '',
-      statut:     '',
+      machine:    '', operateur: '', date: '',
+      poste:      '', production: '', statut: '',
       note:       'Aucun commentaire',
-      // Fusionner les paramètres spécifiques s'ils existent
-      ...(extraParams || {}),
-    };
+    }, extraParams || {});
     const result = await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
     console.log('📧 Email envoyé à', toEmail, result.status);
     return true;
@@ -5765,7 +5798,7 @@ async function sendEmailForReport(subject, message, machine, type, destFilter, e
   return sent;
 }
 
-// ── Mettre à jour le style du label sélectionné ──
+// ── Mettre à jour le style du label destinataire ──
 window.updateDestLabel = function() {
   ['admin','all','none'].forEach(v => {
     const lbl = document.getElementById('dest-'+v+'-lbl');
@@ -5777,10 +5810,9 @@ window.updateDestLabel = function() {
     }
   });
 };
-// Initialiser le style au chargement
 setTimeout(() => { if (typeof updateDestLabel === 'function') updateDestLabel(); }, 800);
 
-// ── Envoyer un email aux Admin/Superviseurs uniquement ──
+// ── Envoyer un email (admin | all | none) ──
 async function sendEmailToAllUsers(subject, message, destFilter, extraParams) {
   const filter = destFilter || 'admin';
   if (filter === 'none') return 0;
@@ -5794,7 +5826,6 @@ async function sendEmailToAllUsers(subject, message, destFilter, extraParams) {
       users = Object.values(profiles).filter(p => p.email && (p.role === 'Admin' || p.role === 'Superviseur'));
     }
     if (users.length === 0) {
-      // Fallback : envoyer à tous si aucun admin trouvé
       const allUsers = Object.values(profiles).filter(p => p.email);
       if (allUsers.length === 0) {
         showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
@@ -6011,7 +6042,8 @@ const ADMIN_SECTION_BY_ACCORDION = {
   'acc-users': 'users',
   'acc-clean': 'data',
   'acc-reset': 'data',
-  'acc-firebase': 'data'
+  'acc-firebase': 'data',
+  'acc-sessions': 'users'
 };
 
 const ADMIN_SECTION_META = {
@@ -7983,6 +8015,122 @@ if (installDismiss) {
     localStorage.setItem('pwa-dismissed', '1');
   });
 }
+
+// ══════════ HISTORIQUE DES SESSIONS ══════════
+window.renderSessionHistory = async function() {
+  const listEl = document.getElementById('sessionHistoryList');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">⏳ Chargement...</div>';
+
+  try {
+    const snap = await get(ref(db, 'sessions'));
+    const all = snap.val() || {};
+
+    // Collecter toutes les sessions
+    const sessions = [];
+    for (const [uid, userSessions] of Object.entries(all)) {
+      for (const [key, s] of Object.entries(userSessions)) {
+        sessions.push({ uid, key, ...s });
+      }
+    }
+
+    // Trier par loginAt desc (plus récent en premier)
+    sessions.sort((a, b) => (b.loginAt || 0) - (a.loginAt || 0));
+
+    if (sessions.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session enregistrée.</div>';
+      return;
+    }
+
+    // Remplir les filtres
+    const filterUser = document.getElementById('sessionFilterUser');
+    const filterDate = document.getElementById('sessionFilterDate');
+    const selUser = filterUser?.value || '';
+    const selDate = filterDate?.value || '';
+
+    // Noms uniques pour filtre
+    const names = [...new Set(sessions.map(s => s.name).filter(Boolean))].sort();
+    const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort().reverse();
+
+    if (filterUser) {
+      const prevUser = filterUser.value;
+      filterUser.innerHTML = '<option value="">👥 Tous les utilisateurs</option>' +
+        names.map(n => `<option value="${n}" ${n===prevUser?'selected':''}>${n}</option>`).join('');
+    }
+    if (filterDate) {
+      const prevDate = filterDate.value;
+      filterDate.innerHTML = '<option value="">📅 Toutes les dates</option>' +
+        dates.map(d => `<option value="${d}" ${d===prevDate?'selected':''}>${d}</option>`).join('');
+    }
+
+    // Filtrer
+    const filtered = sessions.filter(s => {
+      if (selUser && s.name !== selUser) return false;
+      if (selDate && s.date !== selDate) return false;
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div style="color:var(--muted);padding:8px 0">Aucune session pour ce filtre.</div>';
+      return;
+    }
+
+    // Formater heure
+    function fmtTime(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    function fmtDuration(loginTs, logoutTs) {
+      if (!loginTs || !logoutTs) return '—';
+      const diff = logoutTs - loginTs;
+      if (diff < 0) return '—';
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      return (h > 0 ? h + 'h ' : '') + m + 'min ' + s + 's';
+    }
+
+    listEl.innerHTML = `
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border2);text-align:left">
+              <th style="padding:8px 6px;color:var(--muted);font-weight:600">Utilisateur</th>
+              <th style="padding:8px 6px;color:var(--muted);font-weight:600">Rôle</th>
+              <th style="padding:8px 6px;color:var(--muted);font-weight:600">🟢 Connexion</th>
+              <th style="padding:8px 6px;color:var(--muted);font-weight:600">🔴 Déconnexion</th>
+              <th style="padding:8px 6px;color:var(--muted);font-weight:600">⏱ Durée</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(s => {
+              const isOnline = !s.logoutAt;
+              return `<tr style="border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">
+                <td style="padding:8px 6px;font-weight:600;color:var(--text)">${s.name || '—'}</td>
+                <td style="padding:8px 6px;color:var(--muted)">${s.role || '—'}</td>
+                <td style="padding:8px 6px;color:var(--ok)">${fmtTime(s.loginAt)}</td>
+                <td style="padding:8px 6px;color:${isOnline ? 'var(--ok)' : 'var(--danger)'}">
+                  ${isOnline ? '<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block;animation:pulse 2s infinite"></span>En ligne</span>' : fmtTime(s.logoutAt)}
+                </td>
+                <td style="padding:8px 6px;color:var(--muted)">${isOnline ? '⏳ En cours' : fmtDuration(s.loginAt, s.logoutAt)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted2)">${filtered.length} session(s) affichée(s)</div>
+      </div>`;
+  } catch(e) {
+    listEl.innerHTML = '<div style="color:var(--danger)">Erreur chargement : ' + e.message + '</div>';
+  }
+};
+
+// Charger l'historique quand l'accordion sessions s'ouvre
+const _origToggleAccordion = window.toggleAccordion;
+window.toggleAccordion = function(id) {
+  if (_origToggleAccordion) _origToggleAccordion(id);
+  if (id === 'sessions') setTimeout(() => renderSessionHistory(), 150);
+};
 
 window.addEventListener('appinstalled', () => {
   if (installBanner) installBanner.style.display = 'none';
