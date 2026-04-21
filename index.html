@@ -1679,7 +1679,9 @@ tbody td,
         </div>
       </div>
       <div class="filter-row">
-        <input type="month" class="form-input" id="filterMonth" onchange="renderHistory()">
+        <select class="form-select" id="filterMonth" onchange="renderHistory()">
+          <option value="">Tous les mois</option>
+        </select>
         <select class="form-select" id="filterMachine" onchange="renderHistory()">
           <option value="">Toutes les machines</option>
           <option value="Soufflage">Soufflage</option>
@@ -3970,6 +3972,13 @@ window.navigate = function(page) {
   if (page==='chat') { unreadChat=0; unreadGroup=0; updateBadges(); listenGroupChat(); }
   if (page==='alertes') { unreadAlert=0; updateBadges(); }
   if (page.startsWith('machine-')) renderMachinePage(page.replace('machine-',''));
+  if (page==='rapport') {
+    setTimeout(() => {
+      const machine = currentUConf?.machine || document.getElementById('f-machine')?.value;
+      const fmtGroup = document.getElementById('f-format-display')?.closest('.form-group');
+      if (fmtGroup) fmtGroup.style.display = machine === 'B19' ? 'none' : '';
+    }, 100);
+  }
   refreshActivePage();
 };
 
@@ -4273,6 +4282,9 @@ window._buildAdminFields = function() {
   document.getElementById('adminDynFields').innerHTML = `<div class="form-row">${m.fields.map(f=>`
     <div class="form-group"><div class="form-label">${f.label} (${f.unit})</div>
     <input type="number" class="form-input" id="ff_${f.key}" placeholder="0" min="0"></div>`).join('')}</div>`;
+  // Masquer le champ format pour B19 (toujours 19L, pas de choix de format)
+  const fmtGroup = document.getElementById('f-format-display')?.closest('.form-group');
+  if (fmtGroup) fmtGroup.style.display = mid === 'B19' ? 'none' : '';
 };
 
 window.onStatusChange = function() {
@@ -4410,6 +4422,23 @@ window.clearForm = function() {
 
 // ══════════ HISTORY ══════════
 window.renderHistory = function() {
+  // ── Peupler le sélecteur de mois automatiquement ──
+  const monthSel = document.getElementById('filterMonth');
+  if (monthSel) {
+    const allMonths = [...new Set(Object.values(allReports).map(r=>r.date&&r.date.slice(0,7)).filter(Boolean))].sort().reverse();
+    const curVal = monthSel.value;
+    const curMonth = new Date().toISOString().slice(0,7);
+    monthSel.innerHTML = '<option value="">Tous les mois</option>' +
+      allMonths.map(m => {
+        const d = new Date(m+'-15');
+        const label = d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+        const cap = label.charAt(0).toUpperCase()+label.slice(1);
+        return `<option value="${m}"${m===curVal?'selected':''}>${cap}</option>`;
+      }).join('');
+    // Sélectionner mois courant par défaut si pas de valeur
+    if (!monthSel.value) monthSel.value = allMonths.includes(curMonth) ? curMonth : (allMonths[0]||'');
+  }
+
   const month   = document.getElementById('filterMonth')?.value;
   const machine = document.getElementById('filterMachine')?.value;
   const status  = document.getElementById('filterStatus')?.value;
@@ -4430,11 +4459,15 @@ window.renderHistory = function() {
     const uc = dynamicUsers.find(u=>u.name===r.operatorName);
     const canEdit = isAdmin || r.userId === currentUser?.uid;
     const dechets = r.fields?.dechets;
+    // Format : masqué pour B19 (toujours 19L)
+    const formatCell = r.machine === 'B19'
+      ? `<span style="color:var(--muted);font-size:12px">19 L</span>`
+      : `<span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${r.format ? r.format+' L' : '—'}</span>`;
     return `<tr>
       <td>${formatDate(r.date)}</td>
       <td><span style="color:${m?.color};font-weight:700">${m?.icon} ${r.machine}</span></td>
       <td>${r.shift}</td>
-      <td><span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${r.format ? r.format+' L' : '—'}</span></td>
+      <td>${formatCell}</td>
       <td><span style="color:${uc?.color||'var(--muted)'}">●</span> ${r.operatorName}</td>
       <td class="td-num" style="color:${m?.color}">${num(r.fields?.prod)}</td>
       <td style="font-weight:600;color:#f87171">${dechets !== undefined && dechets !== '' ? num(dechets)+' kg' : '<span style="color:var(--muted)">—</span>'}</td>
