@@ -1642,20 +1642,11 @@ tbody td,
           <button class="toggle-switch" id="panneSwitch" onclick="togglePanne()"></button>
           <span>🚨 Signaler une panne — alerter tous les collègues immédiatement</span>
         </div>
-        <!-- Sélecteur destinataires email -->
-        <div style="margin:10px 0 6px 0">
-          <div class="form-label" style="margin-bottom:6px">📧 Envoyer l'email à :</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-admin-lbl">
-              <input type="radio" name="emailDest" id="dest-admin" value="admin" checked onchange="updateDestLabel()" style="accent-color:var(--admin)"> 👤 Admin uniquement
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-all-lbl">
-              <input type="radio" name="emailDest" id="dest-all" value="all" onchange="updateDestLabel()" style="accent-color:var(--ok)"> 👥 Tout le monde
-            </label>
-            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text);background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;transition:all .2s" id="dest-none-lbl">
-              <input type="radio" name="emailDest" id="dest-none" value="none" onchange="updateDestLabel()" style="accent-color:var(--muted)"> 🔕 Ne pas envoyer
-            </label>
-          </div>
+        <!-- Email automatiquement envoyé à tout le monde -->
+        <input type="hidden" name="emailDest" id="dest-all" value="all">
+        <div style="margin:10px 0 6px 0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:7px 12px">
+          <span style="font-size:15px">📧</span>
+          <span style="font-size:13px;color:var(--text)">Email envoyé automatiquement à <strong>tout le monde</strong></span>
         </div>
         <div class="btn-row">
           <button class="btn btn-primary" id="saveBtn" onclick="saveReport()">💾 Enregistrer le rapport</button>
@@ -1718,6 +1709,11 @@ tbody td,
         <button class="itab" onclick="switchStatTab('Étiquette',this)">🏷️ Étiquette</button>
         <button class="itab" onclick="switchStatTab('Emballage',this)">📦 Emballage</button>
         <button class="itab" onclick="switchStatTab('B19',this)">⚙️ B19</button>
+      </div>
+      <!-- Sélecteur de mois -->
+      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px 0;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em">📅 Mois :</span>
+        <select id="statMonthFilter" onchange="renderStats(window.__activeStatTab||'global')" style="background:var(--surface);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:5px 10px;font-size:13px;font-family:var(--font-body)"></select>
       </div>
       <div id="statContent"></div>
     </div>
@@ -3838,6 +3834,7 @@ function setupListeners() {
   const rRef = ref(db,'reports');
   const rL = onValue(rRef, snap => {
     allReports = snap.val() || {};
+    populateStatMonthFilter();
     refreshActivePage();
   });
   listeners.push({ ref:rRef, fn:rL });
@@ -4375,8 +4372,8 @@ window.saveReport = async function() {
 
   // ── Email rapport ──
   if (emailSettings.rapport) {
-    const destSel = document.querySelector('input[name="emailDest"]:checked');
-    const destFilter = destSel ? destSel.value : 'admin';
+    const destSel = document.querySelector('input[name="emailDest"]:checked') || document.getElementById('dest-all');
+    const destFilter = destSel ? destSel.value : 'all';
     if (destFilter !== 'none') {
       sendEmailForReport(
         `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
@@ -4621,6 +4618,34 @@ window.switchStatTab = function(id, btn) {
   renderStats(id);
 };
 
+function populateStatMonthFilter() {
+  const sel = document.getElementById('statMonthFilter');
+  if (!sel) return;
+  const allDates = Object.values(allReports).map(r=>r.date).filter(Boolean);
+  const months = [...new Set(allDates.map(d=>d.slice(0,7)))].sort().reverse();
+  const curMonth = new Date().toISOString().slice(0,7);
+  const curVal = sel.value;
+  sel.innerHTML = months.map(m => {
+    const d = new Date(m+'-15');
+    const label = d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+    const cap = label.charAt(0).toUpperCase()+label.slice(1);
+    return `<option value="${m}"${m===curVal?'selected':''}>${cap}</option>`;
+  }).join('');
+  // Sélectionner mois courant si présent, sinon le plus récent
+  if (!sel.value || !months.includes(sel.value)) {
+    sel.value = months.includes(curMonth) ? curMonth : (months[0]||curMonth);
+  }
+}
+
+function getDaysInMonth(monthStr) {
+  const [y,mo] = monthStr.split('-').map(Number);
+  const last = new Date(y, mo, 0).getDate();
+  return Array.from({length:last},(_,i)=>{
+    const dd = String(i+1).padStart(2,'0');
+    return `${monthStr}-${dd}`;
+  });
+}
+
 function renderStats(tab) {
   const cont = document.getElementById('statContent');
   if (!cont) return;
@@ -4631,12 +4656,17 @@ function renderStats(tab) {
     });
     return;
   }
+  populateStatMonthFilter();
+  const selMonth = document.getElementById('statMonthFilter')?.value || new Date().toISOString().slice(0,7);
+  const monthDays = getDaysInMonth(selMonth);
+  const monthLabel = (()=>{ const d=new Date(selMonth+'-15'); const l=d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); return l.charAt(0).toUpperCase()+l.slice(1); })();
+
   Object.values(charts).forEach(c=>{ try{c.destroy()}catch(e){} });
   charts = {};
 
   if (tab === 'global') {
     const totals = MACHINES.map(m => {
-      const reps = Object.values(allReports).filter(r=>r.machine===m.id);
+      const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
       return { m, total:reps.reduce((s,r)=>s+(r.fields?.prod||0),0), days:[...new Set(reps.map(r=>r.date))].length };
     });
     cont.innerHTML = `<div class="stats-row">${totals.map(({m,total,days})=>`
@@ -4645,15 +4675,15 @@ function renderStats(tab) {
         <div class="sval" style="color:${m.color}">${total>0?num(total):'—'}</div>
         <div class="ssub">${days} jour${days>1?'s':''}</div>
       </div>`).join('')}</div>
-      <div class="card"><div class="card-title">Production par machine — 14 derniers jours</div>
+      <div class="card"><div class="card-title">Production par machine — ${monthLabel}</div>
       <div class="chart-wrap"><canvas id="cGlobal"></canvas></div></div>`;
     setTimeout(()=>{
       charts.g = new Chart(document.getElementById('cGlobal'),{
         type:'bar',
-        data:{ labels:getLast14Days(), datasets:MACHINES.map(m=>({
+        data:{ labels:monthDays.map(d=>d.slice(8)), datasets:MACHINES.map(m=>({
           label:m.id, borderColor:m.color, backgroundColor:m.color+'25',
           borderWidth:2, borderRadius:4,
-          data:getLast14Days().map(d=>Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((s,r)=>s+(r.fields?.prod||0),0))
+          data:monthDays.map(d=>Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((s,r)=>s+(r.fields?.prod||0),0))
         })) },
         options:chartOpts()
       });
@@ -4661,26 +4691,26 @@ function renderStats(tab) {
   } else {
     const m = MACHINES.find(x=>x.id===tab);
     if (!m) return;
-    const reps = Object.values(allReports).filter(r=>r.machine===m.id);
-    cont.innerHTML = `<div class="card"><div class="card-title" style="color:${m.color}">${m.icon} ${m.id} — Détail 14 jours</div>
+    const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
+    cont.innerHTML = `<div class="card"><div class="card-title" style="color:${m.color}">${m.icon} ${m.id} — ${monthLabel}</div>
       <div class="chart-wrap"><canvas id="cMachine"></canvas></div></div>
-      <div class="card" style="margin-top:14px"><div class="card-title">Totaux cumulés</div>
+      <div class="card" style="margin-top:14px"><div class="card-title">Totaux du mois</div>
       <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">${m.fields.map(f=>{
         const tot=reps.reduce((s,r)=>s+(r.fields?.[f.key]||0),0);
         return `<div class="stat-box" style="border-bottom:2px solid ${m.color}">
           <div class="slabel">${f.label}</div>
           <div class="sval" style="color:${m.color}">${num(tot)}</div>
-          <div class="ssub">Total</div></div>`;
+          <div class="ssub">${monthLabel}</div></div>`;
       }).join('')}</div></div>`;
     setTimeout(()=>{
       charts.m = new Chart(document.getElementById('cMachine'),{
         type:'line',
-        data:{ labels:getLast14Days(), datasets:m.fields.map((f,i)=>({
+        data:{ labels:monthDays.map(d=>d.slice(8)), datasets:m.fields.map((f,i)=>({
           label:f.label,
           borderColor:[m.color,'rgba(255,255,255,.35)','rgba(255,255,255,.2)'][i]||m.color,
           backgroundColor:i===0?m.color+'12':'transparent',
           fill:i===0, tension:.35, pointRadius:4, borderWidth:2,
-          data:getLast14Days().map(d=>reps.filter(r=>r.date===d).reduce((s,r)=>s+(r.fields?.[f.key]||0),0))
+          data:monthDays.map(d=>reps.filter(r=>r.date===d).reduce((s,r)=>s+(r.fields?.[f.key]||0),0))
         })) },
         options:chartOpts()
       });
@@ -5800,17 +5830,9 @@ async function sendEmailForReport(subject, message, machine, type, destFilter, e
 
 // ── Mettre à jour le style du label destinataire ──
 window.updateDestLabel = function() {
-  ['admin','all','none'].forEach(v => {
-    const lbl = document.getElementById('dest-'+v+'-lbl');
-    const inp = document.getElementById('dest-'+v);
-    if (lbl && inp) {
-      lbl.style.borderColor = inp.checked ? 'var(--soufflage)' : 'var(--border2)';
-      lbl.style.background  = inp.checked ? 'rgba(0,153,204,.10)' : 'var(--surface)';
-      lbl.style.fontWeight  = inp.checked ? '700' : '400';
-    }
-  });
+  // Les boutons radio ont été supprimés — email envoyé à tout le monde automatiquement
 };
-setTimeout(() => { if (typeof updateDestLabel === 'function') updateDestLabel(); }, 800);
+// no-op call kept for compatibility
 
 // ── Envoyer un email (admin | all | none) ──
 async function sendEmailToAllUsers(subject, message, destFilter, extraParams) {
