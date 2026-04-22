@@ -1517,6 +1517,15 @@ tbody td,
 
 
       <!-- BANNIÈRE ANNONCE ADMIN -->
+      <div id="offlineBanner" style="display:none;margin-bottom:12px;background:linear-gradient(135deg,#1e293b,#334155);border-radius:12px;padding:10px 16px;border:1px solid rgba(255,200,0,.25);animation:fadeIn .4s ease">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">📶</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#fde68a">Mode hors ligne</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:1px">Pas de connexion internet — données en lecture seule depuis le cache</div>
+          </div>
+        </div>
+      </div>
       <div id="announceBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:fadeIn .4s ease"></div>
 
       <!-- BANNIÈRE PROGRAMME DU PERSONNEL -->
@@ -1712,10 +1721,13 @@ tbody td,
         <button class="itab" onclick="switchStatTab('Emballage',this)">📦 Emballage</button>
         <button class="itab" onclick="switchStatTab('B19',this)">⚙️ B19</button>
       </div>
-      <!-- Sélecteur de mois -->
-      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px 0;flex-wrap:wrap">
-        <span style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em">📅 Mois :</span>
-        <select id="statMonthFilter" onchange="renderStats(window.__activeStatTab||'global')" style="background:var(--surface);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:5px 10px;font-size:13px;font-family:var(--font-body)"></select>
+      <!-- Sélecteur de mois + bouton PDF -->
+      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px 0;flex-wrap:wrap;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em">📅 Mois :</span>
+          <select id="statMonthFilter" onchange="renderStats(window.__activeStatTab||'global')" style="background:var(--surface);border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:5px 10px;font-size:13px;font-family:var(--font-body)"></select>
+        </div>
+        <button onclick="exportStatsPDF()" style="background:rgba(0,180,255,.12);border:1.5px solid rgba(0,180,255,.35);color:#7ecfee;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:var(--font-body)">📄 Export PDF</button>
       </div>
       <div id="statContent"></div>
     </div>
@@ -4750,6 +4762,150 @@ function renderStats(tab) {
     },60);
   }
 }
+
+window.exportStatsPDF = function() {
+  const selMonth = document.getElementById('statMonthFilter')?.value || new Date().toISOString().slice(0,7);
+  const tab = window.__activeStatTab || 'global';
+  const monthLabel = (()=>{ const d=new Date(selMonth+'-15'); const l=d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); return l.charAt(0).toUpperCase()+l.slice(1); })();
+  const exportDate = new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const monthDays = getDaysInMonth(selMonth);
+  const numFr = n => (n||0).toLocaleString('fr-FR');
+
+  // Prépare les données selon l'onglet actif
+  let contentHTML = '';
+  if (tab === 'global') {
+    const totals = MACHINES.map(m => {
+      const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
+      const total = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
+      const days = [...new Set(reps.map(r=>r.date))].length;
+      return { m, total, days, reps };
+    });
+    const grandTotal = totals.reduce((s,t)=>s+t.total,0);
+    // Cards par machine
+    const cardsHTML = totals.map(({m,total,days}) => `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid ${m.color};border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-weight:700;margin-bottom:4px">${m.icon} ${m.id}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:${m.color};line-height:1">${total>0?numFr(total):'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#94a3b8">${days} jour${days>1?'s':''}</div>
+          ${grandTotal>0?`<div style="font-size:11px;color:#64748b;margin-top:3px">${Math.round(total/grandTotal*100)}% du total</div>`:''}
+        </div>
+      </div>`).join('');
+    // Tableau détail par jour
+    const tableRows = monthDays.filter(d=>{
+      return MACHINES.some(m=>Object.values(allReports).some(r=>r.machine===m.id&&r.date===d&&(r.fields?.prod||0)>0));
+    }).map(d => {
+      const cols = MACHINES.map(m=>{
+        const v = Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((s,r)=>s+(r.fields?.prod||0),0);
+        return `<td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${v>0?m.color:'#cbd5e1'}">${v>0?numFr(v):'—'}</td>`;
+      }).join('');
+      const dayLabel = new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'});
+      return `<tr><td style="font-size:12px;color:#475569;white-space:nowrap">${dayLabel}</td>${cols}</tr>`;
+    }).join('');
+    contentHTML = `
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Production totale — ${monthLabel}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">${cardsHTML}</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#64748b;font-weight:700">Total combiné</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#6d28d9">${numFr(grandTotal)}</div>
+        </div>
+      </div>
+      ${tableRows?`<div style="margin-top:20px">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Détail par jour</div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:#f1f5f9">
+            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Jour</th>
+            ${MACHINES.map(m=>`<th style="text-align:right;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:${m.color};padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">${m.icon} ${m.id}</th>`).join('')}
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>`:''}`;
+  } else {
+    const m = MACHINES.find(x=>x.id===tab);
+    if (!m) return;
+    const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
+    const totals = m.fields.map(f=>({ f, tot: reps.reduce((s,r)=>s+(r.fields?.[f.key]||0),0) }));
+    const cardsHTML = totals.map(({f,tot})=>`
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid ${m.color};border-radius:10px;padding:14px 16px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-weight:700;margin-bottom:4px">${f.label}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:${m.color};line-height:1">${numFr(tot)}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:3px">${f.unit}</div>
+      </div>`).join('');
+    const tableRows = reps.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>{
+      const dayLabel = new Date(r.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+      const statusBadge = {ok:'<span style="background:#dcfce7;color:#166534;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">✅ OK</span>',warn:'<span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">⚠️ Lent</span>',panne:'<span style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">🔴 Panne</span>',arret:'<span style="background:#f1f5f9;color:#475569;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">⏸️ Arrêt</span>'}[r.status]||'';
+      const fieldCols = m.fields.map(f=>`<td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${m.color}">${numFr(r.fields?.[f.key])}</td>`).join('');
+      return `<tr><td style="font-size:12px;color:#475569;white-space:nowrap">${dayLabel}</td><td style="font-size:12px;color:#64748b">${r.shift||''}</td>${fieldCols}<td>${statusBadge}</td></tr>`;
+    }).join('');
+    contentHTML = `
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">${m.icon} ${m.id} — Totaux ${monthLabel}</div>
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(m.fields.length,3)},1fr);gap:10px">${cardsHTML}</div>
+      </div>
+      ${tableRows?`<div style="margin-top:20px">
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Rapports du mois</div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:#f1f5f9">
+            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Date</th>
+            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Poste</th>
+            ${m.fields.map(f=>`<th style="text-align:right;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:${m.color};padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">${f.label}</th>`).join('')}
+            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Statut</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>`:''}`;
+  }
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+  <title>Statistiques ${monthLabel} — AP Industry Eau Vitale</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    @page{margin:16mm 14mm;size:A4;}
+    body{font-family:'Barlow',Arial,sans-serif;background:#fff;color:#1a2030;}
+    table{width:100%;border-collapse:collapse;}
+    tbody tr:nth-child(even) td{background:#f8fafc;}
+    tbody td{padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+  </style></head><body style="padding:0">
+  <!-- EN-TÊTE -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid #00a7d6;padding-bottom:14px;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#00a7d6;font-weight:700;margin-bottom:5px">📊 Rapport Statistiques</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <svg width="34" height="34" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px;border:1px solid #e2e8f0;padding:3px;background:#fff"><rect width="36" height="36" rx="7" fill="#0099cc"/><text x="18" y="24" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">AP</text></svg>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#1a2030">Technicien <span style="color:#00a7d6">AP Industry Eau Vitale</span></div>
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-top:4px">Statistiques de production — ${monthLabel}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;display:inline-block;margin-bottom:6px">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00a7d6;font-weight:700">Exporté le</div>
+        <div style="font-size:12px;font-weight:600;color:#1a2030;margin-top:2px">${exportDate}</div>
+      </div><br>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;display:inline-block">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00a7d6;font-weight:700">Par</div>
+        <div style="font-size:12px;font-weight:600;color:#1a2030;margin-top:2px">${currentUConf?.name||'—'}</div>
+      </div>
+    </div>
+  </div>
+  ${contentHTML}
+  <!-- PIED DE PAGE -->
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8">
+    <span>Technicien AP Industry Eau Vitale</span>
+    <span>Document généré automatiquement · <strong style="color:#00a7d6">${exportDate}</strong></span>
+    <span>${monthLabel}</span>
+  </div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
+  </body></html>`;
+
+  const w = window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+};
 
 function chartOpts() {
   return {
@@ -8180,6 +8336,21 @@ window.renderPresence = function() {
 </script>
 <!-- PWA : Enregistrement Service Worker + bouton d'installation -->
 <script>
+// ── Détection hors ligne ──
+function updateOfflineBanner() {
+  const banner = document.getElementById('offlineBanner');
+  if (!banner) return;
+  if (!navigator.onLine) {
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+window.addEventListener('online',  updateOfflineBanner);
+window.addEventListener('offline', updateOfflineBanner);
+// Vérifier au chargement
+document.addEventListener('DOMContentLoaded', () => setTimeout(updateOfflineBanner, 500));
+
 // ── Enregistrer le Service Worker sans casser le cache à chaque ouverture ──
 if (!window.__ANDROID_APP__ && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -8187,6 +8358,15 @@ if (!window.__ANDROID_APP__ && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
         reg.update?.();
         console.log('Service Worker enregistré', reg.scope);
+        // Écouter les mises à jour disponibles
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker?.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('SW: nouvelle version disponible');
+            }
+          });
+        });
       }).catch(err => {
         console.log('SW erreur:', err);
       });
