@@ -3261,14 +3261,24 @@ function today() {
   const day = String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 }
-function formatDate(d) {
+function formatDate(d, ts) {
   try {
     const dt = new Date(d+'T12:00:00');
     const day = dt.toLocaleDateString('fr-FR',{weekday:'short'});
     const num = dt.getDate();
     const mon = dt.toLocaleDateString('fr-FR',{month:'short'});
     const yr  = dt.getFullYear();
-    return `<span style="white-space:nowrap;font-size:12px">${day} ${num} ${mon} ${yr}</span>`;
+    // Détecter saisie tardive : rapport soumis un autre jour que la date du rapport
+    let lateTag = '';
+    if (ts) {
+      const saisieDate = new Date(ts).toISOString().split('T')[0];
+      if (saisieDate !== d) {
+        const saisieDt = new Date(ts);
+        const saisieLabel = saisieDt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+        lateTag = `<br><span style="font-size:10px;color:#f59e0b;font-weight:600">⏰ saisi le ${saisieLabel}</span>`;
+      }
+    }
+    return `<span style="white-space:nowrap;font-size:12px">${day} ${num} ${mon} ${yr}${lateTag}</span>`;
   } catch(e){ return d; }
 }
 function timeAgo(ts) {
@@ -4513,7 +4523,7 @@ window.renderHistory = function() {
   const machine = document.getElementById('filterMachine')?.value;
   const status  = document.getElementById('filterStatus')?.value;
 
-  let filtered = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  let filtered = Object.values(allReports).sort((a,b)=>b.date.localeCompare(a.date));
   if (month)   filtered = filtered.filter(r=>r.date.startsWith(month));
   if (week)    { const wr=getWeekRange(week); filtered = filtered.filter(r=>r.date>=wr.start&&r.date<=wr.end); }
   if (machine) filtered = filtered.filter(r=>r.machine===machine);
@@ -4536,7 +4546,7 @@ window.renderHistory = function() {
       ? `<span style="color:var(--muted);font-size:12px">19 L</span>`
       : `<span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${r.format ? r.format+' L' : '—'}</span>`;
     return `<tr>
-      <td style="white-space:nowrap">${formatDate(r.date)}</td>
+      <td style="white-space:nowrap">${formatDate(r.date, r.ts)}</td>
       <td><span style="color:${m?.color};font-weight:700">${m?.icon} ${r.machine}</span></td>
       <td>${r.shift}</td>
       <td>${formatCell}</td>
