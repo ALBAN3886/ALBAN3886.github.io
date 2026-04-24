@@ -1653,14 +1653,26 @@ tbody td,
         </div>
         <!-- Email automatiquement envoyé à tout le monde -->
         <input type="hidden" name="emailDest" id="dest-all" value="all">
-        <div style="margin:10px 0 6px 0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:7px 12px">
-          <span style="font-size:15px">📧</span>
-          <span style="font-size:13px;color:var(--text)">Email envoyé automatiquement à <strong>tout le monde</strong></span>
-        </div>
         <div class="btn-row">
           <button class="btn btn-primary" id="saveBtn" onclick="saveReport()">💾 Enregistrer le rapport</button>
           <button class="btn btn-ghost" onclick="clearForm()">Annuler</button>
           <div class="save-ok" id="saveOk">✓ Rapport enregistré !</div>
+
+<!-- Modale confirmation rapport -->
+<div id="reportSuccessModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:20px;padding:28px 24px;max-width:340px;width:90%;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);border:1px solid var(--border2);animation:fadeIn .3s ease">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;box-shadow:0 4px 20px rgba(34,197,94,.35)">✓</div>
+      <div style="font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px">Rapport enregistré</div>
+      <div style="font-size:13px;color:var(--muted)" id="reportSuccessDetails"></div>
+    </div>
+    <div id="reportSuccessEmailStatus" style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:12px;color:var(--muted2);min-height:36px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px">📧</span>
+      <span id="reportSuccessEmailText">Envoi des notifications en cours…</span>
+    </div>
+    <button onclick="closeReportSuccessModal()" style="width:100%;background:linear-gradient(135deg,#0099cc,#00c6ff);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font-body)">OK</button>
+  </div>
+</div>
         </div>
       </div>
     </div>
@@ -4451,8 +4463,39 @@ window.saveReport = async function() {
   panneSwitchOn = false;
   document.getElementById('panneSwitch').classList.remove('on');
   btn.disabled=false; btn.textContent='💾 Enregistrer le rapport';
-  const ok = document.getElementById('saveOk');
-  ok.classList.add('show'); setTimeout(()=>ok.classList.remove('show'),2500);
+
+  // ── Modale de confirmation ──
+  const modal = document.getElementById('reportSuccessModal');
+  const details = document.getElementById('reportSuccessDetails');
+  const emailText = document.getElementById('reportSuccessEmailText');
+  if (modal) {
+    const dateFmt = new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    details.innerHTML = `<strong style="color:var(--text)">${machine}</strong> · ${shift} · ${dateFmt}<br><span style="color:#22c55e;font-weight:600">${Number(prodVal).toLocaleString('fr-FR')} unités produites</span>`;
+    emailText.textContent = 'Envoi des notifications en cours…';
+    modal.style.display = 'flex';
+    if (emailSettings.rapport) {
+      sendEmailForReport(
+        `${statusEmoji} Rapport ${machine} — ${shift} — ${statusLabel}`,
+        `Un nouveau rapport a été soumis sur AP Industry Eau Vitale.`,
+        machine, 'rapport', 'all',
+        { machine, operateur: currentUConf.name, date, poste: shift,
+          production: Number(prodVal).toLocaleString('fr-FR') + (format ? ' (format '+format+' L)' : ''),
+          statut: statusLabel, note: note || 'Aucun commentaire' }
+      ).then(sent => {
+        if (emailText) {
+          if (typeof sent === 'number' && sent > 0) {
+            emailText.innerHTML = `<span style="color:#22c55e;font-weight:600">✅ ${sent} notification(s) envoyée(s)</span>`;
+          } else {
+            emailText.innerHTML = `<span style="color:#f59e0b;font-weight:600">⚠️ Rapport enregistré — notifications non envoyées</span>`;
+          }
+        }
+      }).catch(() => {
+        if (emailText) emailText.innerHTML = `<span style="color:#f59e0b">⚠️ Rapport enregistré — vérifiez EmailJS</span>`;
+      });
+    } else {
+      emailText.innerHTML = `<span style="color:var(--muted)">🔕 Notifications désactivées</span>`;
+    }
+  }
 };
 
 window.clearForm = function() {
@@ -6090,6 +6133,11 @@ async function incrementEmailCounter(machine, type) {
 }
 
 // ── Envoyer un email lié à un rapport (avec comptage) ──
+window.closeReportSuccessModal = function() {
+  const modal = document.getElementById('reportSuccessModal');
+  if (modal) modal.style.display = 'none';
+};
+
 async function sendEmailForReport(subject, message, machine, type, destFilter, extraParams) {
   const sent = await sendEmailToAllUsers(subject, message, destFilter || 'all', extraParams);
   if (sent > 0) {
