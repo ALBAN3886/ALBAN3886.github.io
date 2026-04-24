@@ -4523,14 +4523,16 @@ window.renderHistory = function() {
   const machine = document.getElementById('filterMachine')?.value;
   const status  = document.getElementById('filterStatus')?.value;
 
+  const getTsMs = r => {
+    if (!r.ts) return 0;
+    if (typeof r.ts === 'number') return r.ts;
+    if (r.ts.seconds) return r.ts.seconds * 1000;
+    return 0;
+  };
   let filtered = Object.values(allReports).sort((a,b) => {
-    // Tri principal : date du rapport décroissant
     const dateCmp = (b.date||'').localeCompare(a.date||'');
     if (dateCmp !== 0) return dateCmp;
-    // Tri secondaire : timestamp de saisie décroissant
-    const tsA = typeof a.ts === 'number' ? a.ts : 0;
-    const tsB = typeof b.ts === 'number' ? b.ts : 0;
-    return tsB - tsA;
+    return getTsMs(b) - getTsMs(a);
   });
   if (month)   filtered = filtered.filter(r=>r.date.startsWith(month));
   if (week)    { const wr=getWeekRange(week); filtered = filtered.filter(r=>r.date>=wr.start&&r.date<=wr.end); }
@@ -5379,7 +5381,7 @@ window.exportExcel = function() {
 
 window.exportPDF = function(machineFilter) {
   const selectedMonth = document.getElementById('filterMonth')?.value || '';
-  let rows = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  let rows = Object.values(allReports).sort((a,b)=>{ const dc=(b.date||'').localeCompare(a.date||''); return dc!==0?dc:(b.ts||0)-(a.ts||0); });
   if (selectedMonth) rows = rows.filter(r => r.date && r.date.startsWith(selectedMonth));
   if (machineFilter) rows = rows.filter(r => r.machine === machineFilter);
   const pdfMonth = selectedMonth || today().substring(0,7);
