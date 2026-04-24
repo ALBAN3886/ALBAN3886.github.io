@@ -4523,7 +4523,15 @@ window.renderHistory = function() {
   const machine = document.getElementById('filterMachine')?.value;
   const status  = document.getElementById('filterStatus')?.value;
 
-  let filtered = Object.values(allReports).sort((a,b)=>b.date.localeCompare(a.date));
+  let filtered = Object.values(allReports).sort((a,b) => {
+    // Tri principal : date du rapport décroissant
+    const dateCmp = (b.date||'').localeCompare(a.date||'');
+    if (dateCmp !== 0) return dateCmp;
+    // Tri secondaire : timestamp de saisie décroissant
+    const tsA = typeof a.ts === 'number' ? a.ts : 0;
+    const tsB = typeof b.ts === 'number' ? b.ts : 0;
+    return tsB - tsA;
+  });
   if (month)   filtered = filtered.filter(r=>r.date.startsWith(month));
   if (week)    { const wr=getWeekRange(week); filtered = filtered.filter(r=>r.date>=wr.start&&r.date<=wr.end); }
   if (machine) filtered = filtered.filter(r=>r.machine===machine);
