@@ -1688,8 +1688,11 @@ tbody td,
         </div>
       </div>
       <div class="filter-row">
-        <select class="form-select" id="filterMonth" onchange="renderHistory()">
+        <select class="form-select" id="filterMonth" onchange="onHistFilterChange('month')">
           <option value="">Tous les mois</option>
+        </select>
+        <select class="form-select" id="filterWeek" onchange="onHistFilterChange('week')">
+          <option value="">Toutes les semaines</option>
         </select>
         <select class="form-select" id="filterMachine" onchange="renderHistory()">
           <option value="">Toutes les machines</option>
@@ -3258,7 +3261,16 @@ function today() {
   const day = String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 }
-function formatDate(d) { try { return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}); } catch(e){return d;} }
+function formatDate(d) {
+  try {
+    const dt = new Date(d+'T12:00:00');
+    const day = dt.toLocaleDateString('fr-FR',{weekday:'short'});
+    const num = dt.getDate();
+    const mon = dt.toLocaleDateString('fr-FR',{month:'short'});
+    const yr  = dt.getFullYear();
+    return `<span style="white-space:nowrap;font-size:12px">${day} ${num} ${mon} ${yr}</span>`;
+  } catch(e){ return d; }
+}
 function timeAgo(ts) {
   if (!ts) return '';
   const diff = Date.now() - ts;
@@ -4320,6 +4332,16 @@ window.saveReport = async function() {
   const note = document.getElementById('f-note').value.trim();
   if (!date) { alert('Sélectionner une date'); return; }
 
+  // ── Vérifier doublon date + machine + poste ──
+  const duplicate = Object.values(allReports).find(r =>
+    r.machine === machine && r.date === date && r.shift === shift && r.userId === currentUser.uid
+  );
+  if (duplicate) {
+    const dateLabel = new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    showToast(`⚠️ Un rapport ${machine} existe déjà pour le ${dateLabel} (${shift}). Modifiez-le plutôt.`, 'warn');
+    return;
+  }
+
   const fields = {};
   m.fields.forEach(f => { const el=document.getElementById('ff_'+f.key); if(el) fields[f.key]=parseFloat(el.value)||0; });
 
@@ -4433,8 +4455,34 @@ window.clearForm = function() {
 };
 
 // ══════════ HISTORY ══════════
+// ── Helper : obtenir la semaine ISO (lundi→dimanche) d'une date ──
+function getWeekRange(dateStr) {
+  const d = new Date(dateStr+'T12:00:00');
+  const day = d.getDay() || 7; // lundi=1 ... dimanche=7
+  const mon = new Date(d); mon.setDate(d.getDate() - day + 1);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = x => x.toISOString().split('T')[0];
+  return { start: fmt(mon), end: fmt(sun) };
+}
+
+function getWeekKey(dateStr) { const w = getWeekRange(dateStr); return w.start; }
+
+function weekLabel(startStr) {
+  const mon = new Date(startStr+'T12:00:00');
+  const sun = new Date(startStr+'T12:00:00'); sun.setDate(mon.getDate()+6);
+  const fmt = x => x.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+  return `Semaine du ${fmt(mon)} au ${fmt(sun)}`;
+}
+
+// Quand on change mois → reset semaine, et vice-versa
+window.onHistFilterChange = function(which) {
+  if (which === 'month') document.getElementById('filterWeek').value = '';
+  if (which === 'week')  document.getElementById('filterMonth').value = '';
+  renderHistory();
+};
+
 window.renderHistory = function() {
-  // ── Peupler le sélecteur de mois automatiquement ──
+  // ── Peupler sélecteur mois ──
   const monthSel = document.getElementById('filterMonth');
   if (monthSel) {
     const allMonths = [...new Set(Object.values(allReports).map(r=>r.date&&r.date.slice(0,7)).filter(Boolean))].sort().reverse();
@@ -4447,17 +4495,30 @@ window.renderHistory = function() {
         const cap = label.charAt(0).toUpperCase()+label.slice(1);
         return `<option value="${m}"${m===curVal?'selected':''}>${cap}</option>`;
       }).join('');
-    // Sélectionner mois courant par défaut si pas de valeur
     if (!monthSel.value) monthSel.value = allMonths.includes(curMonth) ? curMonth : (allMonths[0]||'');
   }
 
+  // ── Peupler sélecteur semaine ──
+  const weekSel = document.getElementById('filterWeek');
+  if (weekSel) {
+    const allWeeks = [...new Set(Object.values(allReports).map(r=>r.date?getWeekKey(r.date):null).filter(Boolean))].sort().reverse();
+    const curWVal = weekSel.value;
+    weekSel.innerHTML = '<option value="">Toutes les semaines</option>' +
+      allWeeks.map(w => `<option value="${w}"${w===curWVal?'selected':''}>${weekLabel(w)}</option>`).join('');
+    if (curWVal && allWeeks.includes(curWVal)) weekSel.value = curWVal;
+  }
+
   const month   = document.getElementById('filterMonth')?.value;
+  const week    = document.getElementById('filterWeek')?.value;
   const machine = document.getElementById('filterMachine')?.value;
   const status  = document.getElementById('filterStatus')?.value;
+
   let filtered = Object.values(allReports).sort((a,b)=>(b.ts||0)-(a.ts||0));
   if (month)   filtered = filtered.filter(r=>r.date.startsWith(month));
+  if (week)    { const wr=getWeekRange(week); filtered = filtered.filter(r=>r.date>=wr.start&&r.date<=wr.end); }
   if (machine) filtered = filtered.filter(r=>r.machine===machine);
   if (status)  filtered = filtered.filter(r=>r.status===status);
+
   const tbl = document.getElementById('historyTable');
   if (!tbl) return;
   if (filtered.length===0) { tbl.innerHTML='<div class="empty"><div class="eico">📋</div><p>Aucun rapport</p></div>'; return; }
@@ -4471,12 +4532,11 @@ window.renderHistory = function() {
     const uc = dynamicUsers.find(u=>u.name===r.operatorName);
     const canEdit = isAdmin || r.userId === currentUser?.uid;
     const dechets = r.fields?.dechets;
-    // Format : masqué pour B19 (toujours 19L)
     const formatCell = r.machine === 'B19'
       ? `<span style="color:var(--muted);font-size:12px">19 L</span>`
       : `<span style="background:rgba(99,102,241,.15);color:#a5b4fc;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">${r.format ? r.format+' L' : '—'}</span>`;
     return `<tr>
-      <td>${formatDate(r.date)}</td>
+      <td style="white-space:nowrap">${formatDate(r.date)}</td>
       <td><span style="color:${m?.color};font-weight:700">${m?.icon} ${r.machine}</span></td>
       <td>${r.shift}</td>
       <td>${formatCell}</td>
