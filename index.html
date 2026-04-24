@@ -6091,7 +6091,7 @@ async function incrementEmailCounter(machine, type) {
 
 // ── Envoyer un email lié à un rapport (avec comptage) ──
 async function sendEmailForReport(subject, message, machine, type, destFilter, extraParams) {
-  const sent = await sendEmailToAllUsers(subject, message, destFilter || 'admin', extraParams);
+  const sent = await sendEmailToAllUsers(subject, message, destFilter || 'all', extraParams);
   if (sent > 0) {
     await incrementEmailCounter(machine, type || 'rapport');
   }
@@ -6106,25 +6106,22 @@ window.updateDestLabel = function() {
 
 // ── Envoyer un email (admin | all | none) ──
 async function sendEmailToAllUsers(subject, message, destFilter, extraParams) {
-  const filter = destFilter || 'admin';
+  const filter = destFilter || 'all'; // Par défaut : tout le monde
   if (filter === 'none') return 0;
   try {
     const snap = await get(ref(db, 'userProfiles'));
     const profiles = snap.val() || {};
     let users;
     if (filter === 'all') {
-      users = Object.values(profiles).filter(p => p.email && p.approved);
+      // Tous les utilisateurs avec un email (approuvés ou non)
+      users = Object.values(profiles).filter(p => p.email);
     } else {
+      // Admin/Superviseur uniquement
       users = Object.values(profiles).filter(p => p.email && (p.role === 'Admin' || p.role === 'Superviseur'));
     }
     if (users.length === 0) {
-      const allUsers = Object.values(profiles).filter(p => p.email);
-      if (allUsers.length === 0) {
-        showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
-        return 0;
-      }
-      const ok = await sendEmail(allUsers[0].email, allUsers[0].name, subject, message, extraParams);
-      return ok ? 1 : 0;
+      showToast('⚠️ Aucun utilisateur avec email trouvé', 'err');
+      return 0;
     }
     const label = filter === 'all' ? 'utilisateur(s)' : 'admin(s)';
     showToast('📧 Envoi en cours à ' + users.length + ' ' + label + '...', 'info');
