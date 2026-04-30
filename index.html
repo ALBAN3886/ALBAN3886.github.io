@@ -4894,89 +4894,132 @@ window.exportStatsPDF = function() {
   const monthDays = getDaysInMonth(selMonth);
   const numFr = n => (n||0).toLocaleString('fr-FR');
 
-  // Prépare les données selon l'onglet actif
+  // Palette de couleurs machines bien contrastées sur fond blanc
+  const MCOLORS = {
+    'Soufflage':   { bg:'#e0f2fe', border:'#0284c7', text:'#0c4a6e', val:'#0369a1' },
+    'Remplissage': { bg:'#dcfce7', border:'#16a34a', text:'#14532d', val:'#15803d' },
+    'Étiquette':   { bg:'#fef9c3', border:'#ca8a04', text:'#713f12', val:'#a16207' },
+    'Emballage':   { bg:'#ffedd5', border:'#ea580c', text:'#7c2d12', val:'#c2410c' },
+    'B19':         { bg:'#f3e8ff', border:'#9333ea', text:'#3b0764', val:'#7e22ce' },
+  };
+
+  const statusBadge = s => ({
+    ok:    '<span style="background:#dcfce7;color:#166534;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;border:1px solid #bbf7d0">✅ OK</span>',
+    warn:  '<span style="background:#fef3c7;color:#92400e;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;border:1px solid #fde68a">⚠️ Lent</span>',
+    panne: '<span style="background:#fee2e2;color:#991b1b;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;border:1px solid #fecaca">🔴 Panne</span>',
+    arret: '<span style="background:#f1f5f9;color:#475569;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;border:1px solid #cbd5e1">⏸️ Arrêt</span>',
+  }[s] || '');
+
   let contentHTML = '';
+
   if (tab === 'global') {
     const totals = MACHINES.map(m => {
       const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
       const total = reps.reduce((s,r)=>s+(r.fields?.prod||0),0);
       const days = [...new Set(reps.map(r=>r.date))].length;
-      return { m, total, days, reps };
+      return { m, total, days };
     });
     const grandTotal = totals.reduce((s,t)=>s+t.total,0);
-    // Cards par machine
-    const cardsHTML = totals.map(({m,total,days}) => `
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid ${m.color};border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-weight:700;margin-bottom:4px">${m.icon} ${m.id}</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:${m.color};line-height:1">${total>0?numFr(total):'—'}</div>
+
+    const cardsHTML = totals.map(({m,total,days}) => {
+      const c = MCOLORS[m.id] || { bg:'#f8fafc', border:'#94a3b8', text:'#1e293b', val:'#334155' };
+      const pct = grandTotal>0 ? Math.round(total/grandTotal*100) : 0;
+      return `<div style="background:${c.bg};border:1.5px solid ${c.border};border-radius:12px;padding:16px 18px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:${c.text};font-weight:800;margin-bottom:8px">${m.icon} ${m.id}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:${c.val};line-height:1">${total>0?numFr(total):'—'}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          <span style="font-size:11px;color:${c.text};font-weight:600">${days} jour${days>1?'s':''}</span>
+          ${grandTotal>0?`<span style="font-size:11px;background:${c.border};color:#fff;border-radius:4px;padding:1px 7px;font-weight:700">${pct}%</span>`:''}
         </div>
-        <div style="text-align:right">
-          <div style="font-size:11px;color:#94a3b8">${days} jour${days>1?'s':''}</div>
-          ${grandTotal>0?`<div style="font-size:11px;color:#64748b;margin-top:3px">${Math.round(total/grandTotal*100)}% du total</div>`:''}
-        </div>
-      </div>`).join('');
-    // Tableau détail par jour
-    const tableRows = monthDays.filter(d=>{
-      return MACHINES.some(m=>Object.values(allReports).some(r=>r.machine===m.id&&r.date===d&&(r.fields?.prod||0)>0));
-    }).map(d => {
-      const cols = MACHINES.map(m=>{
-        const v = Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((s,r)=>s+(r.fields?.prod||0),0);
-        return `<td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${v>0?m.color:'#cbd5e1'}">${v>0?numFr(v):'—'}</td>`;
-      }).join('');
-      const dayLabel = new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'});
-      return `<tr><td style="font-size:12px;color:#475569;white-space:nowrap">${dayLabel}</td>${cols}</tr>`;
+      </div>`;
     }).join('');
+
+    const tableRows = monthDays.filter(d =>
+      MACHINES.some(m=>Object.values(allReports).some(r=>r.machine===m.id&&r.date===d&&(r.fields?.prod||0)>0))
+    ).map(d => {
+      const dayLabel = new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+      const dayTotal = MACHINES.reduce((s,m)=>s+Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((ss,r)=>ss+(r.fields?.prod||0),0),0);
+      const cols = MACHINES.map(m => {
+        const c = MCOLORS[m.id] || {};
+        const v = Object.values(allReports).filter(r=>r.machine===m.id&&r.date===d).reduce((s,r)=>s+(r.fields?.prod||0),0);
+        return `<td style="text-align:right;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:${v>0?(c.val||'#334155'):'#cbd5e1'}">${v>0?numFr(v):'—'}</td>`;
+      }).join('');
+      return `<tr>
+        <td style="padding:8px 12px;font-size:12px;font-weight:600;color:#334155;white-space:nowrap">${dayLabel}</td>
+        ${cols}
+        <td style="text-align:right;padding:8px 12px;font-size:12px;font-weight:800;color:#1e293b">${dayTotal>0?numFr(dayTotal):'—'}</td>
+      </tr>`;
+    }).join('');
+
     contentHTML = `
-      <div style="margin-bottom:20px">
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Production totale — ${monthLabel}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">${cardsHTML}</div>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#64748b;font-weight:700">Total combiné</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#6d28d9">${numFr(grandTotal)}</div>
+      <div style="margin-bottom:24px">
+        <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #e2e8f0">📦 Production totale — ${monthLabel}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">${cardsHTML}</div>
+        <div style="background:#1e293b;border-radius:10px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Total combiné</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff">${numFr(grandTotal)}</div>
         </div>
       </div>
-      ${tableRows?`<div style="margin-top:20px">
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Détail par jour</div>
+      ${tableRows?`<div>
+        <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e2e8f0">📅 Détail par jour</div>
         <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:#f1f5f9">
-            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Jour</th>
-            ${MACHINES.map(m=>`<th style="text-align:right;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:${m.color};padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">${m.icon} ${m.id}</th>`).join('')}
-          </tr></thead>
+          <thead>
+            <tr style="background:#1e293b">
+              <th style="text-align:left;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Jour</th>
+              ${MACHINES.map(m=>{ const c=MCOLORS[m.id]||{}; return `<th style="text-align:right;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:${c.bg||'#e2e8f0'};font-weight:800">${m.icon} ${m.id}</th>`; }).join('')}
+              <th style="text-align:right;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Total</th>
+            </tr>
+          </thead>
           <tbody>${tableRows}</tbody>
         </table>
       </div>`:''}`;
+
   } else {
     const m = MACHINES.find(x=>x.id===tab);
     if (!m) return;
-    const reps = Object.values(allReports).filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth));
-    const totals = m.fields.map(f=>({ f, tot: reps.reduce((s,r)=>s+(r.fields?.[f.key]||0),0) }));
-    const cardsHTML = totals.map(({f,tot})=>`
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid ${m.color};border-radius:10px;padding:14px 16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#64748b;font-weight:700;margin-bottom:4px">${f.label}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:${m.color};line-height:1">${numFr(tot)}</div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:3px">${f.unit}</div>
-      </div>`).join('');
-    const tableRows = reps.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>{
-      const dayLabel = new Date(r.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-      const statusBadge = {ok:'<span style="background:#dcfce7;color:#166534;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">✅ OK</span>',warn:'<span style="background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">⚠️ Lent</span>',panne:'<span style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">🔴 Panne</span>',arret:'<span style="background:#f1f5f9;color:#475569;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">⏸️ Arrêt</span>'}[r.status]||'';
-      const fieldCols = m.fields.map(f=>`<td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${m.color}">${numFr(r.fields?.[f.key])}</td>`).join('');
-      return `<tr><td style="font-size:12px;color:#475569;white-space:nowrap">${dayLabel}</td><td style="font-size:12px;color:#64748b">${r.shift||''}</td>${fieldCols}<td>${statusBadge}</td></tr>`;
+    const c = MCOLORS[m.id] || { bg:'#f8fafc', border:'#64748b', text:'#1e293b', val:'#334155' };
+    const reps = Object.values(allReports)
+      .filter(r=>r.machine===m.id && r.date && r.date.startsWith(selMonth))
+      .sort((a,b)=>a.date.localeCompare(b.date));
+
+    const cardsHTML = m.fields.map(f => {
+      const tot = reps.reduce((s,r)=>s+(r.fields?.[f.key]||0),0);
+      return `<div style="background:${c.bg};border:1.5px solid ${c.border};border-radius:12px;padding:16px 18px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:${c.text};font-weight:800;margin-bottom:8px">${f.label}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:${c.val};line-height:1">${numFr(tot)}</div>
+        <div style="font-size:11px;color:${c.text};margin-top:6px;font-weight:600">${f.unit}</div>
+      </div>`;
     }).join('');
+
+    const tableRows = reps.map(r => {
+      const dayLabel = new Date(r.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+      const fieldCols = m.fields.map(f =>
+        `<td style="text-align:right;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:${c.val}">${numFr(r.fields?.[f.key])}</td>`
+      ).join('');
+      return `<tr>
+        <td style="padding:8px 12px;font-size:12px;font-weight:600;color:#334155;white-space:nowrap">${dayLabel}</td>
+        <td style="padding:8px 12px;font-size:12px;color:#475569">${r.shift||''}</td>
+        ${fieldCols}
+        <td style="padding:8px 12px">${statusBadge(r.status)}</td>
+      </tr>`;
+    }).join('');
+
     contentHTML = `
-      <div style="margin-bottom:20px">
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">${m.icon} ${m.id} — Totaux ${monthLabel}</div>
+      <div style="margin-bottom:24px">
+        <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid ${c.border}">${m.icon} ${m.id} — Totaux ${monthLabel}</div>
         <div style="display:grid;grid-template-columns:repeat(${Math.min(m.fields.length,3)},1fr);gap:10px">${cardsHTML}</div>
       </div>
-      ${tableRows?`<div style="margin-top:20px">
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:10px">Rapports du mois</div>
+      ${tableRows?`<div>
+        <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid ${c.border}">📋 Rapports du mois</div>
         <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:#f1f5f9">
-            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Date</th>
-            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Poste</th>
-            ${m.fields.map(f=>`<th style="text-align:right;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:${m.color};padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">${f.label}</th>`).join('')}
-            <th style="text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:#64748b;padding:8px 10px;font-weight:800;border-bottom:1px solid #cbd5e1">Statut</th>
-          </tr></thead>
+          <thead>
+            <tr style="background:#1e293b">
+              <th style="text-align:left;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Date</th>
+              <th style="text-align:left;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Poste</th>
+              ${m.fields.map(f=>`<th style="text-align:right;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:${c.bg};font-weight:800">${f.label}</th>`).join('')}
+              <th style="text-align:left;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;font-weight:700">Statut</th>
+            </tr>
+          </thead>
           <tbody>${tableRows}</tbody>
         </table>
       </div>`:''}`;
@@ -4984,44 +5027,46 @@ window.exportStatsPDF = function() {
 
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
   <title>Statistiques ${monthLabel} — AP Industry Eau Vitale</title>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     @page{margin:16mm 14mm;size:A4;}
-    body{font-family:'Barlow',Arial,sans-serif;background:#fff;color:#1a2030;}
-    table{width:100%;border-collapse:collapse;}
+    body{font-family:'Barlow',Arial,sans-serif;background:#fff;color:#1e293b;font-size:13px;line-height:1.5;}
     tbody tr:nth-child(even) td{background:#f8fafc;}
-    tbody td{padding:7px 10px;border-bottom:1px solid #f1f5f9;}
+    tbody tr:hover td{background:#f1f5f9;}
     @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
-  </style></head><body style="padding:0">
-  <!-- EN-TÊTE -->
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2px solid #00a7d6;padding-bottom:14px;margin-bottom:20px">
+  </style></head>
+  <body style="padding:0">
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid #0284c7;padding-bottom:16px;margin-bottom:24px">
     <div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#00a7d6;font-weight:700;margin-bottom:5px">📊 Rapport Statistiques</div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <svg width="34" height="34" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;border-radius:7px;border:1px solid #e2e8f0;padding:3px;background:#fff"><rect width="36" height="36" rx="7" fill="#0099cc"/><text x="18" y="24" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">AP</text></svg>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#1a2030">Technicien <span style="color:#00a7d6">AP Industry Eau Vitale</span></div>
+      <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#0284c7;font-weight:800;margin-bottom:6px">📊 Rapport Statistiques</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="8" fill="#0284c7"/><text x="18" y="25" font-family="Arial" font-size="15" font-weight="900" fill="white" text-anchor="middle">AP</text></svg>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#1e293b">Technicien <span style="color:#0284c7">AP Industry Eau Vitale</span></div>
       </div>
-      <div style="font-size:11px;color:#64748b;margin-top:4px">Statistiques de production — ${monthLabel}</div>
+      <div style="font-size:12px;color:#475569;font-weight:500">Statistiques de production — ${monthLabel}</div>
     </div>
-    <div style="text-align:right">
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;display:inline-block;margin-bottom:6px">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00a7d6;font-weight:700">Exporté le</div>
-        <div style="font-size:12px;font-weight:600;color:#1a2030;margin-top:2px">${exportDate}</div>
-      </div><br>
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;display:inline-block">
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#00a7d6;font-weight:700">Par</div>
-        <div style="font-size:12px;font-weight:600;color:#1a2030;margin-top:2px">${currentUConf?.name||'—'}</div>
+    <div style="text-align:right;display:flex;flex-direction:column;gap:6px">
+      <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:8px 14px">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#0284c7;font-weight:800">Exporté le</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:2px">${exportDate}</div>
+      </div>
+      <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:8px;padding:8px 14px">
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:#0284c7;font-weight:800">Par</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:2px">${currentUConf?.name||'—'}</div>
       </div>
     </div>
   </div>
+
   ${contentHTML}
-  <!-- PIED DE PAGE -->
-  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8">
+
+  <div style="margin-top:28px;padding-top:12px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#64748b;font-weight:600">
     <span>Technicien AP Industry Eau Vitale</span>
-    <span>Document généré automatiquement · <strong style="color:#00a7d6">${exportDate}</strong></span>
+    <span>Document généré automatiquement · <strong style="color:#0284c7">${exportDate}</strong></span>
     <span>${monthLabel}</span>
   </div>
+
   <script>window.onload=()=>setTimeout(()=>window.print(),600);<\/script>
   </body></html>`;
 
@@ -5029,6 +5074,7 @@ window.exportStatsPDF = function() {
   w.document.write(html);
   w.document.close();
 };
+
 
 function chartOpts() {
   return {
