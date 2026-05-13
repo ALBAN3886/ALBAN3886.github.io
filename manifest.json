@@ -1,15 +1,15 @@
 {
- {
-  "name": "Technicien Eau Vitale",
-  "short_name": "TEV",
-  "start_url": "/",
+  "name": "Technicien AP Industry Eau Vitale",
+  "short_name": "Eau Vitale",
+  "description": "Application de gestion de ligne de production — AP Industry Eau Vitale",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
+  "background_color": "#0099CC",
   "theme_color": "#0099CC",
-  "description": "Application de gestion de ligne de production — Eau Vitale",
-
+  "lang": "fr",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -24,19 +24,21 @@
       "purpose": "any maskable"
     }
   ],
-
+  "screenshots": [],
   "shortcuts": [
     {
-      "name": "Nouveau rapport",
+      "name": "Tableau de Bord",
+      "short_name": "Dashboard",
+      "description": "Voir le tableau de bord en temps réel",
+      "url": "/index.html#dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon Rapport",
       "short_name": "Rapport",
-      "url": "/#page-rapport",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "description": "Saisir mon rapport de production",
+      "url": "/index.html#rapport",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
