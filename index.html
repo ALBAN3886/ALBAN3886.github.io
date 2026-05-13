@@ -1534,6 +1534,9 @@ tbody td,
       <!-- BANNIÈRE FORMAT DE PRODUCTION -->
       <div id="formatBanner" style="display:none;margin-bottom:16px;animation:fadeIn .4s ease"></div>
 
+      <!-- BANNIÈRE RAPPORTS MANQUANTS -->
+      <div id="missingReportsBanner" style="display:none;margin-bottom:16px;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(227,93,106,.25);animation:fadeIn .4s ease"></div>
+
       <!-- COMPTEUR B19 + EMBALLAGE — MOIS EN COURS -->
       <div style="background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid rgba(99,102,241,.25);box-shadow:0 4px 16px rgba(0,0,0,.15);position:relative;overflow:hidden">
         <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(99,102,241,.06);pointer-events:none"></div>
@@ -4193,6 +4196,10 @@ function renderDashboard() {
   document.getElementById('totalB19Dash').textContent     = b19MonthTotal > 0 ? num(b19MonthTotal) : '0';
   document.getElementById('totalCombineDash').textContent = combined > 0 ? num(combined) : '0';
 
+  // ── Bannière rapports manquants ──
+  if (typeof renderMissingReportsBanner === 'function') renderMissingReportsBanner();
+  if (typeof scheduleMissingReportsReminder === 'function') scheduleMissingReportsReminder();
+
   // Total déchets — même mois actif
   const dechetsTotal = allRepsAll
     .filter(r => r.date && r.date.startsWith(activeMonth))
@@ -6693,6 +6700,167 @@ onValue(ref(db, 'system/productionFormat'), snap => {
   activeProductionFormat = fmt;
   renderFormatBanner(fmt);
 });
+
+// ══════════ RAPPORTS MANQUANTS — DÉTECTION & ALERTE ══════════
+
+const MACHINES_SUIVI = ['Soufflage','Remplissage','Étiquette','Emballage','B19'];
+let _missingReminderTimer = null;
+
+/**
+ * Calcule les jours ouvrés du mois en cours (lun-sam) jusqu'à aujourd'hui
+ * et renvoie ceux pour lesquels une machine n'a aucun rapport.
+ */
+function getMissingReportDays(machine, monthStr) {
+  const today = getToday(); // 'YYYY-MM-DD'
+  const [y, m] = monthStr.split('-').map(Number);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const missing = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${monthStr}-${String(d).padStart(2,'0')}`;
+    if (dateStr > today) break; // pas encore passé
+    const dow = new Date(dateStr+'T12:00:00').getDay(); // 0=dim,6=sam
+    if (dow === 0) continue; // on ignore seulement le dimanche (usine ouvre sam)
+    const hasReport = Object.values(allReports).some(r => r.machine === machine && r.date === dateStr);
+    if (!hasReport) missing.push(dateStr);
+  }
+  return missing;
+}
+
+function renderMissingReportsBanner() {
+  const banner = document.getElementById('missingReportsBanner');
+  if (!banner) return;
+
+  // Uniquement pour Admin/Superviseur
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) { banner.style.display = 'none'; return; }
+
+  const now = new Date();
+  const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  // Collecter les manquants par machine
+  const missingByMachine = {};
+  MACHINES_SUIVI.forEach(machine => {
+    const days = getMissingReportDays(machine, curMonth);
+    if (days.length) missingByMachine[machine] = days;
+  });
+
+  if (Object.keys(missingByMachine).length === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const totalMissing = Object.values(missingByMachine).reduce((s,a)=>s+a.length,0);
+  const machineColors = {
+    Soufflage:'#00a7d6', Remplissage:'#17b97b',
+    'Étiquette':'#e29a2f', Emballage:'#f27c57', B19:'#7c6cff'
+  };
+
+  const rowsHtml = Object.entries(missingByMachine).map(([machine, days]) => {
+    const col = machineColors[machine] || '#f27c57';
+    const daysHtml = days.slice(0,5).map(d => {
+      const dt = new Date(d+'T12:00:00');
+      const label = dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+      return `<span style="background:rgba(227,93,106,.15);border:1px solid rgba(227,93,106,.4);color:#e35d6a;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700">${label}</span>`;
+    }).join(' ');
+    const more = days.length > 5 ? `<span style="color:var(--muted);font-size:11px">+${days.length-5} autres</span>` : '';
+    return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid rgba(227,93,106,.12)">
+      <span style="min-width:90px;font-weight:700;font-size:13px;color:${col}">${machine}</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">${daysHtml}${more}</div>
+    </div>`;
+  }).join('');
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    <div style="background:linear-gradient(135deg,rgba(227,93,106,.14),rgba(227,93,106,.07));border:2px solid rgba(227,93,106,.45);border-radius:14px;padding:16px 18px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="font-size:26px">⚠️</div>
+        <div style="flex:1">
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:800;color:#e35d6a">
+            ${totalMissing} rapport${totalMissing>1?'s':''} manquant${totalMissing>1?'s':''} ce mois
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">
+            Jours sans rapport enregistré pour le mois en cours
+          </div>
+        </div>
+        <button onclick="sendMissingReportsEmail()" title="Envoyer un rappel email"
+          style="padding:8px 14px;background:rgba(227,93,106,.18);border:1.5px solid rgba(227,93,106,.5);color:#e35d6a;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0">
+          📧 Envoyer rappel
+        </button>
+      </div>
+      <div>${rowsHtml}</div>
+    </div>`;
+}
+
+// ── Envoyer un email de rappel pour les rapports manquants ──
+window.sendMissingReportsEmail = async function() {
+  const isAdmin = currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur';
+  if (!isAdmin) return;
+
+  const now = new Date();
+  const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+  const missingByMachine = {};
+  MACHINES_SUIVI.forEach(machine => {
+    const days = getMissingReportDays(machine, curMonth);
+    if (days.length) missingByMachine[machine] = days;
+  });
+
+  if (Object.keys(missingByMachine).length === 0) {
+    showToast('✅ Aucun rapport manquant !', 'ok');
+    return;
+  }
+
+  const lignes = Object.entries(missingByMachine).map(([machine, days]) => {
+    const daysStr = days.map(d => {
+      const dt = new Date(d+'T12:00:00');
+      return dt.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    }).join(', ');
+    return `• ${machine} : ${daysStr}`;
+  }).join('\n');
+
+  const subject = `⚠️ Rapports manquants — AP Industry Eau Vitale`;
+  const message = `Bonjour,\n\nLes rapports suivants n'ont pas été soumis ce mois :\n\n${lignes}\n\nMerci de soumettre ces rapports dès que possible sur l'application Technicien AP Industry Eau Vitale.\n\nCordialement,\nAdministration`;
+
+  showToast('📧 Envoi du rappel en cours…', 'info');
+  const sent = await sendEmailToAllUsers(subject, message, 'all', {
+    machine: 'Toutes machines',
+    operateur: currentUConf?.name || 'Admin',
+    date: now.toLocaleDateString('fr-FR'),
+    poste: '—',
+    production: '—',
+    statut: '⚠️ Rapport manquant',
+    note: lignes,
+  });
+  if (sent > 0) {
+    showToast(`✅ Rappel envoyé à ${sent} utilisateur(s)`, 'ok');
+    // Enregistrer dans Firebase que le rappel a été envoyé aujourd'hui
+    await set(ref(db, `system/missingReminderSent/${getToday()}`), { ts: Date.now(), sentBy: currentUConf?.name });
+  } else {
+    showToast('⚠️ Rappel non envoyé — vérifiez EmailJS', 'err');
+  }
+};
+
+// ── Vérification automatique à 18h00 ──
+function scheduleMissingReportsReminder() {
+  if (_missingReminderTimer) clearTimeout(_missingReminderTimer);
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
+  if (now >= target) return; // déjà passé 18h aujourd'hui
+  const delay = target - now;
+  _missingReminderTimer = setTimeout(async () => {
+    // Vérifier si le rappel n'a pas déjà été envoyé aujourd'hui
+    try {
+      const snap = await get(ref(db, `system/missingReminderSent/${getToday()}`));
+      if (snap.val()) return; // déjà envoyé
+      // Vérifier s'il y a des manquants
+      const curMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const hasMissing = MACHINES_SUIVI.some(m => getMissingReportDays(m, curMonth).length > 0);
+      if (hasMissing && (currentUConf?.role === 'Admin' || currentUConf?.role === 'Superviseur')) {
+        window.sendMissingReportsEmail();
+      }
+    } catch(e) { console.warn('Reminder check error:', e); }
+  }, delay);
+}
 
 // ══════════ GESTION DES THÈMES ══════════
 const THEMES = ['light','arctic','rosegold','mint','sand','night','ocean','volcano','forest','purple','amber','slate','coral'];
