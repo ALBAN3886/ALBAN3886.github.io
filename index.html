@@ -4260,7 +4260,7 @@ function renderDashboard() {
 
   // Label tableau
   const labelEl = document.getElementById('dashReportDateLabel');
-  if (labelEl) labelEl.textContent = formatDate(selDate);
+  if (labelEl) labelEl.innerHTML = formatDate(selDate);
 
   // Machine cards — dernier rapport connu par machine (date sélectionnée en priorité, sinon le plus récent toutes dates)
   const mc = document.getElementById('machineCards');
