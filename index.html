@@ -1163,55 +1163,85 @@ tbody td,
 </head>
 <body>
 
-<!-- ═══════════════ SPLASH SCREEN PUBLICITÉ ═══════════════ -->
+<!-- ═══════════════ SPLASH SCREEN MOTIVATION ═══════════════ -->
 <div id="ad-splash" style="
   position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.92);
+  background:rgba(0,0,0,0.90);
   z-index:99999;
   display:flex;align-items:center;justify-content:center;
 ">
   <div style="
-    background:#1a1a2e;
-    border:1px solid #4f8ef7;
-    border-radius:16px;
-    padding:28px 24px;
+    background:linear-gradient(145deg,#0d1b2a,#1a2a3a);
+    border:1px solid rgba(0,180,255,0.35);
+    border-radius:20px;
+    padding:30px 24px;
     max-width:320px;
     width:90%;
     text-align:center;
-    font-family:sans-serif;
+    font-family:'Barlow',sans-serif;
     color:#fff;
-    box-shadow:0 0 40px rgba(79,142,247,0.3);
+    box-shadow:0 0 50px rgba(0,153,204,0.25);
+    position:relative;
+    overflow:hidden;
   ">
-    <div style="font-size:36px;margin-bottom:12px;">📢</div>
-    <h2 style="font-size:18px;margin:0 0 12px;color:#4f8ef7;">Information importante</h2>
-    <p style="font-size:14px;line-height:1.6;color:#ccc;margin:0 0 8px;">
-      Ce site est <strong style="color:#fff;">gratuit</strong> et financé par la publicité.
+    <!-- Accent décoratif haut -->
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0099CC,#17b97b,#0099CC);border-radius:20px 20px 0 0;"></div>
+
+    <div style="font-size:42px;margin-bottom:10px;">💪</div>
+
+    <h2 style="font-size:17px;font-weight:800;margin:0 0 14px;color:#00c8ff;letter-spacing:0.5px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;">
+      Chaque jour compte
+    </h2>
+
+    <div id="splash-quote" style="font-size:14px;line-height:1.7;color:#cde4f0;margin:0 0 16px;min-height:72px;transition:opacity .4s;"></div>
+
+    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(0,200,255,0.3),transparent);margin:0 0 14px;"></div>
+
+    <p style="font-size:12px;color:#7aa8c0;margin:0 0 18px;line-height:1.5;">
+      La vie que tu mènes forge l'homme que tu deviens.<br>
+      <strong style="color:#17b97b;">Demain sera meilleure. ✨</strong>
     </p>
-    <p style="font-size:14px;line-height:1.6;color:#ccc;margin:0 0 20px;">
-      Des publicités peuvent apparaître lors de votre navigation. Vous pouvez les <strong style="color:#fff;">ignorer</strong> ou appuyer sur <strong style="color:#fff;">Retour</strong> pour fermer.
+
+    <p style="font-size:11px;color:#4d7a90;margin:0 0 18px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;">
+      <strong style="color:#0099CC;">ELOH KOKU ELIKPLIM</strong><br>
+      <span style="color:#5a8a9a;">Technicien · AET — ALBAN ELOH TECHNOLOGY</span>
     </p>
-    <p style="font-size:13px;color:#aaa;margin:0 0 20px;">
-      Merci pour votre compréhension 🙏
-    </p>
-    <p style="font-size:12px;color:#888;margin:0 0 20px;border-top:1px solid #333;padding-top:14px;">
-      De la part du<br>
-      <strong style="color:#4f8ef7;">Directeur Technique</strong><br>
-      <strong style="color:#fff;">ELOH KOKU ELIKPLIM</strong><br>
-      <span style="color:#aaa;">AET — ALBAN ELOH TECHNOLOGY</span>
-    </p>
+
     <button onclick="document.getElementById('ad-splash').style.display='none'" style="
-      background:#4f8ef7;
+      background:linear-gradient(135deg,#0099CC,#006fa6);
       color:#fff;
       border:none;
-      border-radius:8px;
-      padding:12px 32px;
+      border-radius:10px;
+      padding:13px 32px;
       font-size:15px;
-      font-weight:bold;
+      font-weight:700;
       cursor:pointer;
       width:100%;
-    ">J'ai compris ✓</button>
+      font-family:'Barlow Condensed',sans-serif;
+      letter-spacing:0.5px;
+      box-shadow:0 4px 16px rgba(0,153,204,0.35);
+      transition:transform .15s;
+    " onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+      Allons-y 🚀
+    </button>
   </div>
 </div>
+
+<script>
+(function(){
+  var quotes = [
+    "Le travail acharné d'aujourd'hui est la récompense de demain. Chaque effort compte, même dans l'ombre.",
+    "Tu portes beaucoup sur tes épaules — famille, travail, avenir. C'est la marque des grands hommes.",
+    "Les machines s'usent, mais ta détermination, elle, se renforce chaque jour. Continue.",
+    "Ce que tu construis aujourd'hui — pour ta famille, ton avenir — personne ne peut te l'enlever.",
+    "La fatigue du soir est la preuve du courage du matin. Tu es là, tu tiens. C'est énorme.",
+    "Chaque ligne de production que tu maintiens, c'est une famille nourrie, une fierté gagnée.",
+    "Les nuits difficiles finissent toujours. Le soleil se lève sur ceux qui ont tenu."
+  ];
+  var el = document.getElementById('splash-quote');
+  if(el) el.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+})();
+</script>
 <!-- ═══════════════ FIN SPLASH SCREEN ═══════════════ -->
 
 <div id="app-scaler">
