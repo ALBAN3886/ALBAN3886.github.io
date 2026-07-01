@@ -1,67 +1,86 @@
 // ══════════════════════════════════════════════
-// firebase-messaging-sw.js
-// Service Worker pour les notifications Push TEV
-// Uploadez ce fichier à la RACINE de votre dépôt GitHub
-// (même endroit que index.html)
+// firebase-messaging-sw.js (PRO VERSION)
+// Notifications Push TEV / TogoSheets Pro
 // ══════════════════════════════════════════════
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey:            "AIzaSyDq6o-a00NDyMe-Nzmu7uPXSAQxaK6S3g0",
-  authDomain:        "lineops-production.firebaseapp.com",
-  databaseURL:       "https://lineops-production-default-rtdb.firebaseio.com",
-  projectId:         "lineops-production",
-  storageBucket:     "lineops-production.firebasestorage.app",
+  apiKey: "AIzaSyDq6o-a00NDyMeN3mu7uPXSAQxaK6S3g0",
+  authDomain: "lineops-production.firebaseapp.com",
+  databaseURL: "https://lineops-production-default-rtdb.firebaseio.com",
+  projectId: "lineops-production",
+  storageBucket: "lineops-production.firebasestorage.app",
   messagingSenderId: "275802402542",
-  appId:             "1:275802402542:web:becc1b156a3f203b190dff"
+  appId: "1:275802402542:web:becc1b156a3f203b190dff"
 });
 
 const messaging = firebase.messaging();
 
-// ── Notification quand l'app est en arrière-plan ou fermée ──
+
+// ─────────────────────────────────────────────
+// NOTIFICATION BACKGROUND
+// ─────────────────────────────────────────────
 messaging.onBackgroundMessage(payload => {
-  const title = payload.notification?.title || '🔔 TEV';
+
+  const title = payload.notification?.title || '🔔 TogoSheets';
   const body  = payload.notification?.body  || 'Nouvelle notification';
+
+  // 🔥 IMPORTANT: page par défaut (modifiable)
+  const url = payload.data?.url || '/index.html';
 
   self.registration.showNotification(title, {
     body,
-    icon:  '/icône-192.png',
+    icon: '/icône-192.png',
     badge: '/icône-192.png',
-    tag:   'tev-notification',
+    tag: 'togosheets-notification',
     renotify: true,
     requireInteraction: false,
-    data: payload.data || {},
+
+    data: {
+      url: url
+    },
+
     actions: [
-      { action: 'open',    title: '📱 Ouvrir l\'app' },
-      { action: 'dismiss', title: '✕ Ignorer'        }
+      { action: 'open', title: '📱 Ouvrir' },
+      { action: 'dismiss', title: '✕ Fermer' }
     ]
   });
 });
 
-// ── Clic sur la notification → ouvrir l'app ──
+
+// ─────────────────────────────────────────────
+// CLICK NOTIFICATION
+// ─────────────────────────────────────────────
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+
   if (event.action === 'dismiss') return;
+
+  const targetUrl = event.notification.data?.url || '/index.html';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-      // Si l'app est déjà ouverte → la mettre au premier plan
+
+      // 🔥 si déjà ouvert
       for (const client of clientList) {
         if (client.url.includes('alban3886.github.io') && 'focus' in client) {
-          return client.focus();
+          client.focus();
+          client.navigate(targetUrl);
+          return;
         }
       }
-      // Sinon ouvrir l'app
-      if (clients.openWindow) {
-        return clients.openWindow('https://alban3886.github.io');
-      }
+
+      // 🔥 sinon ouvrir
+      return clients.openWindow('https://alban3886.github.io' + targetUrl);
     })
   );
 });
 
-// ── Écouter la file pushQueue dans Firebase Database ──
-// (pour les notifications déclenchées depuis le site)
-self.addEventListener('install',  () => self.skipWaiting());
-self.addEventListener('activate', e  => e.waitUntil(clients.claim()));
+
+// ─────────────────────────────────────────────
+// INSTALL / ACTIVATE
+// ─────────────────────────────────────────────
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(clients.claim()));
