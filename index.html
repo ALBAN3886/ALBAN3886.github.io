@@ -8951,5 +8951,24 @@ window.addEventListener('resize', applyDesktopScale);
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<!-- BOUTON FLOTTANT TÉLÉCHARGEMENT (visible dans toute l'appli, sauf dans l'appli Android elle-même) -->
+<div id="floatingApkWidget" style="position:fixed;right:18px;bottom:18px;z-index:500">
+  <div id="floatingApkPanel" style="display:none;margin-bottom:10px;width:250px;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.22);padding:16px;text-align:left;font-size:12px;color:#4a5568;line-height:1.6">
+    <div style="font-weight:800;color:#1a2030;margin-bottom:10px;text-transform:uppercase;font-size:11px;letter-spacing:.05em">Obtenir l'application</div>
+    <a href="https://raw.githubusercontent.com/ALBAN3886/eauvitale-apk/main/app-debug.apk" download style="display:flex;align-items:center;gap:8px;font-weight:700;color:#0099cc;text-decoration:none;margin-bottom:10px">📲 Télécharger pour Android</a>
+    <div style="font-weight:800;color:#1a2030;margin:10px 0 4px;font-size:11px">🌐 iPhone / PC / Tablette</div>
+    Pas d'APK nécessaire — installez ce site comme une app :<br>
+    <b>iPhone/iPad</b> : Partager ⬆️ → <i>Sur l'écran d'accueil</i><br>
+    <b>PC/Mac</b> : icône ⊕ dans la barre d'adresse → <i>Installer</i><br>
+    <b>Android (navigateur)</b> : menu ⋮ → <i>Ajouter à l'écran d'accueil</i>
+  </div>
+  <button onclick="var p=document.getElementById('floatingApkPanel');p.style.display=(p.style.display==='none'?'block':'none')" style="width:52px;height:52px;border-radius:50%;border:none;background:linear-gradient(135deg,#0099cc,#0066aa);color:#fff;font-size:22px;box-shadow:0 8px 24px rgba(0,102,170,.4);cursor:pointer;display:flex;align-items:center;justify-content:center">📲</button>
+</div>
+<script>
+  if (window.__ANDROID_APP__) {
+    var _fw = document.getElementById('floatingApkWidget');
+    if (_fw) _fw.style.display = 'none';
+  }
+</script>
 </body>
 </html>
